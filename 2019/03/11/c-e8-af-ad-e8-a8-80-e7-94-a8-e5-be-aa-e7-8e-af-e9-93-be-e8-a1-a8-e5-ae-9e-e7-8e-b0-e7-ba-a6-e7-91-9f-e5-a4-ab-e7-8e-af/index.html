@@ -5,15 +5,17 @@
   
 
   
-  <title>Archives: 2019/12 | SRCNN</title>
+  <title>c语言 用循环链表实现约瑟夫环 | SRCNN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="about the single image super-resolution and face hallucination">
-<meta property="og:type" content="website">
-<meta property="og:title" content="SRCNN">
-<meta property="og:url" content="http://yoursite.com/archives/2019/12/index.html">
+  <meta name="description" content="#include &lt;stdio.h&gt; #include &lt;stdlib.h&gt;  &#x2F;&#x2F; 链表结构体 struct ListNode {     int val;     struct ListNode * next; };  &#x2F;&#x2F; 创建循环链表 struct ListNode * create(int n) {     struct ListNode * head &#x3D; (st">
+<meta property="og:type" content="article">
+<meta property="og:title" content="c语言 用循环链表实现约瑟夫环">
+<meta property="og:url" content="http://yoursite.com/2019/03/11/c-e8-af-ad-e8-a8-80-e7-94-a8-e5-be-aa-e7-8e-af-e9-93-be-e8-a1-a8-e5-ae-9e-e7-8e-b0-e7-ba-a6-e7-91-9f-e5-a4-ab-e7-8e-af/index.html">
 <meta property="og:site_name" content="SRCNN">
-<meta property="og:description" content="about the single image super-resolution and face hallucination">
+<meta property="og:description" content="#include &lt;stdio.h&gt; #include &lt;stdlib.h&gt;  &#x2F;&#x2F; 链表结构体 struct ListNode {     int val;     struct ListNode * next; };  &#x2F;&#x2F; 创建循环链表 struct ListNode * create(int n) {     struct ListNode * head &#x3D; (st">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-03-11T08:20:06.000Z">
+<meta property="article:modified_time" content="2019-12-24T06:44:55.021Z">
 <meta property="article:author" content="jzijin">
 <meta property="article:tag" content="SISR">
 <meta property="article:tag" content=" FH">
@@ -70,40 +72,129 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2019/12/24/test-my-site/" class="archive-article-date">
-  <time datetime="2019-12-24T06:25:23.000Z" itemprop="datePublished">Dec 24</time>
+        <section id="main"><article id="post-c-e8-af-ad-e8-a8-80-e7-94-a8-e5-be-aa-e7-8e-af-e9-93-be-e8-a1-a8-e5-ae-9e-e7-8e-b0-e7-ba-a6-e7-91-9f-e5-a4-ab-e7-8e-af" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/11/c-e8-af-ad-e8-a8-80-e7-94-a8-e5-be-aa-e7-8e-af-e9-93-be-e8-a1-a8-e5-ae-9e-e7-8e-b0-e7-ba-a6-e7-91-9f-e5-a4-ab-e7-8e-af/" class="article-date">
+  <time datetime="2019-03-11T08:20:06.000Z" itemprop="datePublished">2019-03-11</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/24/test-my-site/">test_my_site</a>
+    <h1 class="article-title" itemprop="name">
+      c语言 用循环链表实现约瑟夫环
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 
+// 链表结构体
+struct ListNode
+{
+    int val;
+    struct ListNode * next;
+};
+
+// 创建循环链表
+struct ListNode * create(int n)
+{
+    struct ListNode * head = (struct ListNode *)malloc(sizeof(struct ListNode));
+    struct ListNode *q = head;
+    head-&gt;val = 1;
+    head-&gt;next = NULL;
+    int i = 2;
+    while(i&lt;=n){
+        struct ListNode *p = (struct ListNode *)malloc(sizeof(struct ListNode));
+        p-&gt;val = i;
+        p-&gt;next = NULL;
+        q-&gt;next = p;
+        q = p;
+        i++;
+    }
+
+    q-&gt;next = head;
+    return head;
+
+}
+
+int main()
+{
+    struct ListNode * head = create(2);
+    struct ListNode * p = head;
+    struct ListNode * q = head;
+    int i=1;
+    while(1)
+    {
+
+        if(i%3==0)
+        {
+            if(p-&gt;next == q)
+            {
+                q-&gt;next = NULL;
+                break;
+            }
+            q-&gt;next = p-&gt;next;
+            i=1;
+        }
+        else
+        {
+            i++;
+        }
+        q = p;
+        p = p-&gt;next;        
+
+    }
+
+    // q就是最后剩下的
+    printf(&quot;%d &quot;, q-&gt;val);
+
+    return 0;
+}</code></pre><p>主要的思想就是用循环链表来实现。但其他语言 例如 pyhon/php 有更简单的实现方法。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/03/11/c-e8-af-ad-e8-a8-80-e7-94-a8-e5-be-aa-e7-8e-af-e9-93-be-e8-a1-a8-e5-ae-9e-e7-8e-b0-e7-ba-a6-e7-91-9f-e5-a4-ab-e7-8e-af/" data-id="ck4ji9s860001c8ubcil9b5ft" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/03/12/e6-8e-92-e5-ba-8f-e5-a4-a7-e6-9d-82-e7-83-a9-e5-90-84-e7-a7-8d-e5-90-84-e6-a0-b7-e7-9a-84-e6-8e-92-e5-ba-8f/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          排序大杂烩 各种各样的排序
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/03/02/e4-ba-8c-e5-8f-89-e6-a0-91-e7-9a-84-e9-81-8d-e5-8e-86-e5-85-88-e5-ba-8f-e4-b8-ad-e5-ba-8f-e5-90-8e-e5-ba-8f-e5-b1-82-e5-ba-8f/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">二叉树的遍历 先序 中序 后序 层序</div>
+    </a>
+  
+</nav>
+
+  
+</article>
 
 </section>
         

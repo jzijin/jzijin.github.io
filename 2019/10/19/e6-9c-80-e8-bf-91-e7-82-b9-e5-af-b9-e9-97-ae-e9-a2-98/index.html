@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>最近点对问题 | SRCNN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。 可以很简单的写出暴力法破解： &#x2F;&#x2F; Points 为所有点对的集合，using Point &#x3D; pair&lt;double, double&gt;,  &#x2F;&#x2F; a, b 传出参数， 最近点对的两个点。 double get_distance_enforce(const vector&lt;Point&amp;gt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最近点对问题">
+<meta property="og:url" content="http://yoursite.com/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。 可以很简单的写出暴力法破解： &#x2F;&#x2F; Points 为所有点对的集合，using Point &#x3D; pair&lt;double, double&gt;,  &#x2F;&#x2F; a, b 传出参数， 最近点对的两个点。 double get_distance_enforce(const vector&lt;Point&amp;gt">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2019-10-19T05:39:06.000Z">
+<meta property="article:modified_time" content="2019-12-24T06:44:55.022Z">
+<meta property="article:author" content="jzijin">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="SRCNN" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">SRCNN</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">F-H</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/" class="article-date">
+  <time datetime="2019-10-19T05:39:06.000Z" itemprop="datePublished">2019-10-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mathematics/">mathematics</a>►<a class="article-category-link" href="/categories/mathematics/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      最近点对问题
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。</p>
+<pre><code>可以很简单的写出暴力法破解：
+// Points 为所有点对的集合，using Point = pair&lt;double, double&gt;, 
+// a, b 传出参数， 最近点对的两个点。
+double get_distance_enforce(const vector&lt;Point&gt; &amp;Points, Point &amp;a, Point &amp;b)
+{
+    double distance = static_cast&lt;double&gt;(INT32_MAX);
+    for (auto i = Points.begin(); i != Points.end(); ++i)
+    {
+        for (auto j = i + 1; j != Points.end(); ++j)
+        {
+            double tmp = sqrt(distance_square(*i, *j));
+            // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+            if (tmp &lt; distance)
+            {
+                distance = tmp;
+                a = *i;
+                b = *j;
+            }
+        }
+    }
+    return distance;
+}
+这样得出的算法复杂度为O(n^2).</code></pre><p>方法2：可以用递归的方法，分而治之，将一个大问题分解为若干个小问题。</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;random&gt;
+#include &lt;chrono&gt;
+#include &lt;cmath&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+using Point = pair&lt;double, double&gt;;
+constexpr int NO_DISTANCE = 10000;
+
+// 随机生成点对
+void set_point(vector&lt;Point&gt; &amp;Points, int size, double x, double y)
+{
+    std::default_random_engine e(std::chrono::system_clock().now().time_since_epoch().count());
+    std::uniform_real_distribution&lt;double&gt; dis(x, y);
+    for (auto i = 0; i &lt; size; ++i)
+    {
+        Points.push_back(Point(dis(e), dis(e)));
+    }
+}
+
+// 打印点对
+void print_points(const vector&lt;Point&gt; &amp;Points)
+{
+    for (auto i : Points)
+    {
+        cout &lt;&lt; &quot;(&quot; &lt;&lt; i.first &lt;&lt; &quot;, &quot; &lt;&lt; i.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    }
+    cout &lt;&lt; endl;
+}
+
+double distance_square(Point a, Point b)
+{
+    return (a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+}
+
+// points 所有的点的集合， a, b 传出参数
+// Points_X 按X排序的序列， Points_Y 按Y排序的序列。
+double closestPoint(const vector&lt;Point&gt; &amp;Points_X, const vector&lt;Point&gt; &amp;Points_Y, Point &amp;a, Point &amp;b)
+{
+    Point a1, b1, a2, b2;
+    int length = Points_X.size();
+    double distance;
+    if (length &lt; 2)
+        return NO_DISTANCE;
+    else if (length == 2)
+    {
+        a = Points_X[0];
+        b = Points_X[1];
+        distance = sqrt(distance_square(Points_X[0], Points_X[1]));
+    }
+    else
+    {
+        vector&lt;Point&gt; pst1(Points_X.begin(), Points_X.begin() + length / 2);
+        vector&lt;Point&gt; pst2(Points_X.begin() + length / 2, Points_X.end());
+        double d1 = closestPoint(pst1, Points_Y, a1, b1);
+        double d2 = closestPoint(pst2, Points_Y, a2, b2);
+        if (d1 &lt; d2)
+        {
+            distance = d1;
+            a = a1;
+            b = b1;
+        }
+        else
+        {
+            distance = d2;
+            a = a2;
+            b = b2;
+        }
+
+        // 一个点在左边 一个点在右边的情况。
+        vector&lt;Point&gt; pst3;
+        double mid = (Points_X.begin() + length / 2 - 1)-&gt;first;
+        for (auto point : Points_Y)
+        {
+            if (abs(point.first - mid) &lt;= distance)
+                pst3.push_back(point);
+        }
+
+        // 只需要与有序的链接的7个点进行比较就可以了。
+        for (auto i = pst3.begin(); i != pst3.end(); ++i)
+        {
+            for (auto j = i + 1; j != i + 7 &amp;&amp; j != pst3.end(); ++j)
+            {
+                double tmp = sqrt(distance_square(*i, *j));
+                // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+                if (tmp &lt; distance)
+                {
+                    distance = tmp;
+                    a = *i;
+                    b = *j;
+                }
+            }
+        }
+    }
+    return distance;
+}
+
+double get_distance_enforce(const vector&lt;Point&gt; &amp;Points, Point &amp;a, Point &amp;b)
+{
+    double distance = static_cast&lt;double&gt;(INT32_MAX);
+    for (auto i = Points.begin(); i != Points.end(); ++i)
+    {
+        for (auto j = i + 1; j != Points.end(); ++j)
+        {
+            double tmp = sqrt(distance_square(*i, *j));
+            // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+            if (tmp &lt; distance)
+            {
+                distance = tmp;
+                a = *i;
+                b = *j;
+            }
+        }
+    }
+    return distance;
+}
+int main()
+{
+    int points_size;
+    cout &lt;&lt; &quot;请输入要生成的points的数量 &quot;;
+    cin &gt;&gt; points_size;
+
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;随机生成的点是&quot; &lt;&lt; endl;
+    vector&lt;Point&gt; Points;
+    set_point(Points, points_size, -100.0, 100.0);
+    print_points(Points);
+
+    auto start1 = std::chrono::system_clock::now();
+    vector&lt;Point&gt; Points_X(Points);
+    vector&lt;Point&gt; Points_Y(Points);
+
+    sort(Points_X.begin(), Points_X.end(), [](Point a, Point b) { return a.first &lt; b.first; });
+    sort(Points_Y.begin(), Points_Y.end(), [](Point a, Point b) { return a.second &lt; b.second; });
+
+    // cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    // cout &lt;&lt; &quot;按照x升序排列&quot; &lt;&lt; endl;
+    // print_points(Points_X);
+
+    // cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    // cout &lt;&lt; &quot;按照y升序排列&quot; &lt;&lt; endl;
+    // print_points(Points_Y);
+
+    Point a, b;
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;归并法破解&quot; &lt;&lt; endl;
+    double distance1 = closestPoint(Points_X, Points_Y, a, b);
+    auto end1 = std::chrono::system_clock::now();
+    auto duration1 = chrono::duration_cast&lt;chrono::microseconds&gt;(end1 - start1);
+    cout &lt;&lt; &quot;最近的距离是&quot; &lt;&lt; distance1 &lt;&lt; endl;
+    cout &lt;&lt; &quot;两个点分别是 (&quot; &lt;&lt; a.first &lt;&lt; &quot;, &quot; &lt;&lt; a.second &lt;&lt; &quot;), (&quot; &lt;&lt; b.first &lt;&lt; &quot;, &quot; &lt;&lt; b.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;花费了&quot;
+         &lt;&lt; double(duration1.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den
+         &lt;&lt; &quot;秒&quot; &lt;&lt; endl;
+
+    Point c, d;
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;暴力法破解&quot; &lt;&lt; endl;
+    auto start2 = std::chrono::system_clock::now();
+    double distance2 = get_distance_enforce(Points, c, d);
+    auto end2 = std::chrono::system_clock::now();
+    auto duration2 = chrono::duration_cast&lt;chrono::microseconds&gt;(end2 - start2);
+    cout &lt;&lt; &quot;最近的距离是&quot; &lt;&lt; distance2 &lt;&lt; endl;
+    cout &lt;&lt; &quot;两个点分别是 (&quot; &lt;&lt; c.first &lt;&lt; &quot;, &quot; &lt;&lt; c.second &lt;&lt; &quot;), (&quot; &lt;&lt; d.first &lt;&lt; &quot;, &quot; &lt;&lt; d.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;花费了&quot;
+         &lt;&lt; double(duration2.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den
+         &lt;&lt; &quot;秒&quot; &lt;&lt; endl;
+
+    return 0;
+}</code></pre><p>方法2复杂度为O(nlogn)，还可以进一步简化，用左右界限来代替不必要的数组拷贝。</p>
+<p>当n不够大时，其实暴力法需要的时间反而更少，当n特别大的时候，sorry，我并没有测试。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/" data-id="ck4ji9s8d0004c8ub61qm53ac" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/12/24/test-my-site/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          test_my_site
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/10/16/e6-95-b0-e5-ad-a6-e5-bd-92-e7-ba-b3-e6-b3-95-e5-92-8c-e5-bc-ba-e5-bd-92-e7-ba-b3-e6-b3-95/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">数学归纳法和强归纳法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/mathematics/">mathematics</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/mathematics/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/">未分类</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E8%B0%88/">生活随谈</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9D%91%E8%BE%B9%E9%9A%8F%E8%B0%88/" rel="tag">坑边随谈</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/%E5%9D%91%E8%BE%B9%E9%9A%8F%E8%B0%88/" style="font-size: 10px;">坑边随谈</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1970/01/">January 1970</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/12/24/test-my-site/">test_my_site</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/">最近点对问题</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/16/e6-95-b0-e5-ad-a6-e5-bd-92-e7-ba-b3-e6-b3-95-e5-92-8c-e5-bc-ba-e5-bd-92-e7-ba-b3-e6-b3-95/">数学归纳法和强归纳法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/13/gale-shapley-algorithm-e7-a8-b3-e5-ae-9a-e5-a9-9a-e5-a7-bb-e9-97-ae-e9-a2-98-ef-bc-89/">gale-shapley algorithm(稳定婚姻问题）</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/13/e8-83-8c-e5-8c-85-e9-97-ae-e9-a2-98/">背包问题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 jzijin<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
