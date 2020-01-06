@@ -46,23 +46,27 @@
   };
 </script>
 
-  <meta name="description" content="Overview　　SRCNN是深度用在超分辨率重建上的开山之作。其指出传统的基于稀疏矩阵的方法可以看做一个深层神经网络。SRCNN是一个轻量级的网络，只有三个卷积神经网络(CNN)。作者在训练时将图片转化为YCrCb三个通道，只对Y通道进行训练。因为人眼对Y通道比较敏感。">
+  <meta name="description" content="Overview　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SRCNN">
-<meta property="og:url" content="http://yoursite.com/2019/12/24/SRCNN/index.html">
+<meta property="og:title" content="Super-FAN">
+<meta property="og:url" content="http://yoursite.com/2019/12/30/Super-FAN/index.html">
 <meta property="og:site_name" content="SRCNN">
-<meta property="og:description" content="Overview　　SRCNN是深度用在超分辨率重建上的开山之作。其指出传统的基于稀疏矩阵的方法可以看做一个深层神经网络。SRCNN是一个轻量级的网络，只有三个卷积神经网络(CNN)。作者在训练时将图片转化为YCrCb三个通道，只对Y通道进行训练。因为人眼对Y通道比较敏感。">
+<meta property="og:description" content="Overview　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/images/SRCNN_model.png">
-<meta property="article:published_time" content="2019-12-24T08:54:39.000Z">
-<meta property="article:modified_time" content="2019-12-30T07:32:14.495Z">
+<meta property="og:image" content="http://yoursite.com/images/Super-FAN.jpg">
+<meta property="og:image" content="http://yoursite.com/images/FAN.jpg">
+<meta property="og:image" content="http://yoursite.com/images/per-loss.jpg">
+<meta property="og:image" content="http://yoursite.com/images/ad-loss.jpg">
+<meta property="og:image" content="http://yoursite.com/images/heat-loss.jpg">
+<meta property="article:published_time" content="2019-12-30T06:59:04.000Z">
+<meta property="article:modified_time" content="2019-12-30T10:32:09.158Z">
 <meta property="article:author" content="Z.J. Jiang">
 <meta property="article:tag" content="SISR">
 <meta property="article:tag" content=" FH">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/images/SRCNN_model.png">
+<meta name="twitter:image" content="http://yoursite.com/images/Super-FAN.jpg">
 
-<link rel="canonical" href="http://yoursite.com/2019/12/24/SRCNN/">
+<link rel="canonical" href="http://yoursite.com/2019/12/30/Super-FAN/">
 
 
 <script id="page-configurations">
@@ -74,7 +78,7 @@
   };
 </script>
 
-  <title>SRCNN | SRCNN</title>
+  <title>Super-FAN | SRCNN</title>
   
 
 
@@ -184,7 +188,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/24/SRCNN/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/30/Super-FAN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,7 +201,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          SRCNN
+          Super-FAN
         </h1>
 
         <div class="post-meta">
@@ -206,24 +210,18 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2019-12-24 16:54:39" itemprop="dateCreated datePublished" datetime="2019-12-24T16:54:39+08:00">2019-12-24</time>
+              <time title="Created: 2019-12-30 14:59:04 / Modified: 18:32:09" itemprop="dateCreated datePublished" datetime="2019-12-30T14:59:04+08:00">2019-12-30</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-12-30 15:32:14" itemprop="dateModified" datetime="2019-12-30T15:32:14+08:00">2019-12-30</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SISR/" itemprop="url" rel="index">
-                    <span itemprop="name">SISR</span>
+                  <a href="/categories/FH/" itemprop="url" rel="index">
+                    <span itemprop="name">FH</span>
                   </a>
                 </span>
             </span>
@@ -239,30 +237,54 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　SRCNN是深度用在超分辨率重建上的开山之作。其指出传统的基于稀疏矩阵的方法可以看做一个深层神经网络。SRCNN是一个轻量级的网络，只有三个卷积神经网络(CNN)。作者在训练时将图片转化为YCrCb三个通道，只对Y通道进行训练。因为人眼对Y通道比较敏感。</p>
+        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光谱上，不仅在合成低分辨率(人工降质)图像上，而且在真实世界图像上都取得了良好的结果。</p>
 <a id="more"></a>
 
-<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><img src="/images/SRCNN_model.png" class="[SRCNN模型示意图]" title="[14] [6] " alt="title text">
-<p>整个SRCNN模型可以解释成三部分:</p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><img src="/images/Super-FAN.jpg" class="[Super-FAN模型示意图]" title="[14] [6] " alt="title text">
+<p>　　Super-FAN包含三个网络，第一个网络是Super-resolution network用于超分辨重建；第二个网络是disciminator用于分辨原图和超分辨重建图片；第三个网络是FAN,用于在超分辨重建图片进行人脸对齐和landmark定位。在测试阶段discriminator是不需要的。</p>
+<h2 id="Super-resolution-network"><a href="#Super-resolution-network" class="headerlink" title="Super-resolution network"></a>Super-resolution network</h2><p>　　Super-resolution network网络结构和SRGAN网络结构类似，只不过在细节上有一些改变。</p>
 <ul>
-<li>Path extraction and Representation.提取图像Patch，进行卷积提取特征，类似于稀疏编码中的将图像patch映射到低分辨率字典中。</li>
-<li>Non-linear mapping.将低分辨率的特征映射为高分辨率特征，类似于字典学习中的找到图像patch对应的高分辨字典。</li>
-<li>Reconstruction.根据高分辨率特征进行图像重建。类似于字典学习中的根据高分辨率字典进行图像重建。</li>
+<li>Per-block layer distribution. SRGAN网络用了16层在原始低分辨率图片、1层在两倍低分辨率图片，1层在四倍低分辨率图片。标注为16-1-1.由于Super-resolution网络的主要目标是通过幻觉来超级解析其输入，因此仅使用一个更高分辨率的块(如SRGAN)不足以生成清晰的细节，特别是在特别低分辨率的图片。因此Super-FAN采用了12-3-2结构。</li>
+<li>Building block architecture. Super-FAN试验发现PReLU激活函数并没有比ReLU激活函数试验结果好多少，因此采用ReLU激活函数。</li>
+<li>On the “long” skip connection.Super-FAN认为分辨率的提高是一个渐进的过程，在此过程中，每一层的表现都要比上一层有所提高，因此，低水平图片的注入对整体表现的影响较小。在实践中，Super-FAN发现使用它的收益非常小。因此不用skip-connection.</li>
 </ul>
-<p>　　首先用双立方插值对预先设计好的尺寸对一副低分辨率图像进行简单的画质提升处理，将处理后的图像表示为$Y$，原始图像为$X$。</p>
-<h2 id="Path-extraction-and-Representation"><a href="#Path-extraction-and-Representation" class="headerlink" title="Path extraction and Representation"></a>Path extraction and Representation</h2><p>　　这一卷积层的作用可以表示为$\begin{equation}F_{1}\end{equation}$操作。<br>$$\begin{equation}F_{1} = max(0, W_{1} * Y + B_{1})\end{equation}\label{eq1}$$<br>$W_{1}$是滤波器，$B_{1}$是bias. “*”是卷积操作。$W_{1}$对应一个$n_{1}$个滤波器大小是$c \times f_{1} \times f_{1}$, c是通道数，$f_{1}$是卷积核的大小。输出是一个$n_{1}$维的特征图。$B_{1}$是一个$n_{1}$维的向量。在经过每个滤波器之后添加ReLU($max(0, x)$)激活函数。</p>
-<h2 id="Non-Linear-Mapping"><a href="#Non-Linear-Mapping" class="headerlink" title="Non-Linear Mapping"></a>Non-Linear Mapping</h2><p>　　第一层卷基层从图像补丁中提取$n_{1}$维特征。这一卷积层，从$n_{1}$维度非线性映射到$n_{2}$维度。这一卷积层的作用的可以表示为$F_{2}$算子。<br>$$\begin{equation}F_{2} = max(0, W_{2} * F_{1}(Y) + B_{2})\end{equation}\label{eq2}$$<br>$W_{2}$对应一个$n_{2}$个滤波器大小是$n_{1} \times f_{2} \times f_{2}$, $n_{1}$是输入通道数，$f_{2}$是卷积核的大小。输出是一个$n_{2}$维的特征图。$B_{2}$是一个$n_{2}$维的向量。在经过每个滤波器之后添加ReLU($max(0, x)$)激活函数。</p>
-<h2 id="Reconstruction"><a href="#Reconstruction" class="headerlink" title="Reconstruction"></a>Reconstruction</h2><p>　　这一重建卷基层的作用可以用$\begin{equation}F_{3}\end{equation}$算子。<br>$$\begin{equation}F_{3} = max(0, W_{3} * F_{2}(Y) + B_{3})\end{equation}\label{eq3}$$<br>$W_{3}$对应一个c个滤波器大小是$n_{2} \times f_{3} \times f_{3}$, $n_{2}$是输入通道数，$f_{3}$是卷积核的大小。输出是一个c维的超分辨率重建图。$B_{3}$是一个c维的向量。</p>
-<h1 id="Training-Detail"><a href="#Training-Detail" class="headerlink" title="Training Detail"></a>Training Detail</h1><p>　　端对端映射学习可以用$F$算子表示。网络参数用$\theta = {W_{1},W_{2},W_3,B_1,B_2,B_3}$表示。</p>
-<h2 id="Loss-Function"><a href="#Loss-Function" class="headerlink" title="Loss Function"></a>Loss Function</h2><p>　　使用MSE(均方差误差)作为损失函数<br>$$\begin{equation}L(\theta) = \frac{1}{n} \sum_{i=1}^{n} \parallel F(Y_i;\theta)-X_i \parallel ^2 \end{equation}\label{eq4}$$<br>n是batch_size的大小即是一批训练样本的大小。</p>
-<h2 id="Learning-Rate"><a href="#Learning-Rate" class="headerlink" title="Learning Rate"></a>Learning Rate</h2><p>　　优化函数: 随机梯度下降（SGD）<br>$$\begin{equation} \Delta_{i+1} = 0.9 \cdot \Delta_{i} + \eta \cdot \frac{\partial L}{\partial W_{i}^{l}}, W_{i+1}^{l} = W_{i}^{l} + \Delta_{i+1} \end{equation}\label{eq5}$$</p>
-<p>$l$是层数 $l \in {1, 2, 3}$， i是迭代数, $\eta$是学习率。The filter weights of each layer are initialized by drawing randomly from a Gaussian distribution with zero mean and standard deviation 0.001 (and 0 for biases). 前两层的$lr=10^{-4}$ ,第三层的$lr=10^{-5}$.<strong>最后一层使用较小的学习率比较容易收敛</strong>。</p>
-<h2 id="Training-Data"><a href="#Training-Data" class="headerlink" title="Training Data"></a>Training Data</h2><p>　　Basic network setting. $f_1=9, f_2=1, f_3=5, n_1=64, n_2=32$</p>
-<p>　　Y channel pretrain. the other channel use the bicubic.</p>
-<h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><p>　　下面是PyTorch实现的代码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SRCNN</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        super(SRCNN,self).__init__()</span><br><span class="line">        <span class="comment"># here not like the paper, I use the padding</span></span><br><span class="line">        <span class="comment"># here the weight init is not implement</span></span><br><span class="line">        self.conv1 = nn.Conv2d(<span class="number">1</span>,<span class="number">64</span>,kernel_size=<span class="number">9</span>,padding=<span class="number">4</span>);</span><br><span class="line">        self.relu1 = nn.ReLU();</span><br><span class="line">        self.conv2 = nn.Conv2d(<span class="number">64</span>,<span class="number">32</span>,kernel_size=<span class="number">1</span>,padding=<span class="number">0</span>);</span><br><span class="line">        self.relu2 = nn.ReLU();</span><br><span class="line">        self.conv3 = nn.Conv2d(<span class="number">32</span>,<span class="number">1</span>,kernel_size=<span class="number">5</span>,padding=<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self,x)</span>:</span></span><br><span class="line">        out = self.conv1(x)</span><br><span class="line">        out = self.relu1(out)</span><br><span class="line">        out = self.conv2(out)</span><br><span class="line">        out = self.relu2(out)</span><br><span class="line">        out = self.conv3(out)</span><br><span class="line">        <span class="keyword">return</span> out</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Adversarial-network"><a href="#Adversarial-network" class="headerlink" title="Adversarial network"></a>Adversarial network</h2><p>　　发现采用WGAN和使用普通GAN并不会使超分辨率的结果有多大区别。Super-FAN采用WGAN稳定discriminator的训练。Super-FAN的Adversarial network 采用了去除batch normliztion的DCGAN网络。<br><a href="https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html" target="_blank" rel="noopener">DCGAN网络结构PyTorch实现</a></p>
+<h2 id="Face-Alignment-Network"><a href="#Face-Alignment-Network" class="headerlink" title="Face Alignment Network"></a>Face Alignment Network</h2><p>　　如果只采用上述两个网络进行face　hallucination其实可以生成很好的结果了，但是并没有把人脸结构相关的信息纳入超分辨率过程。由此可能导致超分辨率重建图片姿势和表情不正常。为了解决这一问题，提出通过将heatmap regretion的人脸 landmark 定位网络整合到超分辨率过程中，并优化适当的热图损失(heatmap loss)，来加强低分辨率和高分辨率图像之间的人脸结构一致性。<br>　　FAN采用heatmap regression去定位landmark: 不是将输出整成68*2的vector，每张图片的landmark被表示成在landmark区域的2D高斯分布，输出在一个通道上。对FAN进行训练，使其回归到2D高斯分布上，也称heatmap(热图)。heatmap包含了形状信息（姿势表情）、空间信息和位置结构联系。FAN的目标就是使得超分辨率重建图片的heatmap和原图heatmap接近。网络使用了FAN带有两个hourglass(参考论文4)</p>
+<img src="/images/FAN.jpg" class="[FAN模型示意图]" title="[14] [6] " alt="title text">
+<h1 id="Training-Detail"><a href="#Training-Detail" class="headerlink" title="Training Detail"></a>Training Detail</h1><h2 id="Losses-on-Super-resolution-Network"><a href="#Losses-on-Super-resolution-Network" class="headerlink" title="Losses on Super-resolution Network"></a>Losses on Super-resolution Network</h2><ul>
+<li>Pixel Loss. 采用MSELoss<br>$$l_{pixel} = \frac{1}{r^2WH}\sum_{x=1}^{rW}\sum_{y=1}^{rH}(I_{x,y}^{HR} - G_{\theta_G}(I^{LR})_{x,y})^2$$</li>
+<li>Perceptual loss. 不同于SRGAN使用vgg19(FC　layer之前所有层).Super-FAN使用ResNet-50.B1、B2、B3分别获取低级、中级、高级特征。$\phi_i$是经过ｉ层卷积层输出的特征图。<img src="/images/per-loss.jpg" class="[loss]" title="[6] [3] " alt="title text">
 
-<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="http://arxiv.org/abs/1501.00092" target="_blank" rel="noopener">论文地址</a><br><a href="https://github.com/basher667/pytorch_srcnn" target="_blank" rel="noopener">参考代码</a></p>
+</li>
+</ul>
+<h2 id="Losses-on-Adversial-Network"><a href="#Losses-on-Adversial-Network" class="headerlink" title="Losses on Adversial Network"></a>Losses on Adversial Network</h2><ul>
+<li>WGAN loss.<img src="/images/ad-loss.jpg" class="[ad_loss]" title="[6] [3] " alt="title text">
+
+</li>
+</ul>
+<h2 id="Lossed-on-Face-Alignment-Network"><a href="#Lossed-on-Face-Alignment-Network" class="headerlink" title="Lossed on Face Alignment Network"></a>Lossed on Face Alignment Network</h2><ul>
+<li>heatmap loss.<img src="/images/heat-loss.jpg" class="[heat_loss]" title="[6] [3] " alt="title text">
+
+</li>
+</ul>
+<h2 id="Overall-training-loss"><a href="#Overall-training-loss" class="headerlink" title="Overall training loss"></a>Overall training loss</h2><p>$$l^{SR}=\alpha l_{pixel} + \beta l_{feature} + \gamma h_{heatmap} + \zeta l_{WGAN}$$</p>
+<h2 id="Parameters-Setting"><a href="#Parameters-Setting" class="headerlink" title="Parameters Setting"></a>Parameters Setting</h2><ul>
+<li>input image size: 16*16</li>
+<li>output image size: 64*64</li>
+<li>60 epoch lr decreased from 2.5e-4 to 1e-5(all model)</li>
+<li>the ratio between running the generator and the discriminator was kept to 1.</li>
+<li>all networks(super-resolution,disciminator and FAN) were trained jointly for 5 epochs.</li>
+<li>optimizer: RMSProp()</li>
+</ul>
+<h2 id="Dadaset"><a href="#Dadaset" class="headerlink" title="Dadaset"></a>Dadaset</h2><ul>
+<li>300W-LP</li>
+<li>AFLW</li>
+<li>Celeb-A</li>
+<li>LS3D-W balanced</li>
+<li>WiderFace</li>
+</ul>
+<h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><p>TODO:</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="">论文地址</a><br><a href="">参考代码</a></p>
 
     </div>
 
@@ -278,12 +300,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/" rel="prev" title="最近点对问题">
-      <i class="fa fa-chevron-left"></i> 最近点对问题
+    <a href="/2019/12/27/GFRNet/" rel="prev" title="GFRNet">
+      <i class="fa fa-chevron-left"></i> GFRNet
     </a></div>
       <div class="post-nav-item">
-    <a href="/2019/12/27/GFRNet/" rel="next" title="GFRNet">
-      GFRNet <i class="fa fa-chevron-right"></i>
+    <a href="/2019/12/30/FAN/" rel="next" title="FAN">
+      FAN <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -344,7 +366,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Model"><span class="nav-number">2.</span> <span class="nav-text">Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Path-extraction-and-Representation"><span class="nav-number">2.1.</span> <span class="nav-text">Path extraction and Representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Non-Linear-Mapping"><span class="nav-number">2.2.</span> <span class="nav-text">Non-Linear Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reconstruction"><span class="nav-number">2.3.</span> <span class="nav-text">Reconstruction</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Training-Detail"><span class="nav-number">3.</span> <span class="nav-text">Training Detail</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Loss-Function"><span class="nav-number">3.1.</span> <span class="nav-text">Loss Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Learning-Rate"><span class="nav-number">3.2.</span> <span class="nav-text">Learning Rate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Training-Data"><span class="nav-number">3.3.</span> <span class="nav-text">Training Data</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyTorch-Code"><span class="nav-number">4.</span> <span class="nav-text">PyTorch Code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Model"><span class="nav-number">2.</span> <span class="nav-text">Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Super-resolution-network"><span class="nav-number">2.1.</span> <span class="nav-text">Super-resolution network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Adversarial-network"><span class="nav-number">2.2.</span> <span class="nav-text">Adversarial network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Face-Alignment-Network"><span class="nav-number">2.3.</span> <span class="nav-text">Face Alignment Network</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Training-Detail"><span class="nav-number">3.</span> <span class="nav-text">Training Detail</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Losses-on-Super-resolution-Network"><span class="nav-number">3.1.</span> <span class="nav-text">Losses on Super-resolution Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Losses-on-Adversial-Network"><span class="nav-number">3.2.</span> <span class="nav-text">Losses on Adversial Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lossed-on-Face-Alignment-Network"><span class="nav-number">3.3.</span> <span class="nav-text">Lossed on Face Alignment Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Overall-training-loss"><span class="nav-number">3.4.</span> <span class="nav-text">Overall training loss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Parameters-Setting"><span class="nav-number">3.5.</span> <span class="nav-text">Parameters Setting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dadaset"><span class="nav-number">3.6.</span> <span class="nav-text">Dadaset</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyTorch-Code"><span class="nav-number">4.</span> <span class="nav-text">PyTorch Code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
