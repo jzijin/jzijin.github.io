@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="about the single image super-resolution and face hallucination">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SRCNN">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="about the single image super-resolution and face hallucination">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: true,
+    isPost: false
+  };
+</script>
+
+  <title>SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">linux网络编程</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-28 09:55:13 / Modified: 09:55:47" itemprop="dateCreated datePublished" datetime="2020-05-28T09:55:13+08:00">2020-05-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="网络基础"><a href="#网络基础" class="headerlink" title="网络基础"></a>网络基础</h1><h2 id="网络应用程序设计模式："><a href="#网络应用程序设计模式：" class="headerlink" title="网络应用程序设计模式："></a>网络应用程序设计模式：</h2><ul>
+<li>C/S-client/server<ul>
+<li>优点：1.协议选用灵活 2.可以缓存数据</li>
+<li>缺点: 1.对用户安全构成威胁 2.开发工作量大，调试困难</li>
+</ul>
+</li>
+<li>B/S-browser/server<ul>
+<li>优点：跨平台</li>
+<li>缺点：只能使用http
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/26/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/26/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">linux系统编程</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-26 15:33:05 / Modified: 15:36:37" itemprop="dateCreated datePublished" datetime="2020-05-26T15:33:05+08:00">2020-05-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li><a href="#head1"> 进程相关概念</a><ul>
+<li><a href="#head2"> 程序和进程</a></li>
+<li><a href="#head3"> 并行和并发</a></li>
+<li><a href="#head4">pcb—linux 内核的进程控制块是task_struct</a></li>
+<li><a href="#head5"> 进程的五种状态</a></li>
+<li><a href="#head6"> 进程控制</a><ul>
+<li><a href="#head7"> 基本概念</a></li>
+<li><a href="#head8"> exec函数族</a><ul>
+<li><a href="#head9"> 基本概念</a></li>
+<li><a href="#head10"> 执行指定目录下的程序</a></li>
+<li><a href="#head11"> 执行PATH环境变量能够搜索到的程序</a></li>
+</ul>
+</li>
+<li><a href="#head12"> 进程回收</a><ul>
+<li><a href="#head13"> 孤儿进程</a></li>
+<li><a href="#head14"> 僵尸进程</a></li>
+<li><a href="#head15"> 进程回收</a><ul>
+<li><a href="#head16">tips: 段错误：</a>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/05/26/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/15/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/15/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/" class="post-title-link" itemprop="url">C预处理器</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-15 15:25:44 / Modified: 15:43:18" itemprop="dateCreated datePublished" datetime="2020-05-15T15:25:44+08:00">2020-05-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>C语言通过预处理器提供一些语言功能。从概念上讲，预处理器是编译过程中单独执行的第一个步骤。</p>
+<h1 id="文件包含"><a href="#文件包含" class="headerlink" title="文件包含"></a>文件包含</h1><p>文件包含指令，即#include指令</p>
+<ul>
+<li><h1 id="include-“文件名”"><a href="#include-“文件名”" class="headerlink" title="include “文件名”"></a>include “文件名”</h1></li>
+<li><h1 id="include-lt-文件名-gt"><a href="#include-lt-文件名-gt" class="headerlink" title="include &lt;文件名&gt;"></a>include &lt;文件名&gt;</h1>都会将文件名指定的文件的内容粘贴到此处。如果文件名用引号，则在源文件所在的位置查找该文件，如果在该位置没有找到文件，或者如果文件名用尖括号括起来的，则将根据相应的规则查找该文件，这个规则同具体的实现有关。在大的程序中，#include指令是将所有声明捆绑在一起的较好的方法。很自然，如果某个包含文件的内容发生了变化，那么所有依赖于该包含文件的源文件都必须重新编译。</li>
+</ul>
+<h1 id="宏替换"><a href="#宏替换" class="headerlink" title="宏替换"></a>宏替换</h1><ul>
+<li><h1 id="define-名字-替换文本"><a href="#define-名字-替换文本" class="headerlink" title="define 名字 替换文本"></a>define 名字 替换文本</h1></li>
+</ul>
+<h1 id="条件包含"><a href="#条件包含" class="headerlink" title="条件包含"></a>条件包含</h1><p>还可以使用条件语句对预处理本身进行控制，这种条件语句的值是在预处理执行的过程中进行计算。这种方式为在编译过程中根据计算所得的条件值选择性地包含不同代码提供了一种手段。</p>
+<ul>
+<li>例如，为了使得某个头文件只被include一次<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> HDR</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> HDR</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"HDR.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/15/C%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/15/C%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/" class="post-title-link" itemprop="url">C语言中的静态变量</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-15 14:34:40 / Modified: 15:26:19" itemprop="dateCreated datePublished" datetime="2020-05-15T14:34:40+08:00">2020-05-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="static作用于外部变量"><a href="#static作用于外部变量" class="headerlink" title="static作用于外部变量"></a>static作用于外部变量</h1><p>&nbsp;&nbsp;&nbsp;&nbsp;用static声明限定外部变量与函数，可以将其后声明的对象的作用域限定为被编译源文件的剩余部分。通过static限定外部对象，可以达到隐藏外部对象的目的。</p>
+<h2 id="外部变量不加static"><a href="#外部变量不加static" class="headerlink" title="外部变量不加static"></a>外部变量不加static</h2><ol>
+<li>file1 内容 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="keyword">int</span> a=<span class="number">100</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    print_a();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/05/15/C%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/03/Dynamic-Programming/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/03/Dynamic-Programming/" class="post-title-link" itemprop="url">Dynamic Programming</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-03 21:45:33" itemprop="dateCreated datePublished" datetime="2020-04-03T21:45:33+08:00">2020-04-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-05-28 09:57:56" itemprop="dateModified" datetime="2020-05-28T09:57:56+08:00">2020-05-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index">
+                    <span itemprop="name">Algorithm</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h1><p>动态规划与分治方法相似，都是通过组合子问题的解来求解原问题。动态规划方法通常用来求解最优化问题。这类问题可以有喝多可行解，每个解都有一个值，我们希望寻找具有最优值的解。我们通常按如下4个步骤来设计一个动态规划算法:</p>
+<ol>
+<li>刻画一个最优解的结构特征。</li>
+<li>递归地定义最优解的值。</li>
+<li>计算最优解的值，通常采用自底向上的方法。</li>
+<li>利用计算出的信息构造一个最优解。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/" class="post-title-link" itemprop="url">FH-GAN: Face Hallucination and Recognition using Generative Adversarial Network</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-02-21 09:21:04 / Modified: 11:03:53" itemprop="dateCreated datePublished" datetime="2020-02-21T09:21:04+08:00">2020-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/FH/" itemprop="url" rel="index">
+                    <span itemprop="name">FH</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　影响视觉人脸识别的因素很多，如低分辨率图像、年龄、光照和姿态方差等。其中最重要的问题之一是低分辨率的人脸图像，这可能会导致人脸识别的性能下降。一般的人脸识别算法大都假设人脸图像具有足够的分辨率。然而，在实际应用中，许多- ten并没有足够的图像分辨率。现代的人脸幻觉模型显示了从相关的低分辨率图像中重建高分辨率图像的合理性能。但是，他们在产生幻觉时并不考虑身份水平信息，这直接影响了低分辨率人脸识别的结果。为了解决这一问题，我们提出了一种新的人脸生成对抗网络(FH-GAN)，该网络提高了低分辨率人脸图像的质量，并能识别出低分辨率的人脸图像。具体来说，我们的贡献如下:1)我们提出了FH-GAN网络，这是一个端到端的系统，可以同时提高人脸识别和人脸识别的能力。该网络的新颖之处在于，通过结合人脸识别网络进行身份预处理，将身份信息整合到基于gan的人脸幻觉算法中。2)我们还提出了一种新的人脸幻觉网络，即稠密稀疏网络(DSNet)，它是在人脸幻觉技术的基础上发展起来的。3)我们展示了人脸识别和基于gan的训练的好处。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/" class="post-title-link" itemprop="url">Ma:Learning a no-reference quality metric for single-image super-resolution</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-20 09:15:09" itemprop="dateCreated datePublished" datetime="2020-02-20T09:15:09+08:00">2020-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-21 09:20:39" itemprop="dateModified" datetime="2020-02-21T09:20:39+08:00">2020-02-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　最近提出了大量的单图像超分辨率算法，但是很少有研究涉及基于视觉感知的性能评估问题。虽然大多数超分辨率图像都是通过全参考指标来评价的（PSNR, SSIM），但其效果并不明显，实际应用中也不一定能得到所需的真实图像。为了解决这些问题，我们使用大量的超分辨率图像进行人体研究，并提出了一个从视觉感知得分中学习的无参考指标。具体来说，我们设计了三种空间域和频率域的低层统计特征来量化超分辨率伪影，并学习了两阶段回归模型来预测超分辨率图像的质量分数，而不必参考地面真实图像。大量的实验结果表明，该方法对基于人眼感知的超分辨率图像质量评估是有效的。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/" class="post-title-link" itemprop="url">RaGAN:The relativistic discriminator: a key element missing from standard GAN</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-02-18 10:54:41 / Modified: 11:33:18" itemprop="dateCreated datePublished" datetime="2020-02-18T10:54:41+08:00">2020-02-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/GAN/" itemprop="url" rel="index">
+                    <span itemprop="name">GAN</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　在传统的GAN（SGAN）中，判别器D估计输入数据是真实数据的概率。生成器G训练增加让判别器识别生成数据为真实数据的概率。我们认为生成器也应该同时降低让判别器识别真实数据是真实的概率，因为，第一，在一个mini-batch中的数据都是假的，第二，这样能使得散度最小化。第三，在最优设置下，SGAN等价于积分概率度量(IPM) GANs。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/17/Deep_Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/17/Deep_Learning/" class="post-title-link" itemprop="url">Deep_Learning</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-17 23:14:09" itemprop="dateCreated datePublished" datetime="2020-02-17T23:14:09+08:00">2020-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-18 10:49:48" itemprop="dateModified" datetime="2020-02-18T10:49:48+08:00">2020-02-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Deep Learning</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　深度学习允许由多个处理层组成的计算模型学习具有多个抽象级别的数据表示。这些方法极大地提高了语音识别、视觉对象识别、对象检测以及药物发现和基因组学等领域的技术水平。深度学习通过使用反向传播算法来指示机器应该如何改变其内部参数来发现大数据集中复杂的结构，这些内部参数用于从前一层的表示中计算每一层的表示。深度卷积网络在图像、视频、语音和音频处理方面取得了突破，而递归网络则在文本和语音等序列数据方面取得了突破。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/17/Deep_Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/RankSRGAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/12/RankSRGAN/" class="post-title-link" itemprop="url">RankSRGAN</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-01-12 19:36:17" itemprop="dateCreated datePublished" datetime="2020-01-12T19:36:17+08:00">2020-01-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-19 22:57:07" itemprop="dateModified" datetime="2020-02-19T22:57:07+08:00">2020-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　GAN已经被证实在图像超分辨率领域可以恢复出细节尖锐，高频信息丰富的高质量图片。为了提高超分辨率图片视觉质量，PIRM2018-SR挑战赛采用了PI,NIQE,MA等感知方法来达到超分辨率图像的感知质量。但是，现存的方法不能直接优化这些不可微的感知方法，因为这些方法都基于人类的感知投票。为了解决这个问题，我们提出了RankSRGAN去按照感知方法来优化generator生成器。特别的，我们首次训练了可以学习这些感知方法的Ranker,引入了Rank-content loss去优化图片的感知质量。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/12/RankSRGAN/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+  </div>
+
+  
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

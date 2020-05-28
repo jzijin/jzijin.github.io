@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Overview　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Super-FAN">
+<meta property="og:url" content="http://yoursite.com/2019/12/30/Super-FAN/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="Overview　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/images/Super-FAN.jpg">
+<meta property="og:image" content="http://yoursite.com/images/FAN.jpg">
+<meta property="og:image" content="http://yoursite.com/images/per-loss.jpg">
+<meta property="og:image" content="http://yoursite.com/images/ad-loss.jpg">
+<meta property="og:image" content="http://yoursite.com/images/heat-loss.jpg">
+<meta property="article:published_time" content="2019-12-30T06:59:04.000Z">
+<meta property="article:modified_time" content="2020-01-06T07:09:09.319Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/Super-FAN.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2019/12/30/Super-FAN/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Super-FAN | SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/30/Super-FAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Super-FAN
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-12-30 14:59:04" itemprop="dateCreated datePublished" datetime="2019-12-30T14:59:04+08:00">2019-12-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-01-06 15:09:09" itemprop="dateModified" datetime="2020-01-06T15:09:09+08:00">2020-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/FH/" itemprop="url" rel="index">
+                    <span itemprop="name">FH</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　作者提出Sper-FAN: 是一个端到端的能同时完成超分辨率重建和面部landmark的检测。Super-FAN的新颖之处在于，它通过整合一个子网络(FAN)来实现对人脸的对齐，从而将结构信息整合到一个基于gan的超分辨率算法中，并对一种新的热图(heatmap)丢失进行优化(heatmap loss)。举例说明了联合训练这两个网络的好处，不仅在正面图像上，而且在整个面部姿态光谱上，不仅在合成低分辨率(人工降质)图像上，而且在真实世界图像上都取得了良好的结果。<br><a id="more"></a></p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><img src="/images/Super-FAN.jpg" class="[Super-FAN模型示意图]" title="[14] [6] " alt="title text">
+<p>　　Super-FAN包含三个网络，第一个网络是Super-resolution network用于超分辨重建；第二个网络是disciminator用于分辨原图和超分辨重建图片；第三个网络是FAN,用于在超分辨重建图片进行人脸对齐和landmark定位。在测试阶段discriminator是不需要的。</p>
+<h2 id="Super-resolution-network"><a href="#Super-resolution-network" class="headerlink" title="Super-resolution network"></a>Super-resolution network</h2><p>　　Super-resolution network网络结构和SRGAN网络结构类似，只不过在细节上有一些改变。</p>
+<ul>
+<li>Per-block layer distribution. SRGAN网络用了16层在原始低分辨率图片、1层在两倍低分辨率图片，1层在四倍低分辨率图片。标注为16-1-1.由于Super-resolution网络的主要目标是通过幻觉来超级解析其输入，因此仅使用一个更高分辨率的块(如SRGAN)不足以生成清晰的细节，特别是在特别低分辨率的图片。因此Super-FAN采用了12-3-2结构。</li>
+<li>Building block architecture. Super-FAN试验发现PReLU激活函数并没有比ReLU激活函数试验结果好多少，因此采用ReLU激活函数。</li>
+<li>On the “long” skip connection.Super-FAN认为分辨率的提高是一个渐进的过程，在此过程中，每一层的表现都要比上一层有所提高，因此，低水平图片的注入对整体表现的影响较小。在实践中，Super-FAN发现使用它的收益非常小。因此不用skip-connection.</li>
+</ul>
+<h2 id="Adversarial-network"><a href="#Adversarial-network" class="headerlink" title="Adversarial network"></a>Adversarial network</h2><p>　　发现采用WGAN和使用普通GAN并不会使超分辨率的结果有多大区别。Super-FAN采用WGAN稳定discriminator的训练。Super-FAN的Adversarial network 采用了去除batch normliztion的DCGAN网络。<br><a href="https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html" target="_blank" rel="noopener">DCGAN网络结构PyTorch实现</a></p>
+<h2 id="Face-Alignment-Network"><a href="#Face-Alignment-Network" class="headerlink" title="Face Alignment Network"></a>Face Alignment Network</h2><p>　　如果只采用上述两个网络进行face　hallucination其实可以生成很好的结果了，但是并没有把人脸结构相关的信息纳入超分辨率过程。由此可能导致超分辨率重建图片姿势和表情不正常。为了解决这一问题，提出通过将heatmap regretion的人脸 landmark 定位网络整合到超分辨率过程中，并优化适当的热图损失(heatmap loss)，来加强低分辨率和高分辨率图像之间的人脸结构一致性。<br>　　FAN采用heatmap regression去定位landmark: 不是将输出整成68*2的vector，每张图片的landmark被表示成在landmark区域的2D高斯分布，输出在一个通道上。对FAN进行训练，使其回归到2D高斯分布上，也称heatmap(热图)。heatmap包含了形状信息（姿势表情）、空间信息和位置结构联系。FAN的目标就是使得超分辨率重建图片的heatmap和原图heatmap接近。网络使用了FAN带有两个hourglass(参考论文4)<br><img src="/images/FAN.jpg" class="[FAN模型示意图]" title="[14] [6] " alt="title text"></p>
+<h1 id="Training-Detail"><a href="#Training-Detail" class="headerlink" title="Training Detail"></a>Training Detail</h1><h2 id="Losses-on-Super-resolution-Network"><a href="#Losses-on-Super-resolution-Network" class="headerlink" title="Losses on Super-resolution Network"></a>Losses on Super-resolution Network</h2><ul>
+<li>Pixel Loss. 采用MSELoss<script type="math/tex; mode=display">l_{pixel} = \frac{1}{r^2WH}\sum_{x=1}^{rW}\sum_{y=1}^{rH}(I_{x,y}^{HR} - G_{\theta_G}(I^{LR})_{x,y})^2</script></li>
+<li>Perceptual loss. 不同于SRGAN使用vgg19(FC　layer之前所有层).Super-FAN使用ResNet-50.B1、B2、B3分别获取低级、中级、高级特征。$\phi_i$是经过ｉ层卷积层输出的特征图。<img src="/images/per-loss.jpg" class="[loss]" title="[6] [3] " alt="title text">
+</li>
+</ul>
+<h2 id="Losses-on-Adversial-Network"><a href="#Losses-on-Adversial-Network" class="headerlink" title="Losses on Adversial Network"></a>Losses on Adversial Network</h2><ul>
+<li>WGAN loss.<img src="/images/ad-loss.jpg" class="[ad_loss]" title="[6] [3] " alt="title text">
+</li>
+</ul>
+<h2 id="Lossed-on-Face-Alignment-Network"><a href="#Lossed-on-Face-Alignment-Network" class="headerlink" title="Lossed on Face Alignment Network"></a>Lossed on Face Alignment Network</h2><ul>
+<li>heatmap loss.<img src="/images/heat-loss.jpg" class="[heat_loss]" title="[6] [3] " alt="title text">
+</li>
+</ul>
+<h2 id="Overall-training-loss"><a href="#Overall-training-loss" class="headerlink" title="Overall training loss"></a>Overall training loss</h2><script type="math/tex; mode=display">l^{SR}=\alpha l_{pixel} + \beta l_{feature} + \gamma h_{heatmap} + \zeta l_{WGAN}</script><h2 id="Parameters-Setting"><a href="#Parameters-Setting" class="headerlink" title="Parameters Setting"></a>Parameters Setting</h2><ul>
+<li>input image size: 16*16</li>
+<li>output image size: 64*64</li>
+<li>60 epoch lr decreased from 2.5e-4 to 1e-5(all model)</li>
+<li>the ratio between running the generator and the discriminator was kept to 1.</li>
+<li>all networks(super-resolution,disciminator and FAN) were trained jointly for 5 epochs.</li>
+<li>optimizer: RMSProp()</li>
+</ul>
+<h2 id="Dadaset"><a href="#Dadaset" class="headerlink" title="Dadaset"></a>Dadaset</h2><ul>
+<li>300W-LP</li>
+<li>AFLW</li>
+<li>Celeb-A</li>
+<li>LS3D-W balanced</li>
+<li>WiderFace</li>
+</ul>
+<h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><p><a href="https://github.com/jzijin/Super-FAN" target="_blank" rel="noopener">Super-FAN</a></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Bulat_Super-FAN_Integrated_Facial_CVPR_2018_paper.pdf" target="_blank" rel="noopener">论文地址</a><br><a href="https://github.com/1adrianb/face-alignment" target="_blank" rel="noopener">face-alignment</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/27/GFRNet/" rel="prev" title="GFRNet">
+      <i class="fa fa-chevron-left"></i> GFRNet
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/30/FAN/" rel="next" title="FAN">
+      FAN <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Model"><span class="nav-number">2.</span> <span class="nav-text">Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Super-resolution-network"><span class="nav-number">2.1.</span> <span class="nav-text">Super-resolution network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Adversarial-network"><span class="nav-number">2.2.</span> <span class="nav-text">Adversarial network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Face-Alignment-Network"><span class="nav-number">2.3.</span> <span class="nav-text">Face Alignment Network</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Training-Detail"><span class="nav-number">3.</span> <span class="nav-text">Training Detail</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Losses-on-Super-resolution-Network"><span class="nav-number">3.1.</span> <span class="nav-text">Losses on Super-resolution Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Losses-on-Adversial-Network"><span class="nav-number">3.2.</span> <span class="nav-text">Losses on Adversial Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lossed-on-Face-Alignment-Network"><span class="nav-number">3.3.</span> <span class="nav-text">Lossed on Face Alignment Network</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Overall-training-loss"><span class="nav-number">3.4.</span> <span class="nav-text">Overall training loss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Parameters-Setting"><span class="nav-number">3.5.</span> <span class="nav-text">Parameters Setting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dadaset"><span class="nav-number">3.6.</span> <span class="nav-text">Dadaset</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyTorch-Code"><span class="nav-number">4.</span> <span class="nav-text">PyTorch Code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

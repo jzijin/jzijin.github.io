@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Overview　　最近提出了大量的单图像超分辨率算法，但是很少有研究涉及基于视觉感知的性能评估问题。虽然大多数超分辨率图像都是通过全参考指标来评价的（PSNR, SSIM），但其效果并不明显，实际应用中也不一定能得到所需的真实图像。为了解决这些问题，我们使用大量的超分辨率图像进行人体研究，并提出了一个从视觉感知得分中学习的无参考指标。具体来说，我们设计了三种空间域和频率域的低层统计特征来量化超分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ma:Learning a no-reference quality metric for single-image super-resolution">
+<meta property="og:url" content="http://yoursite.com/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="Overview　　最近提出了大量的单图像超分辨率算法，但是很少有研究涉及基于视觉感知的性能评估问题。虽然大多数超分辨率图像都是通过全参考指标来评价的（PSNR, SSIM），但其效果并不明显，实际应用中也不一定能得到所需的真实图像。为了解决这些问题，我们使用大量的超分辨率图像进行人体研究，并提出了一个从视觉感知得分中学习的无参考指标。具体来说，我们设计了三种空间域和频率域的低层统计特征来量化超分">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-02-20T01:15:09.000Z">
+<meta property="article:modified_time" content="2020-02-21T01:20:39.070Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Ma:Learning a no-reference quality metric for single-image super-resolution | SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ma:Learning a no-reference quality metric for single-image super-resolution
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-20 09:15:09" itemprop="dateCreated datePublished" datetime="2020-02-20T09:15:09+08:00">2020-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-21 09:20:39" itemprop="dateModified" datetime="2020-02-21T09:20:39+08:00">2020-02-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　最近提出了大量的单图像超分辨率算法，但是很少有研究涉及基于视觉感知的性能评估问题。虽然大多数超分辨率图像都是通过全参考指标来评价的（PSNR, SSIM），但其效果并不明显，实际应用中也不一定能得到所需的真实图像。为了解决这些问题，我们使用大量的超分辨率图像进行人体研究，并提出了一个从视觉感知得分中学习的无参考指标。具体来说，我们设计了三种空间域和频率域的低层统计特征来量化超分辨率伪影，并学习了两阶段回归模型来预测超分辨率图像的质量分数，而不必参考地面真实图像。大量的实验结果表明，该方法对基于人眼感知的超分辨率图像质量评估是有效的。<br><a id="more"></a><br>　　SISR旨在从低分辨率图片恢复高分辨率图片。最近许多SR算法基于边缘，梯度，领域差值，回归和patch提出来。大多数SR方法关注生成图片尖锐的边缘带有大量的纹理信息，利用SR图片和GT图片进行PSNR和SSIM的计算。在我们最近的研究当中，IFC评价方法表现不错。然而全参考指标（PSNR,SSIM)更多关注图片的信噪比而不是人眼的视觉感受。除此之外，全参考指标需要获得GT图片，SR在现实中应用时，GT图片通常是没有的。在这项工作中，我们建议学习一个无参考的度量方法来评估单图像SR算法的性能。它是由于无参考指标设计模拟视觉百分位(即。(从大规模的感知评分中学习)不需要重新获取地面真实图像作为参考。随着训练数据的增加，无参考指标在SR绩效评价中具有更大的匹配视觉感知的潜力。<br>　　我们首先使用大量的SR图像进行人体实验，以收集感知评分。根据这些训练分数，我们提出了一种新的无参考质量评估算法，它能很好地匹配视觉感知。我们的工作，本质上，使用与一般图像质量评估(IQA)方法相同的方法。然而，我们评估的是SR算法重建信号的有效性，而不是像其他IQA一样分析噪声和失真(如压缩和衰落)。我们根据SR鬼影在空间和频率域的统计特性对其进行量化，并将其回归到收集的感知分数。实验结果证明了所提出的无参考度量方法对现有的图像质量评估的有效性。<br>　　这项工作的主要贡献概括为以下几点:</p>
+<ul>
+<li>我们提出了一种新的无参考IQA度量来评估SR算法的性能，该度量与视觉感知匹配良好</li>
+<li>们开发了一个大规模的SR图像数据集，并对这些图像进行了人体实验研究。我们将收集到的感知分数的SR数据集公开在<a href="https://sites.google.com/site/chaoma99/sr-metric" target="_blank" rel="noopener">https://sites.google.com/site/chaoma99/sr-metric</a><h1 id="Related-work-and-problem-context"><a href="#Related-work-and-problem-context" class="headerlink" title="Related work and problem context"></a>Related work and problem context</h1>　　如何评价超分辨图像的性能，可以归结为超分辨图像的质量评价问题。许多评价方法在这篇论文被用到，根据是否引用了ground-truth HR映像，现有的度量标准分为以下三类。<h2 id="Full-reference-metrics"><a href="#Full-reference-metrics" class="headerlink" title="Full-reference metrics"></a>Full-reference metrics</h2>　　完整的参考IQA方法如MSE、PSNR和SSIM指数在SR文献中被广泛使用。然而，这些措施是为分析一般的图像信号而开发的，并不匹配人类的感知(如MSE) Reibman等人通过使用一组三幅图像和现有的度量标准，进行主题研究，以检查SR表现的局限性。受试者每次都会得到两张SR图像，并被要求从中选择一张。采用布雷德利特里模型对整幅图像的考试成绩进行了分析。结果表明，虽然SSIM表现较好，但它与感知能力的相关性仍不明显。在我们最近的SR基准测试工作中(yang et al., 2014),我们在生成的SR图片的子集中进行了主题研究，并表明IFC (Sheikh et al.， 2005)指标在全参考指标中表现良好。因此，如何有效地评估基于视觉感知的SR算法的性能，对更大规模的课题研究具有重要意义。<h2 id="Semi-reference-metric"><a href="#Semi-reference-metric" class="headerlink" title="Semi-reference metric"></a>Semi-reference metric</h2>　　除了匹配视觉感知的问题外，全参考指标只能在地面真实图像可用时用于评估。为了解决这个问题，已经做了一些努力，使用LR的输入图像作为参考，而不是HR的基础真实图像（这在现实应用中并不总是存在）。Yeganeh等人(2012)提取空间域和频域的二维统计特征，从测试LR图像或生成的SR图像中计算评估分数。然而，在他们的工作中，只分析了8幅图像和4种SR算法。实验结果表明，该方法由于缺乏整体的统计特征，因而效果较差<h2 id="No-reference-metrics"><a href="#No-reference-metrics" class="headerlink" title="No-reference metrics"></a>No-reference metrics</h2>　　当地面真实图像不可用时，SR图像可以通过无参考IQA方法进行评估，基于自然图像具有某些统计特性的假设，这些特性在畸变(如噪声)存在时发生改变，并且这种变化可以被量化以进行质量评估。Ye et al.(2012)和Tang et al.(2014)使用从辅助数据集中获得的特征来量化自然图像退化，作为统计特性的替代。现有的无参考IQA方法都是基于学习的，但是降质模型为噪声、压缩而不是超分辨率重建。因此，目前最先进的无参考IQA方法在处理由SR算法引入的不正确高频细节等伪影时效率较低。另一方面，由于SR图像通常包含模糊和振振有辞的arti- facts，所以所提出的算法与现有的模糊和锐度估计方法有一些相似之处。然而许多鬼影并不只是因为blur　kernel 产生的。在这项工作中，我们提出了一种新的无参考的度量方法来评估SR图像的质量。</li>
+</ul>
+<h1 id="Human-subject-studies"><a href="#Human-subject-studies" class="headerlink" title="Human subject studies"></a>Human subject studies</h1><p>　　我们使用Berkeley segmentation dataset (Martin et al.， 2001)进行实验，因为图像种类繁多，广泛用于SR评价。通过如下方法生成低分辨率图片。生成各种不同级别的低分辨率图片之后。在受试者研究中，我们使用的是绝对评分，而不是两两比较的评分，因为我们有1620张测试图像，这需要数百万的两两比较。， c21620 1。3米)。虽然抽样策略(Ye and Doermann, 2014)可以部分缓解这一负担，但考虑到受试者数量、图像和时间限制，两两比较是不可行的。我们注意到Sheikh等人(2006)和Yang等人(2014)的研究也基于绝对评级。在这项工作中，我们开发了一个用户界面(见图4)来收集这些SR图像的感知分数。在高分辨率的显示器上，我们同时显示由不同的SR算法从一个LR图像生成的9个图片。这些图像是随机显示的，以减少由图像内容相关引起的偏差。受试者根据图片质量进行打分。我们将整个测试平均分为3秒，这样每个部分之后受试者都可以休息一下，在学习中保持高度的注意力。为了减少个体质量标准之间的一致性，我们设计了一个训练过程，在每个部分的开始进行测试，即，通过参考质量评分量表(如表3所示)，让受试者对双三次插值生成的所有地面真实度和SR值进行概述。我们收集了50个受试者的50个评分，用感知质量指数作为中值40的平均值来剔除异常值。据我们所知，就SR图像、算法和学科分数而言，我们的研究是迄今为止规模最大的(见表4)。</p>
+<h1 id="Proposed-algorithm"><a href="#Proposed-algorithm" class="headerlink" title="Proposed algorithm"></a>Proposed algorithm</h1><p>　　我们利用三种统计特性作为特征，包括局部和全局频率变化和空间分辨率，来量化伪影和评估SR图像的质量。每组统计特征在一个金字塔上计算，以消除SR伪影的尺度敏感性。</p>
+<h2 id="Local-frequency-features"><a href="#Local-frequency-features" class="headerlink" title="Local frequency features"></a>Local frequency features</h2><p>　　离散余弦变换(DCT)的系数统计已被证明可以有效地量化图像退化的程度和类型(Srivastava et al.， 2003)，并用于自然图像质量评估(Saad et al.， 2012)。为了解决SR恢复所引入的高频伪影，我们提出将SR图像转换成DCT域，并通过广义高斯分布(GGD)拟合DCT系数，如Saad等(2012)。</p>
+<script type="math/tex; mode=display">f(x | \mu, \gamma)=\frac{1}{2 \Gamma\left(1+\gamma^{-1}\right)} e^{-\left(|x-\mu|^{\gamma}\right)}</script><h2 id="Global-frequency-features"><a href="#Global-frequency-features" class="headerlink" title="Global frequency features"></a>Global frequency features</h2><p>　　一个特定的分布(如GGD)可能不能很好地拟合一个SR - age的小波系数的全局分布。GSM模型有效地描述自然图像的边缘和联合统计(Moorthy和Bovik, 2011;使用一组相邻的小波带。</p>
+<script type="math/tex; mode=display">p_{Y}(y)=\int \frac{1}{(2 \pi)^{N / 2}\left|z^{2} Q\right|^{1 / 2}} e^{\left(-\frac{Y^{T}-1 y}{22^{2}}\right)} p_{z}(z) d z</script><h2 id="Spatial-features"><a href="#Spatial-features" class="headerlink" title="Spatial features"></a>Spatial features</h2><p>　　由于在研究对象中，像素强度的空间不连续性与SR图像的感知分数密切相关(见图6)，因此我们采用与Yeganeh等人(2012)类似的方法对这一特性进行建模。我们从补丁中提取特征，而不是从像素中提取，以增强识别能力。我们将主成分分析应用于斑块上，并使用相应的奇异值来描述空间不连续。<br>　　与内容清晰的图像相比，内容平滑的图像的奇异值被压缩到零的速度更快。从图9 (c)可以看出，随着生成内容趋于平滑，双三次和BP生成的SR图像的单值下降得更快。</p>
+<h2 id="Two-stage-regression-model"><a href="#Two-stage-regression-model" class="headerlink" title="Two-stage regression model"></a>Two-stage regression model</h2><p>　　我们用三个独立的回归森林来模拟局部频率、全球频率和空间不连续的特征(Breiman, 2001;(Criminisi et al.， 2011)。他们的输出是线性回归的知觉评分，以预测评价的SR图像的质量。</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>　　在这篇论文中，我们提出了一种新的无参考的IQA算法来评估SR图像的视觉质量。所提出的评价指标将从SR图像中提取的三种低水平统计特征回归到感知得分。实验结果表明，所提出的度量方法优于目前最先进的SR性能评估方法。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="http://dx.doi.org/10.1016/j.cviu.2016.12.009" target="_blank" rel="noopener">论文地址</a><br><a href="https://github.com/chaoma99/sr-metric" target="_blank" rel="noopener">参考代码</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/" rel="prev" title="RaGAN:The relativistic discriminator: a key element missing from standard GAN">
+      <i class="fa fa-chevron-left"></i> RaGAN:The relativistic discriminator: a key element missing from standard GAN
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/" rel="next" title="FH-GAN: Face Hallucination and Recognition using Generative Adversarial Network">
+      FH-GAN: Face Hallucination and Recognition using Generative Adversarial Network <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Related-work-and-problem-context"><span class="nav-number">2.</span> <span class="nav-text">Related work and problem context</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Full-reference-metrics"><span class="nav-number">2.1.</span> <span class="nav-text">Full-reference metrics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Semi-reference-metric"><span class="nav-number">2.2.</span> <span class="nav-text">Semi-reference metric</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#No-reference-metrics"><span class="nav-number">2.3.</span> <span class="nav-text">No-reference metrics</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Human-subject-studies"><span class="nav-number">3.</span> <span class="nav-text">Human subject studies</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Proposed-algorithm"><span class="nav-number">4.</span> <span class="nav-text">Proposed algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Local-frequency-features"><span class="nav-number">4.1.</span> <span class="nav-text">Local frequency features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Global-frequency-features"><span class="nav-number">4.2.</span> <span class="nav-text">Global frequency features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spatial-features"><span class="nav-number">4.3.</span> <span class="nav-text">Spatial features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Two-stage-regression-model"><span class="nav-number">4.4.</span> <span class="nav-text">Two-stage regression model</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Conclusion"><span class="nav-number">5.</span> <span class="nav-text">Conclusion</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Overview　　GAN已经被证实在图像超分辨率领域可以恢复出细节尖锐，高频信息丰富的高质量图片。为了提高超分辨率图片视觉质量，PIRM2018-SR挑战赛采用了PI,NIQE,MA等感知方法来达到超分辨率图像的感知质量。但是，现存的方法不能直接优化这些不可微的感知方法，因为这些方法都基于人类的感知投票。为了解决这个问题，我们提出了RankSRGAN去按照感知方法来优化generator生成器。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RankSRGAN">
+<meta property="og:url" content="http://yoursite.com/2020/01/12/RankSRGAN/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="Overview　　GAN已经被证实在图像超分辨率领域可以恢复出细节尖锐，高频信息丰富的高质量图片。为了提高超分辨率图片视觉质量，PIRM2018-SR挑战赛采用了PI,NIQE,MA等感知方法来达到超分辨率图像的感知质量。但是，现存的方法不能直接优化这些不可微的感知方法，因为这些方法都基于人类的感知投票。为了解决这个问题，我们提出了RankSRGAN去按照感知方法来优化generator生成器。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/images/Ranker.png">
+<meta property="article:published_time" content="2020-01-12T11:36:17.000Z">
+<meta property="article:modified_time" content="2020-02-19T14:57:07.761Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/Ranker.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/01/12/RankSRGAN/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>RankSRGAN | SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/RankSRGAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RankSRGAN
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-01-12 19:36:17" itemprop="dateCreated datePublished" datetime="2020-01-12T19:36:17+08:00">2020-01-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-19 22:57:07" itemprop="dateModified" datetime="2020-02-19T22:57:07+08:00">2020-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　GAN已经被证实在图像超分辨率领域可以恢复出细节尖锐，高频信息丰富的高质量图片。为了提高超分辨率图片视觉质量，PIRM2018-SR挑战赛采用了PI,NIQE,MA等感知方法来达到超分辨率图像的感知质量。但是，现存的方法不能直接优化这些不可微的感知方法，因为这些方法都基于人类的感知投票。为了解决这个问题，我们提出了RankSRGAN去按照感知方法来优化generator生成器。特别的，我们首次训练了可以学习这些感知方法的Ranker,引入了Rank-content loss去优化图片的感知质量。<br><a id="more"></a><br>　　最近基于深度学习方法的分为两个阵营。一个阵营认为SR是一个重建问题，所以采用MSE作为损失函数去获得更高的PSNR值。然而重建的准确性和视觉上的效果有很大的不同。采用MSEloss通常产生过于平滑/尖锐的图片。为了获得更高的视觉效果，第二个阵营认为SR是一个图片生成问题。通过采用感知损失和对抗学习能够生成细节文理清晰和更多的细节。<br>　　感知SR方法最大的问题在于评估。大多数方法采用主观评估。但是没有采用客观评估的PSNR和SSIM。不能公平的比较不同的算法。所以最近提出很多评价感知SR生成图像质量的方法，PI,NIQE,MA等，PIRM2018-SR采用PI作为感知评价。然而，这些感知方法不可微，不能作为损失函数。不能将NR-IQA方法进行优化，现存的感知SR方法在感知批判下不能有稳定的表现。<br>　　为了解决这个问题，我们提出了简单的可微分的模型—Ranker。它可以模仿任意NR-IQA方法并且提供一个清晰的目标（可以作为损失函数）去优化感知质量。特别的，Ranker是一个语义CNN通过rank方法学习仿真感知方法的表现.由于NR-IQA方法有很大的动态范围，Ranker学习他们输出并排序而不是它们的准确值。就像现实世界一样，人们尝试将不通质量的图片进行排序而不是直接给出一个特定的值。我们将Ranker装备到标准的SRGAN模型并创建了RankerSRGAN。相比SRGAN,RankerSRGAN有rank-content损失通过训练得很好的Ranker去判定输出图片的质量。因此，SR模型在特定图片质量方向上稳定的优化。<br>　　为了训练Ranker，我们准备了另一个训练集通过给经过不同SR算法的输出打上标签。Ranker可以很准确的学习这些排序顺序。Ranker的效果极大的取决于所选择的SR算法。为了有更好的表现，我们采用了SRGAN和ESRGAN。我们用NIQE评价，则两个模型得到了混合的排序。然后Ranker会更倾向于在不同的图片上使用不同的算法，而不是简单的将一张图片进行二分类（SRGAN/ESRGAN）。采用rank-content loss之后，generative 网络输出结果会有更高的rank分数。换句话说，学习到的SR模型可以综合SRGAN和ESRGAN的优点，在感知损失和MSE损失上都能有极好的效果。</p>
+<p>the contribution of this paper:</p>
+<ul>
+<li>We propose a general perceptual SR framework-RankSRGAN that can optimize generator in the direction of indifferentiable perceptual metrics and achieve the state-of-the-art performance.</li>
+<li>We, for the first time, utilize results of other SR methods to build training dataset. The proposed method combines the strengths of different SR methods and generates better results.</li>
+<li>The proposed SR framework is highly flexible and produce diverse results given different rank datasets, perceptual metrics, and loss combinations.</li>
+</ul>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><h2 id="Overview-of-RankSRGAN"><a href="#Overview-of-RankSRGAN" class="headerlink" title="Overview of RankSRGAN"></a>Overview of RankSRGAN</h2><p>　　Ranker基于GAN，有生成器和判别器.判别器网络尝试分辨原始图片和超分辨率重建图片，生成器尝试欺骗判别器。为了获得更多更好的自然纹理，我们给标准的SRGAN添加约束，采用感知方法为先验信息从而获得更高的输出图片质量。<br><img src="/images/Ranker.png" class="[RankSRGAN]" title="[14] [6] " alt="title text"><br>　　Stage1:Generate pair-wise rank iamges.首先，我们采用不同的SR方法生成超分辨率重建图片。然后我们选择一个感知评价方法(例如,NIQE)作用在生成图片上。之后我们选择有相同内容的两张图片作为一对并且根据感知评价方法作用之后得到的分数进行排序。最后，我们得到一堆图片和对应的排序标签。<br>　　Stage2:Train Ranker.Ranker采用一个Siamese框架去训练感知评价方法的表现。我们采用margin-ranking loss, 普遍作为损失函数应用于”learning to rank”来优化Ranker。学习好的Ranker对不同的图片有根据他们的感知分数进行排序的能力。<br>　　Stage3:Introduce rank-content loss.一旦Ranker已经很好的训练之后。我们使用它去定义rank-content loss 来优化SRGAN去生成高质量的图片。</p>
+<h2 id="Ranker"><a href="#Ranker" class="headerlink" title="Ranker"></a>Ranker</h2><h3 id="Ranker-dataset"><a href="#Ranker-dataset" class="headerlink" title="Ranker dataset."></a>Ranker dataset.</h3><p>　　特别地，给出两个输入图片，$y_1, y_2$,排序分数$s_1, s_2$可以得到。</p>
+<script type="math/tex; mode=display">s_1 = R(y_1;\theta_R), s_2 = R(y_2;\theta_R)</script><p>为了使得Ranker输出和感知方法排序一致。我们可以：</p>
+<script type="math/tex; mode=display">\left\{\begin{array}{ll} {s_{1}<s_{2}} & {\text { if } m_{y_{1}}<m_{y_{2}}} \\ {s_{1}>s_{2}} & {\text { if } \quad m_{y_{1}}>m_{y_{2}}} \end{array}\right.</script><p>m 表示图片经过感知方法的质量分数。</p>
+<h3 id="Siamese-architecture"><a href="#Siamese-architecture" class="headerlink" title="Siamese architecture"></a>Siamese architecture</h3><p>　　使用Global Average Pooling layer在Feature Extractor之后，因此这个框架不会受限于输入图片的尺寸。我们不关心分数，我们只关心相对的排序。最后，两个分支的输出输入到margin-ranking loss模块。我们可以计算梯度并反向传播来更新整个模型的参数。</p>
+<h3 id="Optimization"><a href="#Optimization" class="headerlink" title="Optimization"></a>Optimization</h3><p>　　The margin-ranking loss is given below:</p>
+<script type="math/tex; mode=display">\begin{aligned} L\left(s_{1}, s_{2} ; \gamma\right) &=\max \left(0,\left(s_{1}-s_{2}\right) * \gamma+\varepsilon\right) \\ \left\{\begin{array}{ll} {\gamma} & {=-1} & {\text { if } m_{y_{1}}<m_{y_{2}}} \\ {\gamma} & {=1} & {\text { if } \quad m_{y_{1}}>m_{y_{2}}} \end{array}\right. \end{aligned}</script><p>　　因此N对输入样本可以优化。</p>
+<script type="math/tex; mode=display">\begin{aligned} \hat{\Theta} &=\underset{\Theta_{R}}{\arg \min } \frac{1}{N} \sum_{i=1} L\left(s_{1}^{(i)}, s_{2}^{(i)} ; \gamma^{(i)}\right) \\ &=\underset{\Theta_{R}}{\arg \min } \frac{1}{N} \sum_{i=1}^{N} L\left(R\left(y_{1}^{(i)} ; \Theta_{R}\right), R\left(y_{2}^{(i)} ; \Theta_{R}\right) ; \gamma^{(i)}\right) \end{aligned}</script><h2 id="RankSRGAN"><a href="#RankSRGAN" class="headerlink" title="RankSRGAN"></a>RankSRGAN</h2><p>　　RankerSRGAN包括标准SRGAN和提出的Ranker。相比于已有的SRGAN,这个框架加入了训练好的Ranker来约束生成器在SR空间。为了获得更好的视觉效果的图片，对抗学习应用在我们框架中。</p>
+<h3 id="Perceptual-loss"><a href="#Perceptual-loss" class="headerlink" title="Perceptual loss"></a>Perceptual loss</h3><p>　　常规操作。VGG19的前5层。</p>
+<h3 id="Adversarial-loss"><a href="#Adversarial-loss" class="headerlink" title="Adversarial loss"></a>Adversarial loss</h3><p>　　常规操作。</p>
+<script type="math/tex; mode=display">L_{G}=-\log D\left(G\left(x_{i}\right)\right)</script><h3 id="Rank-content-loss"><a href="#Rank-content-loss" class="headerlink" title="Rank-content loss"></a>Rank-content loss</h3><script type="math/tex; mode=display">L_{R}=\operatorname{sigmoid}\left(R\left(G\left(x_{i}\right)\right)\right)</script><p>　　一个更小的Ranking分数意味着生成图片的质量更好。使用Sigmoid函数之后，ranking-content loss 在０ 1 之间</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://wenlongzhang0724.github.io/Projects/RankSRGAN" target="_blank" rel="noopener">论文地址</a><br><a href="https://github.com/WenlongZhang0724/RankSRGAN" target="_blank" rel="noopener">参考代码</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/08/SiGAN/" rel="prev" title="SiGAN">
+      <i class="fa fa-chevron-left"></i> SiGAN
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/17/Deep_Learning/" rel="next" title="Deep_Learning">
+      Deep_Learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Model"><span class="nav-number">2.</span> <span class="nav-text">Model</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview-of-RankSRGAN"><span class="nav-number">2.1.</span> <span class="nav-text">Overview of RankSRGAN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ranker"><span class="nav-number">2.2.</span> <span class="nav-text">Ranker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ranker-dataset"><span class="nav-number">2.2.1.</span> <span class="nav-text">Ranker dataset.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Siamese-architecture"><span class="nav-number">2.2.2.</span> <span class="nav-text">Siamese architecture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Optimization"><span class="nav-number">2.2.3.</span> <span class="nav-text">Optimization</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RankSRGAN"><span class="nav-number">2.3.</span> <span class="nav-text">RankSRGAN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Perceptual-loss"><span class="nav-number">2.3.1.</span> <span class="nav-text">Perceptual loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adversarial-loss"><span class="nav-number">2.3.2.</span> <span class="nav-text">Adversarial loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rank-content-loss"><span class="nav-number">2.3.3.</span> <span class="nav-text">Rank-content loss</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

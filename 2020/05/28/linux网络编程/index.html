@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="网络基础网络应用程序设计模式： C&#x2F;S-client&#x2F;server 优点：1.协议选用灵活 2.可以缓存数据 缺点: 1.对用户安全构成威胁 2.开发工作量大，调试困难   B&#x2F;S-browser&#x2F;server 优点：跨平台 缺点：只能使用http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux网络编程">
+<meta property="og:url" content="http://yoursite.com/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="网络基础网络应用程序设计模式： C&#x2F;S-client&#x2F;server 优点：1.协议选用灵活 2.可以缓存数据 缺点: 1.对用户安全构成威胁 2.开发工作量大，调试困难   B&#x2F;S-browser&#x2F;server 优点：跨平台 缺点：只能使用http">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-05-28T01:55:13.000Z">
+<meta property="article:modified_time" content="2020-05-28T01:55:47.385Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>linux网络编程 | SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/28/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux网络编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-05-28 09:55:13 / Modified: 09:55:47" itemprop="dateCreated datePublished" datetime="2020-05-28T09:55:13+08:00">2020-05-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="网络基础"><a href="#网络基础" class="headerlink" title="网络基础"></a>网络基础</h1><h2 id="网络应用程序设计模式："><a href="#网络应用程序设计模式：" class="headerlink" title="网络应用程序设计模式："></a>网络应用程序设计模式：</h2><ul>
+<li>C/S-client/server<ul>
+<li>优点：1.协议选用灵活 2.可以缓存数据</li>
+<li>缺点: 1.对用户安全构成威胁 2.开发工作量大，调试困难</li>
+</ul>
+</li>
+<li>B/S-browser/server<ul>
+<li>优点：跨平台</li>
+<li>缺点：只能使用http<a id="more"></a>
+<h2 id="协议的概念"><a href="#协议的概念" class="headerlink" title="协议的概念"></a>协议的概念</h2></li>
+</ul>
+</li>
+<li>规则：数据下输和数据解释的规则</li>
+<li>原始协议——&gt;(改进、完善)——&gt;标准协议</li>
+<li>典型协议：<strong>TCP/UDP</strong> HTTP FTP <strong>IP</strong> <strong>ARP（根据IP得到MAC地址）</strong><h2 id="分层模型"><a href="#分层模型" class="headerlink" title="分层模型"></a>分层模型</h2></li>
+<li>7层模型-OSI:<ul>
+<li>物理层</li>
+<li>数据链路层</li>
+<li>网络层</li>
+<li>传输层</li>
+<li>会话层</li>
+<li>表示层</li>
+<li>应用层</li>
+</ul>
+</li>
+<li>TCP/IP四层模型<ul>
+<li>数据链路层 — 以太网桢协议</li>
+<li>网络层 — IP</li>
+<li>传输层 — tcp、udp</li>
+<li>应用层 — ftp、http、ssh</li>
+</ul>
+</li>
+</ul>
+<h2 id="tcp"><a href="#tcp" class="headerlink" title="tcp"></a>tcp</h2><ul>
+<li>面向链接的安全的流式传输协议</li>
+<li>连接的时候进行三次握手</li>
+<li>数据发送的时候，会进行数据确认</li>
+<li>数据丢失之后，会进行数据重传</li>
+</ul>
+<h2 id="udp"><a href="#udp" class="headerlink" title="udp"></a>udp</h2><ul>
+<li>面向无连接的不安全的报式传输</li>
+<li>连接的时候不会握手</li>
+<li>数据发送出去之后就不管了</li>
+<li>如果数据包丢失会全丢 不存在丢失一半的情况</li>
+</ul>
+<h2 id="socket编程"><a href="#socket编程" class="headerlink" title="socket编程"></a>socket编程</h2><ul>
+<li>网络IO编程:读写操作,创建一个套接字，得到的是文件描述符.fd操作的是一块内核缓冲区</li>
+<li>什么是socket:<br>网络通信的函数接口,<br>封装了传输层协议,<br>  tcp<br>  udp</li>
+<li>浏览器-http:<br>封装的是tcp<h3 id="套接字的概念"><a href="#套接字的概念" class="headerlink" title="套接字的概念"></a>套接字的概念</h3></li>
+<li>IP地址</li>
+<li>端口号</li>
+<li>IP+Port<h3 id="网络字节序"><a href="#网络字节序" class="headerlink" title="网络字节序"></a>网络字节序</h3></li>
+<li>大端</li>
+<li>小端</li>
+</ul>
+<h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">文件（内核的缓冲区）操作</span><br><span class="line">socket tcp server</span><br><span class="line">  创建套接字</span><br><span class="line">    <span class="keyword">int</span> lfd = socket</span><br><span class="line">  绑定本地IP和端口</span><br><span class="line">    struct sockaddr_in serv;</span><br><span class="line">    serv.port = htons(port)</span><br><span class="line">    serv.IP = htonl(INADDR_ANY)</span><br><span class="line">    bind(lfd, &amp;serv, <span class="keyword">sizeof</span>(serv));</span><br><span class="line">  监听</span><br><span class="line">    <span class="built_in">listen</span>(lfd, <span class="number">128</span>);</span><br><span class="line">  等待接收连接请求</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">client</span>;</span></span><br><span class="line">    <span class="keyword">int</span> len = <span class="keyword">sizeof</span>(client)</span><br><span class="line">    <span class="keyword">int</span> cfd = accept(lfd, &amp;client, &amp;len)</span><br><span class="line">      cfd-用于通信的</span><br><span class="line">  通信</span><br><span class="line">    接收数据：<span class="built_in">read</span>/recv</span><br><span class="line">    发送数据：<span class="built_in">write</span>/send</span><br><span class="line">  关闭：</span><br><span class="line">    <span class="built_in">close</span>(lfd)</span><br><span class="line">    <span class="built_in">close</span>(cfd)</span><br><span class="line">客户端</span><br><span class="line">  创建套接字</span><br><span class="line">    <span class="keyword">int</span> fd = socket</span><br><span class="line">  连接服务器</span><br><span class="line">    struct sockaddr_in server;</span><br><span class="line">    server.port</span><br><span class="line">    server.ip = <span class="keyword">int</span>  ?????</span><br><span class="line">    server.family</span><br><span class="line">    <span class="built_in">connect</span>（fd, &amp;server, <span class="keyword">sizeof</span>(server));</span><br><span class="line">  通信</span><br><span class="line">    接收数据：<span class="built_in">read</span>/recv</span><br><span class="line">    发送数据：<span class="built_in">write</span>/send</span><br><span class="line">  断开链接</span><br><span class="line">    <span class="built_in">close</span>(fd);</span><br></pre></td></tr></table></figure>
+<h3 id="tcp-三次握手"><a href="#tcp-三次握手" class="headerlink" title="tcp 三次握手"></a>tcp 三次握手</h3><ul>
+<li>第一次握手<ul>
+<li>客户端：携带标志位：SYN，随机产生32位序号</li>
+<li>服务器：检测SYN的值是否为1,</li>
+</ul>
+</li>
+<li>第二次握手<ul>
+<li>服务器：ACK标志位+确认序号（客户端随机序号+1），发起一个链接请求SYN+32随机需要</li>
+<li>客户端：检测标志位，校验确认需要是否正确</li>
+</ul>
+</li>
+<li>第三次握手<ul>
+<li>客户端：<br>  发送确认数据包 ACK+服务器的随机序号+1</li>
+<li>服务器：<br>  检测ACK是否为1,校验确认序号是否正确。<h3 id="tcp-四次挥手"><a href="#tcp-四次挥手" class="headerlink" title="tcp 四次挥手"></a>tcp 四次挥手</h3></li>
+</ul>
+</li>
+<li>第一次挥手<ul>
+<li>客户端:<br>发送断开连接的请求<br>  FIN + 序号<br>  ACK + 序号</li>
+<li>服务器:<br>检测FIN值是否为1,<br>ack的作用告诉对方之前发的数据收到了多少</li>
+</ul>
+</li>
+<li>第二次挥手<ul>
+<li>服务器:<br>给client确认的数据包,<br>  ACK + 确认的编号,<pre><code>FIN对应的序号+1+携带数据大小
+</code></pre></li>
+<li>客户端：<br>检测：ACK值<br>检测确认序号</li>
+</ul>
+</li>
+<li>第三次挥手<ul>
+<li>服务器端：<br>发送断开链接的请求<br>  FIN + 序号<br>  ACK + 序号</li>
+<li>客户端：<br>数据检测</li>
+</ul>
+</li>
+<li>第四次挥手:<br>断开连接:<br>服务器 close<br>客户端 close</li>
+</ul>
+<h2 id="使用多进程的方式，解决服务器处理多连接的问题"><a href="#使用多进程的方式，解决服务器处理多连接的问题" class="headerlink" title="使用多进程的方式，解决服务器处理多连接的问题"></a>使用多进程的方式，解决服务器处理多连接的问题</h2><ul>
+<li>共享<ul>
+<li>读时共享，写时复制</li>
+<li>文件描述符</li>
+<li>内存映射区 — mmap</li>
+</ul>
+</li>
+<li>父进程的角色是什么？<ul>
+<li>等待接受客户端连接 — accept<ul>
+<li>有连接<ul>
+<li>创建一个子进程 fork</li>
+</ul>
+</li>
+<li>将通信的文件描述符关闭<ul>
+<li>浪费资源</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>子进程的角色是什么？<ul>
+<li>通信<ul>
+<li>使用accept返回值 -fd</li>
+</ul>
+</li>
+<li>关掉监听的文件描述符<ul>
+<li>浪费资源</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>创建的进程的个数有限制吗？<ul>
+<li>硬件限制</li>
+<li>文件描述符默认也是有上限的1024</li>
+</ul>
+</li>
+<li>子进程资源回收<ul>
+<li>wait/waitpid</li>
+<li>使用信号回收<ul>
+<li>signal</li>
+<li>sigaction-推荐(信号捕捉)</li>
+</ul>
+</li>
+<li>捕捉信号: SIGCHLD</li>
+</ul>
+</li>
+</ul>
+<h2 id="2MSL"><a href="#2MSL" class="headerlink" title="2MSL"></a>2MSL</h2><h2 id="半关闭"><a href="#半关闭" class="headerlink" title="半关闭"></a>半关闭</h2><ul>
+<li>A给B发送是FIN（A调用close函数），但是B没有给A发送FIN（B没有调用close）</li>
+<li>A断开了与B的连接，B没有断开与A的连接</li>
+<li>特点：<br>A不能给B发送数据，A可以收B发送的数据<br>B可以给A发送数据，<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">函数：<span class="function"><span class="keyword">int</span> <span class="title">shutdown</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> how)</span></span>;</span><br><span class="line">  sockfd: 要半关闭的一方对应的文件描述符(不管dup,dup2多少次，可以全部关闭)</span><br><span class="line">  通信的文件描述符</span><br><span class="line">  how:</span><br><span class="line">    SHUT_RD</span><br><span class="line">    SHUT_WR</span><br><span class="line">    SHUT_RDWR</span><br></pre></td></tr></table></figure>
+<h2 id="端口复用"><a href="#端口复用" class="headerlink" title="端口复用"></a>端口复用</h2></li>
+<li>端口复用最常用的用途是：<br>防止服务器重启时之前绑定的端口还未释放<br>程序突然退出二系统没有释放端口</li>
+<li><p>设置方法</p>
+<p>int opt<br>setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void*)&amp;opt, sizeof(opt))</p>
+</li>
+<li>注意事项：<br>绑定之前设置</li>
+</ul>
+<h3 id="IO操作方式"><a href="#IO操作方式" class="headerlink" title="IO操作方式"></a>IO操作方式</h3><ul>
+<li><p>阻塞等待<br>好处: 不占用CPU宝贵时间片<br>缺点: 同一时刻只能处理一个操作，效率低<br>多线程和多进程</p>
+</li>
+<li><p>非阻塞，忙轮询<br>优点：提高程序的执行效率<br>缺点：需要占用更多的CPU和系统资源</p>
+</li>
+<li><p>使用IO多路转接技术 select/poll/epoll （我觉得其实就是 代理委托给内核）</p>
+<ul>
+<li>select/poll<br>select代收员比较懒，她只会告诉你有几个快递到了，但是那个快递，你需要挨个遍历一遍（委托内核）</li>
+<li>epoll<br>epoll代收快递员很勤快，她不仅会告诉你有几个快递到了，还会告诉你是那个快递公司的快递<h3 id="什么是I-O多路转接技术"><a href="#什么是I-O多路转接技术" class="headerlink" title="什么是I/O多路转接技术"></a>什么是I/O多路转接技术</h3>先构造一张有关文件描述符的列表，将要监听的文件描述符添加到列表中<br>然后调用一个函数，监听该表中的文件描述符，知道这些描述符表中的一个进行I/O操作，该函数才返回<br>该函数为阻塞函数<br>函数对文件描述符的检测操作是由内核完成的<br>在返回时，它告诉进程有多少（哪些）描述符要进行I/O操作</li>
+</ul>
+</li>
+</ul>
+<h3 id="IO多路转接-select"><a href="#IO多路转接-select" class="headerlink" title="IO多路转接 select"></a>IO多路转接 select</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">函数原型</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">select</span> <span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">int</span> nfds<span class="comment">// 要检测的文件描述符中最大的fd+1 - 1024 最大只能是1024</span></span></span></span><br><span class="line"><span class="function"><span class="params">      **fd_set *readfds**, <span class="comment">// 读集合 传入传出参数</span></span></span></span><br><span class="line"><span class="function"><span class="params">      fd_set *writefds, <span class="comment">// 写集合</span></span></span></span><br><span class="line"><span class="function"><span class="params">      fd_set *excepfds, <span class="comment">// 异常集合</span></span></span></span><br><span class="line"><span class="function"><span class="params">      struct timeval *timeout;</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="literal">NULL</span>: 永久阻塞</span></span></span><br><span class="line"><span class="function"><span class="params">          当检测到fd变化的时候返回</span></span></span><br><span class="line"><span class="function"><span class="params">        timeval a</span></span></span><br><span class="line"><span class="function"><span class="params">          a.tv_sec = <span class="number">10</span>;</span></span></span><br><span class="line"><span class="function"><span class="params">          a.tv_sec = <span class="number">0</span>;</span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span></span><br><span class="line"><span class="function">  <span class="keyword">void</span> <span class="title">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">FD_CLR</span><span class="params">(<span class="keyword">int</span> fd, fd_set* <span class="built_in">set</span>)</span></span></span><br><span class="line"><span class="function">  <span class="keyword">void</span> <span class="title">FD_SET</span><span class="params">(<span class="keyword">int</span> fd, fd_set *<span class="built_in">set</span>)</span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">FD_ISSET</span><span class="params">(<span class="keyword">int</span> fd, fd_set* <span class="built_in">set</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> lfd = socket()</span><br><span class="line">  bind()</span><br><span class="line">  <span class="built_in">listen</span>()</span><br><span class="line">  <span class="comment">// 创建一个文件描述符表</span></span><br><span class="line">  fd_set reads, temp</span><br><span class="line">  <span class="comment">// 初始化</span></span><br><span class="line">  fd_zero(&amp;reads)</span><br><span class="line">  <span class="comment">// 监听的lfd加入到读集合</span></span><br><span class="line">  fd_set(lfd, &amp;reads)</span><br><span class="line">  <span class="keyword">int</span> maxfd = lfd;</span><br><span class="line">  <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// 委托内核检测</span></span><br><span class="line">    temp = reads;</span><br><span class="line">    <span class="keyword">int</span> ret = select(maxfd+<span class="number">1</span>,</span><br><span class="line">      &amp;reads, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是不是监听的， 有没有新的链接到达</span></span><br><span class="line">    <span class="keyword">if</span>(fd_isset(lfd, &amp;temp))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 接收新连接</span></span><br><span class="line">      <span class="keyword">int</span> cfd = accept();</span><br><span class="line">      <span class="comment">// cfd加入到读集合‘</span></span><br><span class="line">      fd_set(cfd, &amp;reads)</span><br><span class="line">      <span class="comment">// 跟新maxfd</span></span><br><span class="line">      maxfd = maxfd &gt; cfd ? maxfd : cfd;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 客户端发送数据</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=lfd+<span class="number">1</span>; i&lt;=maxfd; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span>(fd_isset(i, &amp;temp))</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">int</span> len = <span class="built_in">read</span>()</span><br><span class="line">        <span class="keyword">if</span>(len == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="comment">// cfd从读集合中删除</span></span><br><span class="line">          fd_clr(i, &amp;reads);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">write</span>()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="使用select函数的优缺点"><a href="#使用select函数的优缺点" class="headerlink" title="使用select函数的优缺点"></a>使用select函数的优缺点</h4><ul>
+<li>优点<br>跨平台</li>
+<li>缺点<br>每次调用select 都需要吧fd集合从用户态拷贝到内核态<br>这个开销在fd很多时会很大<br>同时每次调用select都需要在内核遍历传递进来的所有fd，这个开销在fd很多时也很大<br>select支持的文件描述符数量太小了，默认是1024</li>
+</ul>
+<h3 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">poll</span><span class="params">(struct pollfd *fd, <span class="keyword">nfd_t</span> nfds, <span class="keyword">int</span> timeout)</span></span></span><br><span class="line">  pollfd: 数组的地址</span><br><span class="line">  nfds:数组的最大长度，数组中最后一个使用的元素下表+<span class="number">1</span></span><br><span class="line">    内核会轮询检测fd数组的每个文件描述符</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">  <span class="keyword">int</span> fd;     <span class="comment">// 文件描述符</span></span><br><span class="line">  short events; <span class="comment">// 等待的事件</span></span><br><span class="line">  short revents; <span class="comment">// 实际发生的时间、 内核给的反馈k</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">三个函数</span><br><span class="line">  该函数生成一个epoll专用的文件描述符</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">epoll_create</span><span class="params">(<span class="keyword">int</span> <span class="built_in">size</span>)</span></span></span><br><span class="line">    size:epoll上能关注的最大描述符数</span><br><span class="line">  用于控制某个epoll文件描述符时间，可以注册，修改、删除</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">epoll_ctl</span><span class="params">(<span class="keyword">int</span> epfd, <span class="keyword">int</span> op, <span class="keyword">int</span> fd, struct epoll_event *event)</span></span>;</span><br><span class="line">    epfd: epoll_create 生成的epoll专用描述粗</span><br><span class="line">    op</span><br><span class="line">      EPOLL_CTL_ADD 注册</span><br><span class="line">      EPOLL_CTL_MOD 修改</span><br><span class="line">      EPOLL_CTL_DEL 删除</span><br><span class="line">    fd: 关联的文件描述符</span><br><span class="line">    event: 告诉内核要监听什么时间</span><br><span class="line">  等待IO事件发生-可以设置阻塞的函数</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">epoll_wait</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> epfd,</span></span></span><br><span class="line"><span class="function"><span class="params">    struct epoll_event* events,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> maxevents,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> timeout</span></span></span><br><span class="line"><span class="function"><span class="params">  )</span></span></span><br><span class="line">  对应select 和poll函数</span><br><span class="line">  参数：</span><br><span class="line">    epfd:要检测的句柄</span><br><span class="line">    events:用于回传待处理事件的数组</span><br><span class="line">    maxevents: 告诉内核这个events的大小</span><br><span class="line">    timeout: 为超时时间</span><br><span class="line">      <span class="number">-1</span> 永久阻塞</span><br><span class="line">      <span class="number">0</span> 立即返回</span><br><span class="line">      &gt;<span class="number">0</span> 为所设置的时间</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> epoll_data &#123;</span><br><span class="line">  <span class="keyword">void</span> *ptr;</span><br><span class="line">  <span class="keyword">int</span> fd;</span><br><span class="line">  <span class="keyword">uint32_t</span> u32;</span><br><span class="line">  <span class="keyword">uint64_t</span> u64;</span><br><span class="line">&#125;<span class="keyword">epoll_data_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> &#123;</span></span><br><span class="line">  <span class="keyword">uint32_t</span> events;</span><br><span class="line">  <span class="keyword">epoll_data_t</span> data;</span><br><span class="line">&#125;</span><br><span class="line">events:</span><br><span class="line">  EPOLLIN 读</span><br><span class="line">  EPOLLOUT 写</span><br><span class="line">  EPOLLERR 异常</span><br><span class="line"></span><br><span class="line">  epoll 模型</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> lfd = socket();</span><br><span class="line">    <span class="comment">// 绑定</span></span><br><span class="line">    bind();</span><br><span class="line">    <span class="comment">// 监听</span></span><br><span class="line">    <span class="built_in">listen</span>()</span><br><span class="line">    <span class="comment">// epoll 数根节点</span></span><br><span class="line">    <span class="keyword">int</span> epfd = epoll_create(<span class="number">3000</span>);</span><br><span class="line">    <span class="comment">// 存储发送变化的fd对应信息</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">all</span>[3000];</span></span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    <span class="comment">// 监听的lfd挂到epoll数上</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">epoll_event</span> <span class="title">ev</span>;</span></span><br><span class="line">    <span class="comment">// 在ev中 init lfd信息</span></span><br><span class="line">    ev.events = EPOLLIN</span><br><span class="line">    ev.data.fd = lfd;</span><br><span class="line">    epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &amp;ev)</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 委托内核检测事件</span></span><br><span class="line">      <span class="keyword">int</span> ret = epoll_wait(epfd, all, <span class="number">3000</span>, <span class="number">-1</span>);</span><br><span class="line">      <span class="comment">// 根据ret遍历all数组</span></span><br><span class="line">      fork（<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;ret; ++i)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">int</span> fd = all[i].data.fd;</span><br><span class="line">        <span class="comment">// 有新的链接</span></span><br><span class="line">        <span class="keyword">if</span>(fd == lfd)</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="comment">// 接收连接请求  accept不阻塞</span></span><br><span class="line">          <span class="keyword">int</span> cfd = accept();</span><br><span class="line">          <span class="comment">// cfd 挂到epoll数上</span></span><br><span class="line">          ev.events = EPILLIN</span><br><span class="line">          ev.data = cfd;</span><br><span class="line">          epoll_Ctl(epfd, epoll_ctl_...)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">          <span class="comment">// 只处理客户端发来的数据</span></span><br><span class="line">          <span class="keyword">if</span>(!all[i].events &amp; EPOLLIN)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">            <span class="comment">// 读数据</span></span><br><span class="line">            recv</span><br><span class="line">            <span class="keyword">if</span>(len == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">              <span class="built_in">close</span>(fd);</span><br><span class="line">              epoll_ctl_del</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 写数据</span></span><br><span class="line">            send()</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 已经链接的客户端有数据发送过来</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="epoll-三种工作模式"><a href="#epoll-三种工作模式" class="headerlink" title="epoll 三种工作模式"></a>epoll 三种工作模式</h4><ol>
+<li>水平触发模式-根据读来解释<ul>
+<li>只要fd对应的缓冲区有树</li>
+<li>epoll_wait 返回</li>
+<li>返回的次数与发送数据的次数没有关系</li>
+<li>epoll默认的工作模式</li>
+</ul>
+</li>
+<li>边沿触发模式-ET （边沿阻塞）<ul>
+<li>fd - 阻塞属性</li>
+<li>客户端给server发数据<br>发一次数据server的epoll_wait返回一次<br>不在乎数据是否读完<br>如果读不完，如何全部读出来<br> while(recv());<br>   数据读完之后recv会阻塞<br>   解决阻塞问题<pre><code> 设置非阻塞
+</code></pre></li>
+</ul>
+</li>
+<li><p>边沿非阻塞触发</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">效率最高</span><br><span class="line">如何设置非阻塞</span><br><span class="line"> <span class="built_in">open</span>()</span><br><span class="line">   设置flags</span><br><span class="line">   必须 O_WDRW | ONONBLOCK</span><br><span class="line">   终端文件: /dev/tty</span><br><span class="line"> fcntl</span><br><span class="line">   <span class="keyword">int</span> flag = fcntl(fd, F_GETFL);</span><br><span class="line">   flag |= O_NONBLOCK <span class="comment">// 修改文件描述符</span></span><br><span class="line">   fcntl(fd, F_SETFL, flag);</span><br><span class="line">将缓冲区的全部数据都读出来</span><br><span class="line"> <span class="keyword">while</span>(recv() &gt; <span class="number">0</span>)</span><br><span class="line"> &#123;</span><br><span class="line">   <span class="built_in">printf</span>();</span><br><span class="line"> &#125;</span><br><span class="line"> 当缓冲区数据读完，是否返回<span class="number">0</span>???</span><br><span class="line"></span><br><span class="line"> 阻塞</span><br><span class="line">   数据读完之后</span><br><span class="line"> 非阻塞</span><br><span class="line">   强行读了一个没有数据的缓冲区(fd)</span><br><span class="line">   判断errno == EAGIAN</span><br></pre></td></tr></table></figure>
+<h4 id="文件描述符突破1024限制"><a href="#文件描述符突破1024限制" class="headerlink" title="文件描述符突破1024限制"></a>文件描述符突破1024限制</h4><ul>
+<li>select 突破不了，需要重新编译内核</li>
+<li><p>poll和epoll可以突破1024限制</p>
+</li>
+<li><p>查看计算硬件限制的文件描述符上线</p>
+<ul>
+<li>cat /proc/sys/fs/maxfd</li>
+</ul>
+</li>
+<li>修改<ul>
+<li>/etc</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="UDP通信流程"><a href="#UDP通信流程" class="headerlink" title="UDP通信流程"></a>UDP通信流程</h2><ul>
+<li>server<ul>
+<li>创建套接字</li>
+<li>绑定本地IP和端口</li>
+<li>通信</li>
+<li>recvfrom() 会保存client的IP和端口</li>
+<li>关闭套接字</li>
+</ul>
+</li>
+</ul>
+<h2 id="tcp-udp-使用场景"><a href="#tcp-udp-使用场景" class="headerlink" title="tcp udp 使用场景"></a>tcp udp 使用场景</h2><ul>
+<li><p>tcp 使用场景</p>
+<ul>
+<li>对数据安全性安全要求高的时候<ul>
+<li>登录数据的传输</li>
+<li>文件传输</li>
+</ul>
+</li>
+<li>http协议<ul>
+<li>传输层协议-tcp</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>udp使用场景</p>
+<ul>
+<li>效率高-实时性要求比较高<ul>
+<li>视频聊天</li>
+<li>通话</li>
+</ul>
+</li>
+<li>有实力的大公司<ul>
+<li>使用udp<ul>
+<li>在应用层自定义协议，做数据校验！！！（保证UDP的不丢失）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="广播"><a href="#广播" class="headerlink" title="广播"></a>广播</h2><ul>
+<li>服务器<ul>
+<li>创建套接字-socket</li>
+<li>fd绑定服务器IP和端口</li>
+<li>初始化客户端IP和端口信息<ul>
+<li>struct  sockaddr_in cli;</li>
+<li>cli.sin_family = af_inet;</li>
+<li>cli.port = htons(8888)</li>
+<li>inet_pton(af_inet, “IP必须是广播IP”, &amp;cli.adr);</li>
+</ul>
+</li>
+<li>发送数据<ul>
+<li>sendto(fd, buf, len, 0, )</li>
+</ul>
+</li>
+<li>设置广播权限<ul>
+<li>setsockopt();</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>客户端<ul>
+<li>创建套接字</li>
+<li>显示绑定端口<ul>
+<li>bind()</li>
+</ul>
+</li>
+<li>接收数据 - server数据<ul>
+<li>recvfrom();</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>使用范围<ul>
+<li>只适用于局域网</li>
+</ul>
+</li>
+</ul>
+<h2 id="组播"><a href="#组播" class="headerlink" title="组播"></a>组播</h2><ul>
+<li><p>使用范围</p>
+<ul>
+<li>局域网</li>
+<li>Internet</li>
+</ul>
+</li>
+<li><p>sever:</p>
+<ul>
+<li>需要使用组播地址</li>
+<li>发送到客户端对应的端口上</li>
+<li>添加组播权限</li>
+</ul>
+</li>
+<li>client:<ul>
+<li>绑定固定端口</li>
+<li>加入到组播地址</li>
+</ul>
+</li>
+</ul>
+<h2 id="本地套接字完成没有血缘关系的进程间的通信"><a href="#本地套接字完成没有血缘关系的进程间的通信" class="headerlink" title="本地套接字完成没有血缘关系的进程间的通信"></a>本地套接字完成没有血缘关系的进程间的通信</h2><ol>
+<li>文件格式</li>
+</ol>
+<ul>
+<li>管道:p</li>
+<li>套接字：s<ul>
+<li>伪文件</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>服务器端</li>
+</ol>
+<ul>
+<li>创建套接字<ul>
+<li>int fd = socket(AF_LOCAL, sock_stream, 0);</li>
+</ul>
+</li>
+<li>绑定<ul>
+<li>struct sockaddr_un serv;</li>
+<li>serv.sun_family = af_local</li>
+<li>strcpy(serv.sun_path, “server.socket”);</li>
+<li>bind(lfd, (struct sockaddr&amp;)&amp;serv, len); // 绑定成功文件就创建出来了</li>
+</ul>
+</li>
+<li>设置监听<ul>
+<li>listen</li>
+</ul>
+</li>
+<li>等待链接请求<ul>
+<li>struct sockaddr_un client;</li>
+<li>int len = sizeof(client)</li>
+<li>int cfd = accept(lfd, &amp;client, &amp;len);</li>
+</ul>
+</li>
+<li>通信<ul>
+<li>send</li>
+<li>recv</li>
+</ul>
+</li>
+<li>断开连接<ul>
+<li>close(cfd)</li>
+<li>close(lfd)</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>客户端</li>
+</ol>
+<ul>
+<li>创建套接字<ul>
+<li>int fd = socket(af_local, sock_stream, 0)</li>
+</ul>
+</li>
+<li>绑定一个套接字文件<ul>
+<li>struct sockaddr_un client;</li>
+<li>client.sun_family = af_local;</li>
+<li>strcpy(client.sun_paht, “client.socket”);</li>
+<li>bind(fd, (struct sockaddr*)&amp;client, len)</li>
+</ul>
+</li>
+<li>链接服务器<ul>
+<li>struct sockaddr_un serv;</li>
+<li>serv.sun_family = af_local</li>
+<li>strcpy(serv.sun_path, “server.socket”);</li>
+<li>connect(fd, &amp;serv, sizeof(serv))</li>
+</ul>
+</li>
+<li>通信<ul>
+<li>recv</li>
+<li>send</li>
+</ul>
+</li>
+<li>关闭<ul>
+<li>close</li>
+</ul>
+</li>
+</ul>
+<h2 id="心跳包"><a href="#心跳包" class="headerlink" title="心跳包"></a>心跳包</h2><ul>
+<li>判断客户端和服务器是否处于链接状态<ul>
+<li>心跳状态<ul>
+<li>不会携带大量的数据</li>
+<li>每个一定时间服务器-&gt;客户端/客户端-&gt;服务器发送一个心跳包</li>
+</ul>
+</li>
+<li>心跳包看成一个协议<ul>
+<li>应用层协议</li>
+</ul>
+</li>
+<li>判断网络是否断开<ul>
+<li>有多个连续的心跳包没收到/没有回复</li>
+<li>关闭通信的套接字</li>
+</ul>
+</li>
+<li>重连<ul>
+<li>重新初始套接字</li>
+<li>继续发送心跳包</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>乒乓包<ul>
+<li>比心跳包携带的数据多一些</li>
+<li>除了知道连接是否存在，还能获取一些信息</li>
+</ul>
+</li>
+</ul>
+<h1 id="libevent"><a href="#libevent" class="headerlink" title="libevent"></a>libevent</h1><h2 id="事件的底层处理框架"><a href="#事件的底层处理框架" class="headerlink" title="事件的底层处理框架"></a>事件的底层处理框架</h2><p>  一个函数</p>
+<h2 id="消息循环"><a href="#消息循环" class="headerlink" title="消息循环"></a>消息循环</h2><p>  一个函数</p>
+<h2 id="创建事件"><a href="#创建事件" class="headerlink" title="创建事件"></a>创建事件</h2><p>  不带缓冲区的-event<br>    几个函数<br>  带缓冲区-bufferevent<br>    几个函数</p>
+<h2 id="资源释放"><a href="#资源释放" class="headerlink" title="资源释放"></a>资源释放</h2><p>  几个函数</p>
+<h2 id="libevent是干什么的"><a href="#libevent是干什么的" class="headerlink" title="libevent是干什么的"></a>libevent是干什么的</h2><ul>
+<li>开源的库，提高开发效率<ul>
+<li>封装了socket通信</li>
+<li>封装了IO多路转接</li>
+</ul>
+</li>
+<li>精简，专注于网络，性能高</li>
+<li>事件驱动</li>
+</ul>
+<h2 id="使用套路"><a href="#使用套路" class="headerlink" title="使用套路"></a>使用套路</h2><ul>
+<li>创建一个事件处理框架</li>
+<li>创建一个时间</li>
+<li>事件添加到事件处理框架上</li>
+<li>开始事件循环</li>
+<li>释放资源</li>
+</ul>
+<h2 id="事件处理框架-event-base"><a href="#事件处理框架-event-base" class="headerlink" title="事件处理框架-event_base"></a>事件处理框架-event_base</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、使用libevent函数之前需要分配一个或者多个event_base结构体</span><br><span class="line"><span class="number">2</span>、创建event_base_new(<span class="keyword">void</span>);</span><br><span class="line">  释放event_base_free()</span><br><span class="line">  循环监听event_base_dispatch();事件循环</span><br><span class="line"><span class="number">3</span></span><br><span class="line">  查看event_base封装的后端</span><br><span class="line">  <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>** <span class="title">event_get_supported_methods</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="title">event_base_get_method</span><span class="params">(<span class="keyword">const</span> struct event_base* base)</span></span>;</span><br><span class="line"></span><br><span class="line">  event_base 和 fork</span><br><span class="line">    子进程创建成功之后，父进程可以继续使用event_base</span><br><span class="line">    子进程需要继续使用event_base需要重新初始化</span><br><span class="line">      event_reinit(base);</span><br><span class="line">  event_base_new</span><br><span class="line">  event_new</span><br><span class="line">  event_free</span><br><span class="line">  event_add</span><br></pre></td></tr></table></figure>
+<h2 id="bufferevent-理解"><a href="#bufferevent-理解" class="headerlink" title="bufferevent 理解"></a>bufferevent 理解</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">是libevent为IO缓冲区操作提供的一种通用机制</span><br><span class="line">bufferevent由一个底层的传输端口（如套接字—），一个读取换红区和一个写入缓冲区组成</span><br><span class="line">与通常</span><br><span class="line"></span><br><span class="line"><span class="number">1</span>、创建基于套接字的bufferevent</span><br><span class="line">  bufferevent_socket_new</span><br><span class="line">释放</span><br><span class="line">  bufferevent_free</span><br><span class="line">  bufferevent_setcb : 设置回调</span><br><span class="line">  bufferevent_write</span><br><span class="line">  bufferevent_read</span><br><span class="line">  bufferevent_enable</span><br><span class="line">  bufferevent_disable</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在bufferevent上启动链接</span><br><span class="line">  bufferevent_socket_connect()</span><br><span class="line"></span><br><span class="line">链接监听器 evconnlistener</span><br><span class="line"></span><br><span class="line">server端evconnlistener_new_bind() <span class="comment">// 直接一步到位</span></span><br><span class="line">创建监听的套接字</span><br><span class="line">绑定</span><br><span class="line">监听</span><br><span class="line">接收连接请求</span><br><span class="line"><span class="function">struct <span class="title">evconnlistener_new_bind</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    struct event_base *base,</span></span></span><br><span class="line"><span class="function"><span class="params">    evconnlistener_cb cb 接收链接之后，用户需要做什么j</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">void</span> *ptr, <span class="comment">// 回调函数</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">unsigned</span> flags,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> backlog,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="number">-1</span> 使用的默认的最大值</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">const</span> struct sockaddr *sa,</span></span></span><br><span class="line"><span class="function"><span class="params">      服务器的IP和端口信息</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> socklen</span></span></span><br><span class="line"><span class="function"><span class="params">  )</span></span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/26/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/" rel="prev" title="linux系统编程">
+      <i class="fa fa-chevron-left"></i> linux系统编程
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#网络基础"><span class="nav-number">1.</span> <span class="nav-text">网络基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络应用程序设计模式："><span class="nav-number">1.1.</span> <span class="nav-text">网络应用程序设计模式：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#协议的概念"><span class="nav-number">1.2.</span> <span class="nav-text">协议的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分层模型"><span class="nav-number">1.3.</span> <span class="nav-text">分层模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tcp"><span class="nav-number">1.4.</span> <span class="nav-text">tcp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#udp"><span class="nav-number">1.5.</span> <span class="nav-text">udp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket编程"><span class="nav-number">1.6.</span> <span class="nav-text">socket编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字的概念"><span class="nav-number">1.6.1.</span> <span class="nav-text">套接字的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络字节序"><span class="nav-number">1.6.2.</span> <span class="nav-text">网络字节序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socket"><span class="nav-number">1.6.3.</span> <span class="nav-text">socket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcp-三次握手"><span class="nav-number">1.6.4.</span> <span class="nav-text">tcp 三次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcp-四次挥手"><span class="nav-number">1.6.5.</span> <span class="nav-text">tcp 四次挥手</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用多进程的方式，解决服务器处理多连接的问题"><span class="nav-number">1.7.</span> <span class="nav-text">使用多进程的方式，解决服务器处理多连接的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2MSL"><span class="nav-number">1.8.</span> <span class="nav-text">2MSL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#半关闭"><span class="nav-number">1.9.</span> <span class="nav-text">半关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口复用"><span class="nav-number">1.10.</span> <span class="nav-text">端口复用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IO操作方式"><span class="nav-number">1.10.1.</span> <span class="nav-text">IO操作方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是I-O多路转接技术"><span class="nav-number">1.10.2.</span> <span class="nav-text">什么是I&#x2F;O多路转接技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO多路转接-select"><span class="nav-number">1.10.3.</span> <span class="nav-text">IO多路转接 select</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用select函数的优缺点"><span class="nav-number">1.10.3.1.</span> <span class="nav-text">使用select函数的优缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#poll"><span class="nav-number">1.10.4.</span> <span class="nav-text">poll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#epoll"><span class="nav-number">1.10.5.</span> <span class="nav-text">epoll</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#epoll-三种工作模式"><span class="nav-number">1.10.5.1.</span> <span class="nav-text">epoll 三种工作模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件描述符突破1024限制"><span class="nav-number">1.10.5.2.</span> <span class="nav-text">文件描述符突破1024限制</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UDP通信流程"><span class="nav-number">1.11.</span> <span class="nav-text">UDP通信流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tcp-udp-使用场景"><span class="nav-number">1.12.</span> <span class="nav-text">tcp udp 使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#广播"><span class="nav-number">1.13.</span> <span class="nav-text">广播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组播"><span class="nav-number">1.14.</span> <span class="nav-text">组播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地套接字完成没有血缘关系的进程间的通信"><span class="nav-number">1.15.</span> <span class="nav-text">本地套接字完成没有血缘关系的进程间的通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#心跳包"><span class="nav-number">1.16.</span> <span class="nav-text">心跳包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#libevent"><span class="nav-number">2.</span> <span class="nav-text">libevent</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#事件的底层处理框架"><span class="nav-number">2.1.</span> <span class="nav-text">事件的底层处理框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息循环"><span class="nav-number">2.2.</span> <span class="nav-text">消息循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建事件"><span class="nav-number">2.3.</span> <span class="nav-text">创建事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源释放"><span class="nav-number">2.4.</span> <span class="nav-text">资源释放</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libevent是干什么的"><span class="nav-number">2.5.</span> <span class="nav-text">libevent是干什么的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用套路"><span class="nav-number">2.6.</span> <span class="nav-text">使用套路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件处理框架-event-base"><span class="nav-number">2.7.</span> <span class="nav-text">事件处理框架-event_base</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bufferevent-理解"><span class="nav-number">2.8.</span> <span class="nav-text">bufferevent 理解</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>
