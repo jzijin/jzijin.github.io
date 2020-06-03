@@ -180,6 +180,491 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/03/Dynamic-Programming/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/03/Dynamic-Programming/" class="post-title-link" itemprop="url">Dynamic Programming</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-04-03 21:45:33" itemprop="dateCreated datePublished" datetime="2020-04-03T21:45:33+08:00">2020-04-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-05-28 09:57:56" itemprop="dateModified" datetime="2020-05-28T09:57:56+08:00">2020-05-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithm/" itemprop="url" rel="index">
+                    <span itemprop="name">Algorithm</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h1><p>动态规划与分治方法相似，都是通过组合子问题的解来求解原问题。动态规划方法通常用来求解最优化问题。这类问题可以有喝多可行解，每个解都有一个值，我们希望寻找具有最优值的解。我们通常按如下4个步骤来设计一个动态规划算法:</p>
+<ol>
+<li>刻画一个最优解的结构特征。</li>
+<li>递归地定义最优解的值。</li>
+<li>计算最优解的值，通常采用自底向上的方法。</li>
+<li>利用计算出的信息构造一个最优解。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/" class="post-title-link" itemprop="url">FH-GAN: Face Hallucination and Recognition using Generative Adversarial Network</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-02-21 09:21:04 / Modified: 11:03:53" itemprop="dateCreated datePublished" datetime="2020-02-21T09:21:04+08:00">2020-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/FH/" itemprop="url" rel="index">
+                    <span itemprop="name">FH</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　影响视觉人脸识别的因素很多，如低分辨率图像、年龄、光照和姿态方差等。其中最重要的问题之一是低分辨率的人脸图像，这可能会导致人脸识别的性能下降。一般的人脸识别算法大都假设人脸图像具有足够的分辨率。然而，在实际应用中，许多- ten并没有足够的图像分辨率。现代的人脸幻觉模型显示了从相关的低分辨率图像中重建高分辨率图像的合理性能。但是，他们在产生幻觉时并不考虑身份水平信息，这直接影响了低分辨率人脸识别的结果。为了解决这一问题，我们提出了一种新的人脸生成对抗网络(FH-GAN)，该网络提高了低分辨率人脸图像的质量，并能识别出低分辨率的人脸图像。具体来说，我们的贡献如下:1)我们提出了FH-GAN网络，这是一个端到端的系统，可以同时提高人脸识别和人脸识别的能力。该网络的新颖之处在于，通过结合人脸识别网络进行身份预处理，将身份信息整合到基于gan的人脸幻觉算法中。2)我们还提出了一种新的人脸幻觉网络，即稠密稀疏网络(DSNet)，它是在人脸幻觉技术的基础上发展起来的。3)我们展示了人脸识别和基于gan的训练的好处。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/21/FH-GAN-Face-Hallucination-and-Recognition-using-Generative-Adversarial-Network/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/" class="post-title-link" itemprop="url">Ma:Learning a no-reference quality metric for single-image super-resolution</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-20 09:15:09" itemprop="dateCreated datePublished" datetime="2020-02-20T09:15:09+08:00">2020-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-21 09:20:39" itemprop="dateModified" datetime="2020-02-21T09:20:39+08:00">2020-02-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　最近提出了大量的单图像超分辨率算法，但是很少有研究涉及基于视觉感知的性能评估问题。虽然大多数超分辨率图像都是通过全参考指标来评价的（PSNR, SSIM），但其效果并不明显，实际应用中也不一定能得到所需的真实图像。为了解决这些问题，我们使用大量的超分辨率图像进行人体研究，并提出了一个从视觉感知得分中学习的无参考指标。具体来说，我们设计了三种空间域和频率域的低层统计特征来量化超分辨率伪影，并学习了两阶段回归模型来预测超分辨率图像的质量分数，而不必参考地面真实图像。大量的实验结果表明，该方法对基于人眼感知的超分辨率图像质量评估是有效的。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/20/MA-Learning-a-no-reference-quality-metric-for-single-image-super-resolution/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/" class="post-title-link" itemprop="url">RaGAN:The relativistic discriminator: a key element missing from standard GAN</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-02-18 10:54:41 / Modified: 11:33:18" itemprop="dateCreated datePublished" datetime="2020-02-18T10:54:41+08:00">2020-02-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/GAN/" itemprop="url" rel="index">
+                    <span itemprop="name">GAN</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　在传统的GAN（SGAN）中，判别器D估计输入数据是真实数据的概率。生成器G训练增加让判别器识别生成数据为真实数据的概率。我们认为生成器也应该同时降低让判别器识别真实数据是真实的概率，因为，第一，在一个mini-batch中的数据都是假的，第二，这样能使得散度最小化。第三，在最优设置下，SGAN等价于积分概率度量(IPM) GANs。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/18/RaGAN-The-relativistic-discriminator-a-key-element-missing-from-standard-GAN/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/17/Deep_Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/02/17/Deep_Learning/" class="post-title-link" itemprop="url">Deep_Learning</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-17 23:14:09" itemprop="dateCreated datePublished" datetime="2020-02-17T23:14:09+08:00">2020-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-18 10:49:48" itemprop="dateModified" datetime="2020-02-18T10:49:48+08:00">2020-02-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Deep Learning</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　深度学习允许由多个处理层组成的计算模型学习具有多个抽象级别的数据表示。这些方法极大地提高了语音识别、视觉对象识别、对象检测以及药物发现和基因组学等领域的技术水平。深度学习通过使用反向传播算法来指示机器应该如何改变其内部参数来发现大数据集中复杂的结构，这些内部参数用于从前一层的表示中计算每一层的表示。深度卷积网络在图像、视频、语音和音频处理方面取得了突破，而递归网络则在文本和语音等序列数据方面取得了突破。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/02/17/Deep_Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/12/RankSRGAN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/12/RankSRGAN/" class="post-title-link" itemprop="url">RankSRGAN</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-01-12 19:36:17" itemprop="dateCreated datePublished" datetime="2020-01-12T19:36:17+08:00">2020-01-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-02-19 22:57:07" itemprop="dateModified" datetime="2020-02-19T22:57:07+08:00">2020-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SISR/" itemprop="url" rel="index">
+                    <span itemprop="name">SISR</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　GAN已经被证实在图像超分辨率领域可以恢复出细节尖锐，高频信息丰富的高质量图片。为了提高超分辨率图片视觉质量，PIRM2018-SR挑战赛采用了PI,NIQE,MA等感知方法来达到超分辨率图像的感知质量。但是，现存的方法不能直接优化这些不可微的感知方法，因为这些方法都基于人类的感知投票。为了解决这个问题，我们提出了RankSRGAN去按照感知方法来优化generator生成器。特别的，我们首次训练了可以学习这些感知方法的Ranker,引入了Rank-content loss去优化图片的感知质量。<br>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/12/RankSRGAN/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/08/SiGAN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -500,518 +985,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/27/GFRNet/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/12/27/GFRNet/" class="post-title-link" itemprop="url">GFRNet</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-12-27 09:49:26" itemprop="dateCreated datePublished" datetime="2019-12-27T09:49:26+08:00">2019-12-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-12-30 18:25:48" itemprop="dateModified" datetime="2019-12-30T18:25:48+08:00">2019-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/FH/" itemprop="url" rel="index">
-                    <span itemprop="name">FH</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　Guided face restortion network(GFRNet).包含两个网络，WarpNet和RecNet.WarpNet预测面部流场使得Guide face和degraded face有相同的姿势（对齐操作）。输入degrade face和warped guide face到RecNet中重建出高质量face.WarpNet中的loss是landmark loss和TV loss。退化模型进行了模糊、加噪、下采样、JPEG压缩操作。<br>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/12/27/GFRNet/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/24/SRCNN/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/12/24/SRCNN/" class="post-title-link" itemprop="url">SRCNN</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-12-24 16:54:39" itemprop="dateCreated datePublished" datetime="2019-12-24T16:54:39+08:00">2019-12-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-12-30 15:32:14" itemprop="dateModified" datetime="2019-12-30T15:32:14+08:00">2019-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SISR/" itemprop="url" rel="index">
-                    <span itemprop="name">SISR</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>　　SRCNN是深度用在超分辨率重建上的开山之作。其指出传统的基于稀疏矩阵的方法可以看做一个深层神经网络。SRCNN是一个轻量级的网络，只有三个卷积神经网络(CNN)。作者在训练时将图片转化为YCrCb三个通道，只对Y通道进行训练。因为人眼对Y通道比较敏感。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/12/24/SRCNN/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/" class="post-title-link" itemprop="url">最近点对问题</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-10-19 13:39:06" itemprop="dateCreated datePublished" datetime="2019-10-19T13:39:06+08:00">2019-10-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-02-18 10:48:47" itemprop="dateModified" datetime="2020-02-18T10:48:47+08:00">2020-02-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mathematics/" itemprop="url" rel="index">
-                    <span itemprop="name">mathematics</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。<br>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/10/19/e6-9c-80-e8-bf-91-e7-82-b9-e5-af-b9-e9-97-ae-e9-a2-98/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/16/e6-95-b0-e5-ad-a6-e5-bd-92-e7-ba-b3-e6-b3-95-e5-92-8c-e5-bc-ba-e5-bd-92-e7-ba-b3-e6-b3-95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/16/e6-95-b0-e5-ad-a6-e5-bd-92-e7-ba-b3-e6-b3-95-e5-92-8c-e5-bc-ba-e5-bd-92-e7-ba-b3-e6-b3-95/" class="post-title-link" itemprop="url">数学归纳法和强归纳法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-10-16 09:36:55" itemprop="dateCreated datePublished" datetime="2019-10-16T09:36:55+08:00">2019-10-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-12-24 16:23:40" itemprop="dateModified" datetime="2019-12-24T16:23:40+08:00">2019-12-24</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mathematics/" itemprop="url" rel="index">
-                    <span itemprop="name">mathematics</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <pre><code>数学归纳法的原理： 为证明对所有的正整数n，p(n)为真，其中p(n)是一个命题函数
-需要完成两个步骤
-    基础步骤： 证明命题p(1)成立
-    归纳步骤： 证明对每个正整数k来说， p(k) --&gt; p(k+1)
-
-    强归纳法： 要证明对所有的正整数n而言，都有p(n)为真，其中p(n)为命题函数，我们
-要完成如下两个步骤：
-    基础步骤： 证明p(1)为真
-    归纳步骤： 要证明对所有正整数k来说，蕴含式 p(1)&amp;p(2)...p(k)  --&gt; p(k+1)也为真
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/10/16/e6-95-b0-e5-ad-a6-e5-bd-92-e7-ba-b3-e6-b3-95-e5-92-8c-e5-bc-ba-e5-bd-92-e7-ba-b3-e6-b3-95/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/13/gale-shapley-algorithm-e7-a8-b3-e5-ae-9a-e5-a9-9a-e5-a7-bb-e9-97-ae-e9-a2-98-ef-bc-89/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/13/gale-shapley-algorithm-e7-a8-b3-e5-ae-9a-e5-a9-9a-e5-a7-bb-e9-97-ae-e9-a2-98-ef-bc-89/" class="post-title-link" itemprop="url">gale-shapley algorithm(稳定婚姻问题）</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-10-13 17:20:49" itemprop="dateCreated datePublished" datetime="2019-10-13T17:20:49+08:00">2019-10-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-03 21:40:45" itemprop="dateModified" datetime="2020-04-03T21:40:45+08:00">2020-04-03</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithm/" itemprop="url" rel="index">
-                    <span itemprop="name">Algorithm</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>稳定婚姻问题的解决</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/10/13/gale-shapley-algorithm-e7-a8-b3-e5-ae-9a-e5-a9-9a-e5-a7-bb-e9-97-ae-e9-a2-98-ef-bc-89/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/13/e8-83-8c-e5-8c-85-e9-97-ae-e9-a2-98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/13/e8-83-8c-e5-8c-85-e9-97-ae-e9-a2-98/" class="post-title-link" itemprop="url">背包问题</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-10-13 16:01:39" itemprop="dateCreated datePublished" datetime="2019-10-13T16:01:39+08:00">2019-10-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-03 21:40:45" itemprop="dateModified" datetime="2020-04-03T21:40:45+08:00">2020-04-03</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithm/" itemprop="url" rel="index">
-                    <span itemprop="name">Algorithm</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>背包问题的解决<br>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/10/13/e8-83-8c-e5-8c-85-e9-97-ae-e9-a2-98/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1077,14 +1055,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">33</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">

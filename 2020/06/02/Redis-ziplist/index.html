@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="压缩列表的构成1&lt;zlbytes&gt;&lt;zltail&gt;&lt;zllen&gt;&lt;entry1&gt;....&lt;entryn&gt;&lt;zlend&gt; 上述展示了一个压缩列表的构成  zlbytes:uint32_t，4字节，记录整个压缩列表占用的内存字节数：在对压缩列表进行内存重分配，或者计算zlend的位置时使用 zltail:uint32_t，4字节，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis ziplist">
+<meta property="og:url" content="http://yoursite.com/2020/06/02/Redis-ziplist/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="压缩列表的构成1&lt;zlbytes&gt;&lt;zltail&gt;&lt;zllen&gt;&lt;entry1&gt;....&lt;entryn&gt;&lt;zlend&gt; 上述展示了一个压缩列表的构成  zlbytes:uint32_t，4字节，记录整个压缩列表占用的内存字节数：在对压缩列表进行内存重分配，或者计算zlend的位置时使用 zltail:uint32_t，4字节，">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-06-02T15:36:46.000Z">
+<meta property="article:modified_time" content="2020-06-03T06:36:11.137Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="SISR">
+<meta property="article:tag" content=" FH">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/02/Redis-ziplist/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Redis ziplist | SRCNN</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SRCNN</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">SISR-FH</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/02/Redis-ziplist/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis ziplist
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-02 23:36:46" itemprop="dateCreated datePublished" datetime="2020-06-02T23:36:46+08:00">2020-06-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-06-03 14:36:11" itemprop="dateModified" datetime="2020-06-03T14:36:11+08:00">2020-06-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="压缩列表的构成"><a href="#压缩列表的构成" class="headerlink" title="压缩列表的构成"></a>压缩列表的构成</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;zlbytes&gt;&lt;zltail&gt;&lt;zllen&gt;&lt;entry1&gt;....&lt;entryn&gt;&lt;zlend&gt;</span><br></pre></td></tr></table></figure>
+<p>上述展示了一个压缩列表的构成</p>
+<ul>
+<li>zlbytes:uint32_t，4字节，记录整个压缩列表占用的内存字节数：在对压缩列表进行内存重分配，或者计算zlend的位置时使用</li>
+<li>zltail:uint32_t，4字节，记录压缩列表最后一个entry的offset。</li>
+<li>zllen:uint16_t，2字节，记录压缩列表entry的个数，当值大于INT16i_MAX时，需要遍历整个压缩列表才能计算得到长度</li>
+<li>entry:列表节点，</li>
+<li>zlend:uint6_t，1字节，0xFF，标记压缩列表的末端<a id="more"></a>
+</li>
+</ul>
+<h1 id="压缩列表的节点"><a href="#压缩列表的节点" class="headerlink" title="压缩列表的节点"></a>压缩列表的节点</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;prevlen&gt; &lt;encoding&gt; &lt;entry-data&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>prevlen:记录上一个entry的长度，用于从尾向前移动<ul>
+<li>如果前一个entry的长度小于254字节，那么prelen属性的长度为1个字节</li>
+<li>入股前一个entry的长度大于254字节，那么prelen属性的长度为5个字节，其中第一个字节设置为0xFE，而之后的四个字节用于保存前一个节点的长度。</li>
+</ul>
+</li>
+<li>encoding:记录entry的内容的属性和长度<ul>
+<li>|00pppppp| encoding长度为一个字节，pppppp代表entry-data的长度，小于63个字节的字符串数据，字符串数据</li>
+<li>|01pppppp|qqqqqqqq| encoding长度为两个字节，ppppppqqqqqqqq表示entry-data的长度，小于16383个字节的字符串数据</li>
+<li>|10000000|qqqqqqqq|rrrrrrrr|ssssssss|tttttttt| encoding长度为五个字节，q-t表示entry的长度，小于$2^{32}-1$字节的字符串数据</li>
+<li>|11000000| encoding长度为一个字节，encoding+entry-data为3个字节 整型数据 int16_t(2 bytes)</li>
+<li>|11010000| encoding长度为一个字节，encoding+entry-data为5个字节整型数据 int32_t(4 bytes)</li>
+<li>|11100000| encoding长度为一个字节，encoding+entry-data为9个字节整型数据 int64_t(8 bytes)</li>
+<li>|11110000| encoding长度为一个字节，encoding+entry-data为4个字节整型数据 24bit带符号整型数据(3 bytes)</li>
+<li>|11111110| encoding长度为一个字节，encoding+entry-data为2个字节整型数据 8bit带符号整型数据(1 bytes)</li>
+<li>|1111xxxx| xxxx 在0001-1101(1-13)之间的数据, 计算的时候要减1(0-12).</li>
+<li>|11111111| 0xFF结束标识符</li>
+</ul>
+</li>
+<li>entry-data: 根据encoding决定存储的数据类型和长度。str 或 int</li>
+</ul>
+<h1 id="连锁更新"><a href="#连锁更新" class="headerlink" title="连锁更新"></a>连锁更新</h1><p>当插入一个entry时，因为每个entry的头部都要用一个字节或者五个字节记录上一个entry的长度<br>所以插入一个entry后，需要更新后面所有entry的prevlen，最坏情况是之后所有entry的prevlen的<br>长度都由一个字节变为五个字节。</p>
+<ul>
+<li>需要逐个entry更新到最后一个</li>
+<li>需要收缩长度的地方，为了提高效率，我们不进行收缩，而使用5个字节表示原先用1个字节就能表示的长度<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> *__ziplistCascadeUpdate(<span class="keyword">unsigned</span> <span class="keyword">char</span> *zl, <span class="keyword">unsigned</span> <span class="keyword">char</span> *p) &#123;</span><br><span class="line">    <span class="keyword">size_t</span> curlen = intrev32ifbe(ZIPLIST_BYTES(zl)), rawlen, rawlensize;</span><br><span class="line">    <span class="keyword">size_t</span> offset, noffset, extra;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> *np;</span><br><span class="line">    zlentry cur, next;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (p[<span class="number">0</span>] != ZIP_END) &#123;</span><br><span class="line">        <span class="comment">// 得到当前entry</span></span><br><span class="line">        zipEntry(p, &amp;cur);</span><br><span class="line">        <span class="comment">// 当前entry的总长度</span></span><br><span class="line">        rawlen = cur.headersize + cur.len;</span><br><span class="line">        <span class="comment">// 需要用几个字节来存储当前entry的总长度，&lt;254 1 个字节， 大于254 5个字节</span></span><br><span class="line">        rawlensize = zipStorePrevEntryLength(<span class="literal">NULL</span>,rawlen);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Abort if there is no next entry. */</span></span><br><span class="line">        <span class="comment">// 如果p已经是最后一个entry了</span></span><br><span class="line">        <span class="keyword">if</span> (p[rawlen] == ZIP_END) <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">// 得到下一个entry的地址</span></span><br><span class="line">        zipEntry(p+rawlen, &amp;next);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Abort when "prevlen" has not changed. */</span></span><br><span class="line">        <span class="comment">// 如果下一个entry的prelen已经是正确的不需要做任何操作</span></span><br><span class="line">        <span class="keyword">if</span> (next.prevrawlen == rawlen) <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 下一个entry需要用5个字节来替换1个字节存储，扩容</span></span><br><span class="line">        <span class="keyword">if</span> (next.prevrawlensize &lt; rawlensize) &#123;</span><br><span class="line">            <span class="comment">/* The "prevlen" field of "next" needs more bytes to hold</span></span><br><span class="line"><span class="comment">             * the raw length of "cur". */</span></span><br><span class="line">            offset = p-zl;</span><br><span class="line">            <span class="comment">// 需要增加的字节的大小</span></span><br><span class="line">            extra = rawlensize-next.prevrawlensize;</span><br><span class="line">            <span class="comment">// 重新resize</span></span><br><span class="line">            zl = ziplistResize(zl,curlen+extra);</span><br><span class="line">            p = zl+offset;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* Current pointer and offset for next element. */</span></span><br><span class="line">            <span class="comment">// 下一个指针地址</span></span><br><span class="line">            np = p+rawlen;</span><br><span class="line">            <span class="comment">// 下一个指针的offset</span></span><br><span class="line">            noffset = np-zl;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* Update tail offset when next element is not the tail element. */</span></span><br><span class="line">            <span class="comment">// 改变&lt;zoffset&gt;</span></span><br><span class="line">            <span class="keyword">if</span> ((zl+intrev32ifbe(ZIPLIST_TAIL_OFFSET(zl))) != np) &#123;</span><br><span class="line">                ZIPLIST_TAIL_OFFSET(zl) =</span><br><span class="line">                    intrev32ifbe(intrev32ifbe(ZIPLIST_TAIL_OFFSET(zl))+extra);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* Move the tail to the back. */</span></span><br><span class="line">            <span class="comment">//  需要扩张，把后面内存的东西搬到前面来</span></span><br><span class="line">            memmove(np+rawlensize,</span><br><span class="line">                np+next.prevrawlensize,</span><br><span class="line">                curlen-noffset-next.prevrawlensize<span class="number">-1</span>); </span><br><span class="line">            zipStorePrevEntryLength(np,rawlen);</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* Advance the cursor */</span></span><br><span class="line">            <span class="comment">// 指向下一个节点来继续更新操作</span></span><br><span class="line">            p += rawlen;</span><br><span class="line">            <span class="comment">// 更新当前的ziplist的长度</span></span><br><span class="line">            curlen += extra;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (next.prevrawlensize &gt; rawlensize) &#123;</span><br><span class="line">                <span class="comment">/* This would result in shrinking, which we want to avoid.</span></span><br><span class="line"><span class="comment">                 * So, set "rawlen" in the available bytes. */</span></span><br><span class="line">                <span class="comment">// 可能会导致收缩，但是我们不做收缩 收缩效率降低</span></span><br><span class="line">                <span class="comment">// 我们此时用5个字节来表示原先1个字节就可以存储的长度</span></span><br><span class="line">                zipStorePrevEntryLengthLarge(p+rawlen,rawlen);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                zipStorePrevEntryLength(p+rawlen,rawlen);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* Stop here, as the raw length of "next" has not changed. */</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> zl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="压缩列表API"><a href="#压缩列表API" class="headerlink" title="压缩列表API"></a>压缩列表API</h1><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*ziplistNew(void)</td>
+<td>创建一个新的压缩列表</td>
+</tr>
+<tr>
+<td>*ziplistMerge(unsigned char **first, unsigned char **second)</td>
+<td>合并两个压缩列表</td>
+</tr>
+<tr>
+<td>*ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where)</td>
+<td>创建一个列表，添加到表头或表尾</td>
+</tr>
+<tr>
+<td>*ziplistIndex(unsigned char *zl, int index)</td>
+<td>返回压缩列表索引上的节点</td>
+</tr>
+<tr>
+<td>*ziplistNext(unsigned char *zl, unsigned char *p)</td>
+<td>得到压缩列表下一个节点</td>
+</tr>
+<tr>
+<td>*ziplistPrev(unsigned char *zl, unsigned char *p)</td>
+<td>得到压缩列表上一个节点</td>
+</tr>
+<tr>
+<td>ziplistGet(unsigned char *p, unsigned char **sval, unsigned int *slen, long long *lval)</td>
+<td>获取给定接待呢所保存的值</td>
+</tr>
+<tr>
+<td>*ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char *s, unsigned int slen)</td>
+<td>插入一个节点</td>
+</tr>
+<tr>
+<td>*ziplistDelete(unsigned char *zl, unsigned char **p)</td>
+<td>删除一个节点</td>
+</tr>
+<tr>
+<td>*ziplistDeleteRange(unsigned char *zl, int index, unsigned int num)</td>
+<td>删除一个范围的节点</td>
+</tr>
+<tr>
+<td>*ziplistFind(unsigned char *p, unsigned char *vstr, unsigned int vlen, unsigned int skip)</td>
+<td>在压缩列表中查找并返回包含了给定值的节点</td>
+</tr>
+<tr>
+<td>ziplistLen(unsigned char *zl)</td>
+<td>返回压缩列表包含节点的数量</td>
+</tr>
+<tr>
+<td>ziplistBlobLen(unsigned char *zl)</td>
+<td>返回压缩列表目前占用的字节数</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/02/Redis-%E5%AD%97%E5%85%B8/" rel="prev" title="Redis 字典">
+      <i class="fa fa-chevron-left"></i> Redis 字典
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/03/Redis-%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/" rel="next" title="Redis 整数集合">
+      Redis 整数集合 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#压缩列表的构成"><span class="nav-number">1.</span> <span class="nav-text">压缩列表的构成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#压缩列表的节点"><span class="nav-number">2.</span> <span class="nav-text">压缩列表的节点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#连锁更新"><span class="nav-number">3.</span> <span class="nav-text">连锁更新</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#压缩列表API"><span class="nav-number">4.</span> <span class="nav-text">压缩列表API</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">about the single image super-resolution and face hallucination</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">33</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.njust.edu.cn/" title="http:&#x2F;&#x2F;www.njust.edu.cn" rel="noopener" target="_blank">南京理工大学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://ehall.njust.edu.cn/new/index.html" title="http:&#x2F;&#x2F;ehall.njust.edu.cn&#x2F;new&#x2F;index.html" rel="noopener" target="_blank">南京理工大学智慧服务</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://lib.njust.edu.cn/" title="http:&#x2F;&#x2F;lib.njust.edu.cn&#x2F;" rel="noopener" target="_blank">南京理工大学图书馆</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        extensions: ['[mhchem]/mhchem.js'],
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>
