@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。   可以很简单的写出暴力法破解： &#x2F;&#x2F; Points 为所有点对的集合，using Point &#x3D; pair&lt;double, double&gt;,  &#x2F;&#x2F; a, b 传出参数， 最近点对的两个点。 double get_distance_enforce(const vector&lt;Point&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最近点对问题">
+<meta property="og:url" content="http://example.com/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。   可以很简单的写出暴力法破解： &#x2F;&#x2F; Points 为所有点对的集合，using Point &#x3D; pair&lt;double, double&gt;,  &#x2F;&#x2F; a, b 传出参数， 最近点对的两个点。 double get_distance_enforce(const vector&lt;Point&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-19T05:39:06.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.450Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/","path":"2019/10/19/computer science/最近点对问题/","title":"最近点对问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>最近点对问题 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="最近点对问题 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          最近点对问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-10-19 13:39:06" itemprop="dateCreated datePublished" datetime="2019-10-19T13:39:06+08:00">2019-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/mathematics/" itemprop="url" rel="index"><span itemprop="name">mathematics</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>9 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>考虑确定平面上n个点(x1, y1),(x2,y2)…(xn,yn)集合上的最近点对的问题。</p>
+<!---more--->
+
+<pre><code>可以很简单的写出暴力法破解：
+// Points 为所有点对的集合，using Point = pair&lt;double, double&gt;, 
+// a, b 传出参数， 最近点对的两个点。
+double get_distance_enforce(const vector&lt;Point&gt; &amp;Points, Point &amp;a, Point &amp;b)
+&#123;
+    double distance = static_cast&lt;double&gt;(INT32_MAX);
+    for (auto i = Points.begin(); i != Points.end(); ++i)
+    &#123;
+        for (auto j = i + 1; j != Points.end(); ++j)
+        &#123;
+            double tmp = sqrt(distance_square(*i, *j));
+            // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+            if (tmp &lt; distance)
+            &#123;
+                distance = tmp;
+                a = *i;
+                b = *j;
+            &#125;
+        &#125;
+    &#125;
+    return distance;
+&#125;
+这样得出的算法复杂度为O(n^2).
+</code></pre>
+<p>方法2：可以用递归的方法，分而治之，将一个大问题分解为若干个小问题。</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;random&gt;
+#include &lt;chrono&gt;
+#include &lt;cmath&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+using Point = pair&lt;double, double&gt;;
+constexpr int NO_DISTANCE = 10000;
+
+// 随机生成点对
+void set_point(vector&lt;Point&gt; &amp;Points, int size, double x, double y)
+&#123;
+    std::default_random_engine e(std::chrono::system_clock().now().time_since_epoch().count());
+    std::uniform_real_distribution&lt;double&gt; dis(x, y);
+    for (auto i = 0; i &lt; size; ++i)
+    &#123;
+        Points.push_back(Point(dis(e), dis(e)));
+    &#125;
+&#125;
+
+// 打印点对
+void print_points(const vector&lt;Point&gt; &amp;Points)
+&#123;
+    for (auto i : Points)
+    &#123;
+        cout &lt;&lt; &quot;(&quot; &lt;&lt; i.first &lt;&lt; &quot;, &quot; &lt;&lt; i.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    &#125;
+    cout &lt;&lt; endl;
+&#125;
+
+double distance_square(Point a, Point b)
+&#123;
+    return (a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+&#125;
+
+// points 所有的点的集合， a, b 传出参数
+// Points_X 按X排序的序列， Points_Y 按Y排序的序列。
+double closestPoint(const vector&lt;Point&gt; &amp;Points_X, const vector&lt;Point&gt; &amp;Points_Y, Point &amp;a, Point &amp;b)
+&#123;
+    Point a1, b1, a2, b2;
+    int length = Points_X.size();
+    double distance;
+    if (length &lt; 2)
+        return NO_DISTANCE;
+    else if (length == 2)
+    &#123;
+        a = Points_X[0];
+        b = Points_X[1];
+        distance = sqrt(distance_square(Points_X[0], Points_X[1]));
+    &#125;
+    else
+    &#123;
+        vector&lt;Point&gt; pst1(Points_X.begin(), Points_X.begin() + length / 2);
+        vector&lt;Point&gt; pst2(Points_X.begin() + length / 2, Points_X.end());
+        double d1 = closestPoint(pst1, Points_Y, a1, b1);
+        double d2 = closestPoint(pst2, Points_Y, a2, b2);
+        if (d1 &lt; d2)
+        &#123;
+            distance = d1;
+            a = a1;
+            b = b1;
+        &#125;
+        else
+        &#123;
+            distance = d2;
+            a = a2;
+            b = b2;
+        &#125;
+
+        // 一个点在左边 一个点在右边的情况。
+        vector&lt;Point&gt; pst3;
+        double mid = (Points_X.begin() + length / 2 - 1)-&gt;first;
+        for (auto point : Points_Y)
+        &#123;
+            if (abs(point.first - mid) &lt;= distance)
+                pst3.push_back(point);
+        &#125;
+
+        // 只需要与有序的链接的7个点进行比较就可以了。
+        for (auto i = pst3.begin(); i != pst3.end(); ++i)
+        &#123;
+            for (auto j = i + 1; j != i + 7 &amp;&amp; j != pst3.end(); ++j)
+            &#123;
+                double tmp = sqrt(distance_square(*i, *j));
+                // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+                if (tmp &lt; distance)
+                &#123;
+                    distance = tmp;
+                    a = *i;
+                    b = *j;
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    return distance;
+&#125;
+
+double get_distance_enforce(const vector&lt;Point&gt; &amp;Points, Point &amp;a, Point &amp;b)
+&#123;
+    double distance = static_cast&lt;double&gt;(INT32_MAX);
+    for (auto i = Points.begin(); i != Points.end(); ++i)
+    &#123;
+        for (auto j = i + 1; j != Points.end(); ++j)
+        &#123;
+            double tmp = sqrt(distance_square(*i, *j));
+            // 如果跨分割线的两点距离小于已知距离，则记录该距离。
+            if (tmp &lt; distance)
+            &#123;
+                distance = tmp;
+                a = *i;
+                b = *j;
+            &#125;
+        &#125;
+    &#125;
+    return distance;
+&#125;
+int main()
+&#123;
+    int points_size;
+    cout &lt;&lt; &quot;请输入要生成的points的数量 &quot;;
+    cin &gt;&gt; points_size;
+
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;随机生成的点是&quot; &lt;&lt; endl;
+    vector&lt;Point&gt; Points;
+    set_point(Points, points_size, -100.0, 100.0);
+    print_points(Points);
+
+    auto start1 = std::chrono::system_clock::now();
+    vector&lt;Point&gt; Points_X(Points);
+    vector&lt;Point&gt; Points_Y(Points);
+
+    sort(Points_X.begin(), Points_X.end(), [](Point a, Point b) &#123; return a.first &lt; b.first; &#125;);
+    sort(Points_Y.begin(), Points_Y.end(), [](Point a, Point b) &#123; return a.second &lt; b.second; &#125;);
+
+    // cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    // cout &lt;&lt; &quot;按照x升序排列&quot; &lt;&lt; endl;
+    // print_points(Points_X);
+
+    // cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    // cout &lt;&lt; &quot;按照y升序排列&quot; &lt;&lt; endl;
+    // print_points(Points_Y);
+
+    Point a, b;
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;归并法破解&quot; &lt;&lt; endl;
+    double distance1 = closestPoint(Points_X, Points_Y, a, b);
+    auto end1 = std::chrono::system_clock::now();
+    auto duration1 = chrono::duration_cast&lt;chrono::microseconds&gt;(end1 - start1);
+    cout &lt;&lt; &quot;最近的距离是&quot; &lt;&lt; distance1 &lt;&lt; endl;
+    cout &lt;&lt; &quot;两个点分别是 (&quot; &lt;&lt; a.first &lt;&lt; &quot;, &quot; &lt;&lt; a.second &lt;&lt; &quot;), (&quot; &lt;&lt; b.first &lt;&lt; &quot;, &quot; &lt;&lt; b.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;花费了&quot;
+         &lt;&lt; double(duration1.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den
+         &lt;&lt; &quot;秒&quot; &lt;&lt; endl;
+
+    Point c, d;
+    cout &lt;&lt; &quot;********************************************************************************&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;暴力法破解&quot; &lt;&lt; endl;
+    auto start2 = std::chrono::system_clock::now();
+    double distance2 = get_distance_enforce(Points, c, d);
+    auto end2 = std::chrono::system_clock::now();
+    auto duration2 = chrono::duration_cast&lt;chrono::microseconds&gt;(end2 - start2);
+    cout &lt;&lt; &quot;最近的距离是&quot; &lt;&lt; distance2 &lt;&lt; endl;
+    cout &lt;&lt; &quot;两个点分别是 (&quot; &lt;&lt; c.first &lt;&lt; &quot;, &quot; &lt;&lt; c.second &lt;&lt; &quot;), (&quot; &lt;&lt; d.first &lt;&lt; &quot;, &quot; &lt;&lt; d.second &lt;&lt; &quot;)&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;花费了&quot;
+         &lt;&lt; double(duration2.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den
+         &lt;&lt; &quot;秒&quot; &lt;&lt; endl;
+
+    return 0;
+&#125;
+</code></pre>
+<p>方法2复杂度为O(nlogn)，还可以进一步简化，用左右界限来代替不必要的数组拷贝。</p>
+<p>当n不够大时，其实暴力法需要的时间反而更少，当n特别大的时候，sorry，我并没有测试。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/10/16/computer%20science/%E6%95%B0%E5%AD%A6%E5%BD%92%E7%BA%B3%E6%B3%95%E5%92%8C%E5%BC%BA%E5%BD%92%E7%BA%B3%E6%B3%95/" rel="prev" title="数学归纳法和强归纳法">
+                  <i class="fa fa-angle-left"></i> 数学归纳法和强归纳法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/12/24/computer%20science/SRCNN/" rel="next" title="SRCNN">
+                  SRCNN <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2019/10/19/computer%20science/%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9%E9%97%AE%E9%A2%98/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

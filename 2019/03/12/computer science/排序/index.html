@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="各种排序算法   先上一张图 再来直接上代码。 &#x2F;&#x2F;https:&#x2F;&#x2F;www.cnblogs.com&#x2F;hokky&#x2F;p&#x2F;8529042.html &#x2F;&#x2F;https:&#x2F;&#x2F;blog.csdn.net&#x2F;m0_37962600&#x2F;article&#x2F;details&#x2F;81475585 &#x2F;* 如果排序算法能保证：对于待排序的序列里任一对排序吗相同的记录a,b，在排序之后的序列中a,b的前后顺序 保持不变，就称这种排序是稳">
+<meta property="og:type" content="article">
+<meta property="og:title" content="排序大杂烩 各种各样的排序">
+<meta property="og:url" content="http://example.com/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="各种排序算法   先上一张图 再来直接上代码。 &#x2F;&#x2F;https:&#x2F;&#x2F;www.cnblogs.com&#x2F;hokky&#x2F;p&#x2F;8529042.html &#x2F;&#x2F;https:&#x2F;&#x2F;blog.csdn.net&#x2F;m0_37962600&#x2F;article&#x2F;details&#x2F;81475585 &#x2F;* 如果排序算法能保证：对于待排序的序列里任一对排序吗相同的记录a,b，在排序之后的序列中a,b的前后顺序 保持不变，就称这种排序是稳">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1156494-62f859c2ac6f95ff.png">
+<meta property="article:published_time" content="2019-03-12T08:34:07.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.450Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/1156494-62f859c2ac6f95ff.png">
+
+
+<link rel="canonical" href="http://example.com/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/","path":"2019/03/12/computer science/排序/","title":"排序大杂烩 各种各样的排序"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>排序大杂烩 各种各样的排序 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="排序大杂烩 各种各样的排序 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          排序大杂烩 各种各样的排序
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-12 16:34:07" itemprop="dateCreated datePublished" datetime="2019-03-12T16:34:07+08:00">2019-03-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>各种排序算法</p>
+<!---more--->
+<p><img src="https://upload-images.jianshu.io/upload_images/1156494-62f859c2ac6f95ff.png"></p>
+<p>先上一张图</p>
+<p>再来直接上代码。</p>
+<pre><code>//https://www.cnblogs.com/hokky/p/8529042.html
+//https://blog.csdn.net/m0_37962600/article/details/81475585
+/*
+如果排序算法能保证：对于待排序的序列里任一对排序吗相同的记录a,b，在排序之后的序列中a,b的前后顺序
+保持不变，就称这种排序是稳定的。也就是说，稳定的算法能够维持序列中的所有排序码相同的记录的相对位置
+。如果一份排序算法不能保证上述条件，它就是不稳定的。
+*/
+// 插入排序
+/*
+void insertSort(int *arr[],int len)&#123;
+    int i;
+    int j;
+    int temp;  //定义一个临时变量，用于交换数据时存储 
+    for(i=1;i&lt;len;i++)&#123;  //因为我们要对该待排序列的每一个元素都和前面的已排好序的序列进行插入，所以我们会对序列进行遍历 
+        for(j=0;j&lt;i;j++)&#123;  //第二层循环主要用于对已排好序的序列进行扫描，和要插入进来的数据进行逐一比较，然后决定插入到哪里 
+        ////从前往后对已排好序的元素和待插入元素进行大小比较，然后直到找到一个元素比被插入元素大，则交换位置 
+            if(arr[j]&gt;arr[i])&#123;
+                temp=arr[i];
+                arr[i]=arr[j];
+                arr[j]=temp;
+            &#125;
+        &#125;
+    &#125;
+&#125;
+*/
+// 选择排序
+/*
+给定数组：int[] arr=&#123;里面n个数据&#125;；第1趟排序，在待排序数据arr[1]~arr[n]中选出最小的数据，将它与arrr[1]交换；第2趟，在待排序数据arr[2]~arr[n]中选出最小的数据，将它与r[2]交换；以此类推，第i趟在待排序数据arr[i]~arr[n]中选出最小的数据，将它与r[i]交换，直到全部排序完成。
+*/
+void selectsort(int *arr)
+&#123;
+    for(int i=0; i&lt;size-1; i++)
+    &#123;
+        int k=i;
+        for (int j=k+1; j&lt;size; j++)
+        &#123;
+            if(arr[j] &lt; arr[k])
+            &#123;
+                k = j; // 记录目前找到的最小元素的位置
+            &#125;
+        &#125;
+        // 内层循环后，也就是找到本轮循环的最小的数之后，在进行交换
+        if(i != k)
+        &#123;
+            int temp = arr[i];
+            arr[i] = arr[k];
+            arr[k] = temp;
+        &#125;
+    &#125;
+&#125;
+// 快速排序
+void quicksort(int left, int right)
+&#123;
+    int i, j, t, temp;
+    if (left &gt; right)
+    &#123;
+        return;
+    &#125;
+    temp = a[left]; // temp 中存的就是基准数
+    i = left;
+    j = right;
+    while (i != j)
+    &#123;
+        // 顺序很重要， 要先从右往左找
+        while (a[j] &gt;= temp &amp;&amp; i &lt; j)
+        &#123;
+            j--;
+        &#125;
+        while (a[i] &lt;= temp &amp;&amp; i &lt; j)
+        &#123;
+            i++;
+        &#125;
+        // 交换两个数在数组中的位置
+        if (i &lt; j)
+        &#123; // 当哨兵i和哨兵j没有相遇时
+            t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+        &#125;
+    &#125;
+    // 最终基准数归位
+
+    a[left] = a[i];
+    a[i] = temp;
+    quicksort(left, i - 1);  // 继续处理左边的 这是递归的过程
+    quicksort(i + 1, right); // 处理右边的， 这也是一个递归的过程
+&#125;
+
+// 桶排序
+/*
+输入是由一个随机过程产生的[0, 1)区间上均匀分布的实数。将区间[0, 1)划分为n个大小相等的子区间（桶），每桶大小1/n：[0, 1/n)， [1/n, 2/n)， [2/n, 3/n)，…，[k/n, (k+1)/n )，…将n个输入元素分配到这些桶中，对桶中元素进行排序，然后依次连接桶输入0 ≤A[1..n] &lt;1辅助数组B[0..n-1]是一指针数组，指向桶（链表）。
+*/
+
+/* 当数比较集中的时候非常适合用桶排序 可以极大的节省时间
+一年的全国高考考生人数为500 万，分数使用标准分，最低100 ，最高900 ，没有小数，要求对这500 万元素的数组进行排序。
+分析：对500W数据排序，如果基于比较的先进排序，平均比较次数为O(5000000*log5000000)≈1.112亿。但是我们发现，这些数据都有特殊的条件： 100=&lt;score&lt;=900。那么我们就可以考虑桶排序这样一个“投机取巧”的办法、让其在毫秒级别就完成500万排序。
+方法：创建801(900-100)个桶。将每个考生的分数丢进f(score)=score-100的桶中。这个过程从头到尾遍历一遍数据只需要500W次。然后根据桶号大小依次将桶中数值输出，即可以得到一个有序的序列。而且可以很容易的得到100分有***人，501分有***人。
+实际上，桶排序对数据的条件有特殊要求，如果上面的分数不是从100-900，而是从0-2亿，那么分配2亿个桶显然是不可能的。所以桶排序有其局限性，适合元素值集合并不大的情况。
+*/
+
+// 冒泡排序
+void bubble_sort(int a[], int n)
+&#123;
+    int i, j, temp;
+    for (j = 0; j &lt; n - 1; j++)// 外层循环控制排序的趟数
+        for (i = 0; i &lt; n - 1 - j; i++)// 内层循环控制每一趟排序多少次
+        &#123;
+            if (a[i] &gt; a[i + 1])
+            &#123;
+                temp = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = temp;
+            &#125;
+        &#125;
+&#125;
+
+// 归并排序
+//https://www.cnblogs.com/skywang12345/p/3602369.html
+// python 代码的实现
+def merge(lfrom, lto, low, mid, high):
+    i, j, k = low, m, high
+    while i&lt;mid and j&lt;high:   # 反复复制两分段首记录中较小的
+        if lfrom[i].key &lt;= lfrom[j].key:
+            lto[k] = lfrom[i]
+            i += 1
+        else:
+            lto[k] = lfrom[j]
+            j += 1
+        k += 1
+    while i &lt; mid:    # 复制第一段剩余记录
+        lto[k] = lfrom[i]
+        i += 1
+        k += 1
+    while j&lt;high:    # 复制第二段剩余记录
+        lto[k] = lfrom[j]
+        j += 1
+        k += 1
+def merge_pass(lfrom, lto, llen, slen):
+    i = 0
+    while i+2*slen &lt; llen:    # 归并长slen的两段
+        merge(lfrom, lto, i, i+slen, i+2*slen)
+        i += 2*slen
+    if i+slen &lt; llen   # 剩下两段， 后段长度小于slen
+        merge(lfrom, lto, i, i+slen, llen)
+    else:              # 只剩下一段， 复制到表lto
+        for j in range(i, llen):
+            lto[j] = lfrom[j]
+
+
+def merge_sort(lst):
+    slen, llen = 1, len(lst)
+    templst = [None] * llen
+    while slen &lt; llen 
+        merge_pass(lst, templst, llen, slen)
+        slen *= 2
+        merge_pass(templst, lst, llen, slen)  # 结果存回原位
+        slen *= 2
+
+// c语言代码实现
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+void Merge(int sourceArr[], int tempArr[], int startIndex, int midIndex, int endIndex)
+&#123;
+    int i = startIndex, j = midIndex + 1, k = startIndex;
+    while (i != midIndex + 1 &amp;&amp; j != endIndex + 1) // 从小到大记录数据
+    &#123;
+        if (sourceArr[i] &gt; sourceArr[j])
+            tempArr[k++] = sourceArr[j++];
+        else
+            tempArr[k++] = sourceArr[i++];
+    &#125;
+    while (i != midIndex + 1) // 记录前面一段的剩余部分
+        tempArr[k++] = sourceArr[i++];
+    while (j != endIndex + 1) // 记录后面一段的剩余部分
+        tempArr[k++] = sourceArr[j++];
+    for (i = startIndex; i &lt;= endIndex; i++)
+        sourceArr[i] = tempArr[i]; // 重新写回
+&#125;
+
+//内部使用递归 需要开辟和sourceArr一样大小的空间
+void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex)
+&#123;
+    int midIndex;
+    if (startIndex &lt; endIndex)
+    &#123;
+        midIndex = startIndex + (endIndex - startIndex) / 2; //避免溢出int
+        MergeSort(sourceArr, tempArr, startIndex, midIndex);
+        MergeSort(sourceArr, tempArr, midIndex + 1, endIndex);
+        Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
+    &#125;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    int a[8] = &#123;50, 10, 20, 30, 70, 40, 80, 60&#125;;
+    int i, b[8];
+    MergeSort(a, b, 0, 7);
+    for (i = 0; i &lt; 8; i++)
+        printf(&quot;%d &quot;, a[i]);
+    printf(&quot;\n&quot;);
+    return 0;
+&#125;
+// 堆排序
+// https://www.cnblogs.com/MOBIN/p/5374217.html
+// https://www.jianshu.com/p/938789fde325
+/*
+A[i]的左节点为A[2i+1],右节点为A[2i+2]，父节点为A[i/2]，它从数组索引的角度描述了数字与数字在二叉树中的位置关系。
+（1、在应用此结论时需确认A[i]存在相应的左节点、右节点、根节点；
+2、此结论在后面会反复用到；
+3、此结论实际上是完全二叉树的一个基本性质，这也是为什么堆的结构性要求其满足完全二叉树的形式，就是为了使用此结论）
+
+*/
+
+/*堆序性说得通俗一点儿就是，父节点中的元素不小于（不大于）任意子节点的元素。
+这里的元素在本文中是以数字体现的。注：本文只讨论“大根堆”，即父节点中的元素不小于任意子节点的元素这种情形。
+所以，在一个大根堆中，一个节点的元素在其子树所有元素组成的集合中必定是最大值。这一结论至关重要。
+以下给出了两个大根堆的示例：
+*/
+/*
+下面开始进入正题了，堆排序算法究竟是怎么实现的呢？其实只需要简单的两步就可以实现堆排序：1）根据无序数组创建一个大根堆；2）不断调整大根堆，使其到达有序。
+*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+ 
+void swap(int* a, int* b) &#123;
+    int temp = *b;
+    *b = *a;
+    *a = temp;
+&#125;
+ 
+void max_heapify(int arr[], int start, int end) &#123;
+    //建立父节点指标和子节点指标
+    int dad = start;
+    int son = dad * 2 + 1;
+    while (son &lt;= end) &#123; //若子节点指标在范围内才做比较
+        if (son + 1 &lt;= end &amp;&amp; arr[son] &lt; arr[son + 1]) //先比较两个子节点大小，选择最大的
+            son++;
+        if (arr[dad] &gt; arr[son]) //如果父节点大於子节点代表调整完毕，直接跳出函数
+            return;
+        else &#123; //否则交换父子内容再继续子节点和孙节点比较
+            swap(&amp;arr[dad], &amp;arr[son]);
+            dad = son;
+            son = dad * 2 + 1;
+        &#125;
+    &#125;
+&#125;
+ 
+void heap_sort(int arr[], int len) &#123;
+    int i;
+    //初始化，i从最後一个父节点开始调整
+    for (i = len / 2 - 1; i &gt;= 0; i--)
+        max_heapify(arr, i, len - 1);
+    //先将第一个元素和已排好元素前一位做交换，再重新调整，直到排序完毕
+    for (i = len - 1; i &gt; 0; i--) &#123;
+        swap(&amp;arr[0], &amp;arr[i]);
+        max_heapify(arr, 0, i - 1);
+    &#125;
+&#125;
+ 
+int main() &#123;
+    int arr[] = &#123; 3, 5, 3, 0, 8, 6, 1, 5, 8, 6, 2, 4, 9, 4, 7, 0, 1, 8, 9, 7, 3, 1, 2, 5, 9, 7, 4, 0, 2, 6 &#125;;
+    int len = (int) sizeof(arr) / sizeof(*arr);
+    heap_sort(arr, len);
+    int i;
+    for (i = 0; i &lt; len; i++)
+        printf(&quot;%d &quot;, arr[i]);
+    printf(&quot;\n&quot;);
+    return 0;
+&#125;
+
+// 剃须刀排序 双向冒泡排序
+vector&lt;int&gt; shaker_sort(const vector&lt;int&gt; &amp;v)
+&#123;
+    vector&lt;int&gt; res = v;
+    int start = 0, end = res.size() - 1, shift = 1;
+    while(start &lt; end)
+    &#123;
+        for(auto i = start; i&lt;end; ++i)
+        &#123;
+            if(res[i] &gt; res[i+1])
+            &#123;
+                swap(res[i], res[i+1]);
+                shift = i;
+            &#125;
+        &#125;
+        // 到shift 以后的元素已经排好序了
+        end = shift;
+        for(auto j=end-1; j&gt;=start; --j)
+        &#123;
+            if(res[j] &gt; res[j+1])
+            &#123;
+                swap(res[j], res[j+1]);
+                shift = j + 1;
+            &#125;
+        &#125;
+        // 到shift之前的元素已经都排好序了。
+        start = shift;
+    &#125;
+    return res;
+&#125;
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/03/11/computer%20science/%E7%BA%A6%E7%91%9F%E5%A4%AB%E7%8E%AF/" rel="prev" title="c语言 用循环链表实现约瑟夫环">
+                  <i class="fa fa-angle-left"></i> c语言 用循环链表实现约瑟夫环
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/03/17/computer%20science/mysql-e5-bf-85-e7-9f-a5-e5-bf-85-e4-bc-9a/" rel="next" title="MySQL 必知必会">
+                  MySQL 必知必会 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

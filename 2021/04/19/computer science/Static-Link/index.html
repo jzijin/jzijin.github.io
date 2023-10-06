@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言在日常的开发中很多时候都会遇到链接问题。比如，缺少模块、缺少库或者库版本不兼容导致的链接问题；错误定义多个全局变量导致程序运行产生不可预知的错误。为了减少这些错误的发生，我们应当理解链接过程。本文主要讨论静态链接。   Example接下来主要通过下面简单的例子来介绍静态链接。 12345678910main.c:int sum(int *a, int n);int array[2] &#x3D; &amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Static Link">
+<meta property="og:url" content="http://example.com/2021/04/19/computer%20science/Static-Link/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="前言在日常的开发中很多时候都会遇到链接问题。比如，缺少模块、缺少库或者库版本不兼容导致的链接问题；错误定义多个全局变量导致程序运行产生不可预知的错误。为了减少这些错误的发生，我们应当理解链接过程。本文主要讨论静态链接。   Example接下来主要通过下面简单的例子来介绍静态链接。 12345678910main.c:int sum(int *a, int n);int array[2] &#x3D; &amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-04-19T15:46:56.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2021/04/19/computer%20science/Static-Link/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2021/04/19/computer%20science/Static-Link/","path":"2021/04/19/computer science/Static-Link/","title":"Static Link"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Static Link | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Example"><span class="nav-number">2.</span> <span class="nav-text">Example</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">静态链接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">目标文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%AE%9A%E4%BD%8D%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">可重定位目标文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E5%92%8C%E7%AC%A6%E5%8F%B7%E8%A1%A8"><span class="nav-number">6.</span> <span class="nav-text">符号和符号表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">6.1.</span> <span class="nav-text">符号表的结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A7%A3%E6%9E%90"><span class="nav-number">7.</span> <span class="nav-text">符号解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E6%9E%90%E5%A4%9A%E9%87%8D%E5%AE%9A%E4%B9%89%E7%9A%84%E5%85%A8%E5%B1%80%E7%AC%A6%E5%8F%B7"><span class="nav-number">7.1.</span> <span class="nav-text">解析多重定义的全局符号</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%BA%93%E7%9A%84%E9%93%BE%E6%8E%A5%E9%A1%BA%E5%BA%8F"><span class="nav-number">8.</span> <span class="nav-text">静态库的链接顺序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="nav-number">9.</span> <span class="nav-text">重定位</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">10.</span> <span class="nav-text">结语</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/19/computer%20science/Static-Link/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Static Link | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Static Link
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-04-19 23:46:56" itemprop="dateCreated datePublished" datetime="2021-04-19T23:46:56+08:00">2021-04-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2021/04/19/computer%20science/Static-Link/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2021/04/19/computer%20science/Static-Link/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在日常的开发中很多时候都会遇到链接问题。比如，缺少模块、缺少库或者库版本不兼容导致的链接问题；错误定义多个全局变量导致程序运行产生不可预知的错误。为了减少这些错误的发生，我们应当理解链接过程。本文主要讨论静态链接。</p>
+<!---more--->
+
+<h1 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h1><p>接下来主要通过下面简单的例子来介绍静态链接。</p>
+<figure class="highlight stan"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">main.c:</span><br><span class="line"><span class="type">int</span> <span class="built_in">sum</span>(<span class="type">int</span> *a, <span class="type">int</span> n);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="type">array</span>[<span class="number">2</span>] = &#123;<span class="number">1</span>, <span class="number">2</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> val = <span class="built_in">sum</span>(<span class="type">array</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">return</span> val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sum</span>.c</span><br><span class="line"><span class="built_in">int</span> <span class="keyword">sum</span>(<span class="built_in">int</span> *a, <span class="built_in">int</span> n)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">int</span> i, s = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++) </span><br><span class="line">    &#123;</span><br><span class="line">        s += a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用gcc命令将上述两文件编译成可执行程序。</p>
+<p>我们使用最简单的例子来学习静态链接。main函数初始化一个int形的array数组。然后调用sum函数计算array个各元素的和。</p>
+<h1 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h1><p>为了构造可执行文件，链接器必须完成两个主要任务</p>
+<ol>
+<li>符号解析。一个函数，全局变量或者静态变量可以是一个符号，局部变量在栈空间分配，不是一个符号。符号解析的目的是将每个符号引用正好一个符号定义关联起来。</li>
+<li>重定位。编译器和链接器生成以地址0开始的代码段和数据段。这些地址并不是程序执行时的真正地址，因此需要通过链接器修正所有符号的引用，使它们的地址为程序执行时的真正地址。</li>
+</ol>
+<h1 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h1><p>目标文件有三种形式</p>
+<ul>
+<li>可重定位文件。包含代码和数据，可以被用来链接成可执行文件或共享目标文件。</li>
+<li>可执行文件。可直接复制到内存并执行。</li>
+<li>共享目标文件。一种特殊类型的可重定位目标文件，可以在加载或者运行时被动态地加载进内存并链接。</li>
+</ul>
+<h1 id="可重定位目标文件"><a href="#可重定位目标文件" class="headerlink" title="可重定位目标文件"></a>可重定位目标文件</h1><p>目标文件将代码，数据，符号表，调试信息等不同属性的信息，以段的形式存储。一个目标文件中有多个段。</p>
+<ul>
+<li>ELF头。可以使用readelf命令查看ELF文件头信息。ELF文件头定义了ELF魔数、文件机器字节长度、数据存储方式、版本、运行平台、ABI版本、ELF重定位类型、硬件平台、硬件平台版本、入口地址、程序头入口和长度、段表的位置和长度及段的数量等。</li>
+<li>.text。已编译程序的机器代码</li>
+<li>.rodata。只读数据，例如printf语句中的格式化输出字符串。</li>
+<li>.data。已初始化的全局和静态变量。</li>
+<li>.bss。未初始化或初始化为0的全局和静态变量。未初始化变量不占用任何磁盘空间。运行是，在内存分配这些变量，初始值为0</li>
+<li>.symtab。符号表，存放程序中定义和引用的函数和全局变量的信息。</li>
+<li>.rel.text。代码段重定位表。根据其中存储的符号offset值可以计算出符号正确地址，</li>
+<li>.rel.data。数据段重定位表。</li>
+<li>.strtab。字符串表。保存字符串，符号的名字，段名等。</li>
+</ul>
+<h1 id="符号和符号表"><a href="#符号和符号表" class="headerlink" title="符号和符号表"></a>符号和符号表</h1><p>每个目标文件都有一个相应的符号表，这个表记录了目标文件定义和引用的所有符号。一般有三种不同的符号：</p>
+<ul>
+<li>定义在本目标文件的全局符号，可被其他目标文件使用。对应在本目标文件中定义的非static的函数和全局变量。</li>
+<li>定义在其他目标文件，在本目标文件中引用的全局变量。对应在其他目标文件定义的非static的函数和全局变量。</li>
+<li>在本目标文件定义和引用的局部符号。对应static修饰的函数或变量。</li>
+</ul>
+<h2 id="符号表的结构"><a href="#符号表的结构" class="headerlink" title="符号表的结构"></a>符号表的结构</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span>	st_name; <span class="comment">/* string table offset */</span></span><br><span class="line">    <span class="type">char</span> type:<span class="number">4</span>, <span class="comment">/* Function or data (4bits) */</span></span><br><span class="line">         bingding:<span class="number">4</span>;  <span class="comment">/* Local or global (4bits) */</span></span><br><span class="line">    <span class="type">char</span> reserved;  <span class="comment">/* unused */</span></span><br><span class="line">    <span class="type">short</span>	section; <span class="comment">/* section header index */</span></span><br><span class="line">    <span class="type">long</span>	value; <span class="comment">/* section offset or absolute address */</span></span><br><span class="line">    <span class="type">long</span>	size;  <span class="comment">/* object size in bytes */</span></span><br><span class="line">&#125; Elf64_Sym; </span><br></pre></td></tr></table></figure>
+<ul>
+<li>name。字符串表的偏移量。</li>
+<li>type。符号类型</li>
+<li>binding。符号是本地的还是全局的。</li>
+<li>section。到段表(section header)的索引</li>
+<li>value。表示偏移量或者绝对地址。</li>
+<li>size。符号的大小。<br>可以使用readelf工具分析上文提到的例子的目标文件。<br><code>readelf -s main.o</code>可以得到以下输出：<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Num:    <span class="keyword">Value</span>          Size <span class="keyword">Type</span>    Bind   Vis      Ndx <span class="type">Name</span></span><br><span class="line">  <span class="number">0</span>: <span class="number">0000000000000000</span>     <span class="number">0</span> NOTYPE  <span class="keyword">LOCAL</span>  <span class="keyword">DEFAULT</span>  UND </span><br><span class="line">  <span class="number">1</span>: <span class="number">0000000000000000</span>     <span class="number">0</span> FILE    <span class="keyword">LOCAL</span>  <span class="keyword">DEFAULT</span>  ABS main.c</span><br><span class="line">  <span class="number">2</span>: <span class="number">0000000000000000</span>     <span class="number">0</span> SECTION <span class="keyword">LOCAL</span>  <span class="keyword">DEFAULT</span>    <span class="number">1</span> </span><br><span class="line">  <span class="number">3</span>: <span class="number">0000000000000000</span>     <span class="number">8</span> <span class="keyword">OBJECT</span>  <span class="keyword">GLOBAL</span> <span class="keyword">DEFAULT</span>    <span class="number">3</span> <span class="keyword">array</span></span><br><span class="line">  <span class="number">4</span>: <span class="number">0000000000000000</span>    <span class="number">33</span> FUNC    <span class="keyword">GLOBAL</span> <span class="keyword">DEFAULT</span>    <span class="number">1</span> main</span><br><span class="line">  <span class="number">5</span>: <span class="number">0000000000000000</span>     <span class="number">0</span> NOTYPE  <span class="keyword">GLOBAL</span> <span class="keyword">DEFAULT</span>  UND _GLOBAL_OFFSET_TABLE_</span><br><span class="line">  <span class="number">6</span>: <span class="number">0000000000000000</span>     <span class="number">0</span> NOTYPE  <span class="keyword">GLOBAL</span> <span class="keyword">DEFAULT</span>  UND sum</span><br></pre></td></tr></table></figure>
+可以得知符号main是一个位于.text段偏移量为0的33字节函数。array是一个位于.data段的偏移量为0的8字节符号。</li>
+</ul>
+<h1 id="符号解析"><a href="#符号解析" class="headerlink" title="符号解析"></a>符号解析</h1><h2 id="解析多重定义的全局符号"><a href="#解析多重定义的全局符号" class="headerlink" title="解析多重定义的全局符号"></a>解析多重定义的全局符号</h2><p>函数和已初始化的全局变量是强符号，未初始化的全局变量是弱符号。针对强弱符号的概念，linux链接器使用如下规则处理多重定义的符号名</p>
+<ul>
+<li>规则1: 不允许强符号被多次定义</li>
+<li>规则2: 如果一个强符号和多个弱符号同名，那么选择强符号。</li>
+<li>规则3: 如果有多个弱符号同名，那么从这些弱符号中任意选择一个。(程序员自我修养中说到是选择占用空间最大的符号。)</li>
+</ul>
+<ol>
+<li><p>example 1</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> a = <span class="number">0</span>;</span><br><span class="line"><span class="built_in">int</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="built_in">int</span> <span class="title">main</span>()</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>符号a是一个强符号，被定义了两次。编译这段程序会提示：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">test.c:<span class="number">2</span>:<span class="number">5</span>: error: redefinition of ‘a’</span><br><span class="line">    <span class="number">2</span> <span class="string">| int a = 1;</span></span><br><span class="line">      <span class="string">|     ^</span></span><br><span class="line">test.c:<span class="number">1</span>:<span class="number">5</span>: note: previous definition of ‘a’ was here</span><br><span class="line">    <span class="number">1</span> <span class="string">| int a = 0;</span></span><br><span class="line">      <span class="string">|     ^</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>example 2:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* test.c */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> x = <span class="number">10000</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;x = %d\n&quot;</span>, x);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* func.c */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    x = <span class="number">20000</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><code>gcc -o main test.c func.c &amp;&amp; ./main</code>应该打印<code>x = 20000</code><br>然而，实际上在我的电脑测试并不能成功通过编译。gcc版本是10.2.0。经查证，gcc 10.0以上的版本编译默认从-fcommon转到-fno-common.-fno-common选项告诉链接器，遇到重定义符号，就触发一个错误。</p>
+<p>使用<code>gcc -o main test.c func.c -fcommon &amp;&amp; ./main</code>打印<code>x = 20000</code>。</p>
+<ol start="3">
+<li>example3<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* test.c */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(<span class="type">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x = <span class="number">20000</span>;</span><br><span class="line"><span class="type">int</span> y = <span class="number">10000</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">func</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;x = 0x%x y = 0x%x \n&quot;</span>, x, y);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* func.c */</span></span><br><span class="line"><span class="type">double</span> x;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    x = <span class="number">-0.0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>使用<code>gcc -o main test.c func.c -fcommon &amp;&amp; ./main</code>,编译过程只会产生一条警告信息<code>/usr/bin/ld: warning: alignment 4 of symbol x in /tmp/cc9XEYKu.o is smaller than 8 in /tmp/ccTc5xbh.o</code>输出<code>x=0x0 y = 80000000</code>(double数-0.0的二进制表示是0x80000000)。<br>这是一个微小的错误，但有时难以发现，可能在程序运行很久之后才表现出来。我们应该如何避免呢？</p>
+<ul>
+<li>使用全局变量时就将其初始化，使之成为一个强符号。</li>
+<li>gcc编译的时候使用-fno-common选项</li>
+<li>gcc编译使用-Werror选项，将所有警告都变成错误</li>
+</ul>
+<h1 id="静态库的链接顺序"><a href="#静态库的链接顺序" class="headerlink" title="静态库的链接顺序"></a>静态库的链接顺序</h1><p>静态库链接时候需要满足一定的顺序，有时改变某两个静态库的顺序就不能链接成功了。在符号解析阶段，链接器从左到右按照它们在编译器驱动程序命令行上出现的顺序来扫描可重定位目标文件和静态库。<strong>在命令行中，如果定义一个符号的库出现在引用这个符号的目标文件之前，那么引用就不能解析，链接会失败</strong></p>
+<p>例如，可以重新编译上述的example2。使用下列命令将func.c编译成func.a静态库。</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcc -<span class="keyword">c</span> -fcommon func.<span class="keyword">c</span></span><br><span class="line">gcc -<span class="keyword">c</span> -fcommon test.<span class="keyword">c</span></span><br><span class="line">ar rcs libfunc.a func.o</span><br></pre></td></tr></table></figure>
+<p>使用下列命令可以成功编译。<br>gcc -static -o main test.o .&#x2F;libfunc.a<br>而使用<br>gcc -static -o main .&#x2F;libfunc.a test.o<br>则编译不通过，提示找不到符号</p>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/ld: test.o: <span class="keyword">in</span> <span class="keyword">function</span> `main<span class="comment">&#x27;:</span></span><br><span class="line">test.c:(.<span class="keyword">text</span>+<span class="number">0</span>x5): undefined reference <span class="keyword">to</span> `func<span class="comment">&#x27;</span></span><br><span class="line"><span class="symbol">collect2:</span> <span class="keyword">error</span>: ld returned <span class="number">1</span> <span class="keyword">exit</span> status</span><br></pre></td></tr></table></figure>
+<p>在命令行命令编译过程中，如果定义一个符号的库出现在引用这个符号的目标文件之前，那么引用就不能被解析，链接就会失败。因此尤其需要考虑库的位置。必须确保对符号的引用出现在该符号定义之前。</p>
+<h1 id="重定位"><a href="#重定位" class="headerlink" title="重定位"></a>重定位</h1><p>编译器遇到对最终位置未知的目标引用，它就会产生一个重定位条目，告诉链接器在将目标文件合并成可执行文件时如何修改这个引用。代码的重定位条目放在.rel.text中。已初始化数据的重定位条目放在.rel.data中。下面结构体展示了重定位条目的格式。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">long</span> offset;    <span class="comment">/* offset of the referenct to relocate */</span></span><br><span class="line">    <span class="type">long</span> type:<span class="number">32</span>,   <span class="comment">/* relocation type */</span></span><br><span class="line">         symbol:<span class="number">32</span>; <span class="comment">/* Symbol table index */</span></span><br><span class="line">    <span class="type">long</span> addend;    <span class="comment">/* constant part of relocation expression */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>offset。需要被修改的引用的节偏移。</li>
+<li>type。重定位类型，这里只讨论R_X86_64_PC32(相对地址引用)和R_X86_64_32(绝对地址引用)两种。</li>
+<li>symbol。被修改引用应该指向的符号。</li>
+<li>addend。相对地址引用中需要使用该值对被修改引用的值做位置偏移。<br>下面对本文最开始提到的main.o做重定位。使用<code>objdump -d main.o</code>查看反汇编代码。<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">0000000000000000</span> &lt;main&gt;:</span><br><span class="line">   <span class="attribute">0</span>:   <span class="number">55</span>                      push   %rbp</span><br><span class="line">   <span class="attribute">1</span>:   <span class="number">48</span> <span class="number">89</span> e5                mov    %rsp,%rbp</span><br><span class="line">   <span class="attribute">4</span>:   <span class="number">48</span> <span class="number">83</span> ec <span class="number">10</span>             sub    $<span class="number">0</span>x10,%rsp</span><br><span class="line">   <span class="attribute">8</span>:   be <span class="number">02</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>          mov    $<span class="number">0</span>x2,%esi</span><br><span class="line">   <span class="attribute">d</span>:   <span class="number">48</span> <span class="number">8</span>d <span class="number">3</span>d <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>    lea    <span class="number">0</span>x0(%rip),%rdi        # <span class="number">14</span> &lt;main+<span class="number">0</span>x14&gt;</span><br><span class="line">  <span class="attribute">14</span>:   e8 <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>          call   <span class="number">19</span> &lt;main+<span class="number">0</span>x19&gt;</span><br><span class="line">  <span class="attribute">19</span>:   <span class="number">89</span> <span class="number">45</span> fc                mov    %eax,-<span class="number">0</span>x4(%rbp)</span><br><span class="line">  <span class="attribute">1c</span>:   <span class="number">8</span>b <span class="number">45</span> fc                mov    -<span class="number">0</span>x4(%rbp),%eax</span><br><span class="line">  <span class="attribute">1f</span>:   c9                      leave  </span><br><span class="line">  <span class="attribute">20</span>:   c3                      ret     </span><br></pre></td></tr></table></figure>
+对sum地址的引用为相对引用。相应的重定位条目r由4个字段组成:<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">r.offset</span> = <span class="number">0</span>xf</span><br><span class="line"><span class="attr">r.symbol</span> = sum</span><br><span class="line"><span class="attr">r.type</span> = R_X<span class="number">86_64_</span>PC32</span><br><span class="line"><span class="attr">r.addend</span> = -<span class="number">4</span></span><br></pre></td></tr></table></figure>
+现在假定编译器链接完之后，sum符号的地址是0x000000000000113a，main符号的地址是0x0000000000001119。那么如何根据这两个地址计算出sum引用的地址呢？<br>在调用call是，PC的值为call指令之后的指令地址，也就是0x0000000000001119 + 13 &#x3D; 0x0000000000001132<br>也就是说0x0000000000001132 + x &#x3D; 0x000000000000113a, 计算得到x为8。如下所示：<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0000000000001119</span> &lt;main&gt;:</span><br><span class="line">    <span class="number">1119</span>:       <span class="number">55</span>                      push   <span class="variable">%rbp</span></span><br><span class="line">    <span class="number">111</span>a:       <span class="number">48</span> <span class="number">89</span> e<span class="number">5</span>                mov    <span class="variable">%rsp</span><span class="punctuation">,</span><span class="variable">%rbp</span></span><br><span class="line">    <span class="number">111</span>d:       <span class="number">48</span> <span class="number">83</span> ec <span class="number">10</span>             <span class="keyword">sub</span>    $<span class="number">0x10</span><span class="punctuation">,</span><span class="variable">%rsp</span></span><br><span class="line">    <span class="number">1121</span>:       be <span class="number">02</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>          mov    $<span class="number">0x2</span><span class="punctuation">,</span><span class="variable">%esi</span></span><br><span class="line">    <span class="number">1126</span>:       <span class="number">48</span> <span class="number">8</span>d <span class="number">3</span>d fb <span class="number">2</span>e <span class="number">00</span> <span class="number">00</span>    lea    <span class="number">0x2efb</span>(<span class="variable">%rip</span>)<span class="punctuation">,</span><span class="variable">%rdi</span>        # <span class="number">4028</span> &lt;array&gt;</span><br><span class="line">    <span class="number">112</span>d:       e<span class="number">8</span> <span class="number">08</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>          <span class="keyword">call</span>   <span class="number">113</span>a &lt;sum&gt;</span><br><span class="line">    <span class="number">1132</span>:       <span class="number">89</span> <span class="number">45</span> fc                mov    <span class="variable">%eax</span><span class="punctuation">,</span><span class="number">-0</span><span class="keyword">x</span><span class="number">4</span>(<span class="variable">%rbp</span>)</span><br><span class="line">    <span class="number">1135</span>:       <span class="number">8</span>b <span class="number">45</span> fc                mov    <span class="number">-0</span><span class="keyword">x</span><span class="number">4</span>(<span class="variable">%rbp</span>)<span class="punctuation">,</span><span class="variable">%eax</span></span><br><span class="line">    <span class="number">1138</span>:       <span class="keyword">c</span><span class="number">9</span>                      leave  </span><br><span class="line">    <span class="number">1139</span>:       <span class="keyword">c</span><span class="number">3</span>                      <span class="keyword">ret</span>    </span><br><span class="line"></span><br><span class="line"><span class="number">000000000000113</span>a &lt;sum&gt;:</span><br><span class="line">    <span class="number">113</span>a:       <span class="number">55</span>                      push   <span class="variable">%rbp</span></span><br><span class="line">    <span class="number">113</span>b:       <span class="number">48</span> <span class="number">89</span> e<span class="number">5</span>                mov    <span class="variable">%rsp</span><span class="punctuation">,</span><span class="variable">%rbp</span></span><br><span class="line">    <span class="number">113</span>e:       <span class="number">48</span> <span class="number">89</span> <span class="number">7</span>d e<span class="number">8</span>             mov    <span class="variable">%rdi</span><span class="punctuation">,</span><span class="number">-0</span><span class="keyword">x</span><span class="number">18</span>(<span class="variable">%rbp</span>)</span><br><span class="line">    <span class="number">1142</span>:       <span class="number">89</span> <span class="number">75</span> e<span class="number">4</span>                mov    <span class="variable">%esi</span><span class="punctuation">,</span><span class="number">-0</span><span class="keyword">x</span><span class="number">1</span><span class="keyword">c</span>(<span class="variable">%rbp</span>)</span><br><span class="line">    ......</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>本文简单介绍了静态链接。大量参考了《程序员的自我修养》和《深入理解计算机系统》这两本书。参考这两本书可以对静态链接有更深入的理解。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/06/03/computer%20science/Redis-%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/" rel="prev" title="Redis 整数集合">
+                  <i class="fa fa-angle-left"></i> Redis 整数集合
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/05/26/computer%20science/Linux-kernel-module/" rel="next" title="Linux kernel module">
+                  Linux kernel module <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2021/04/19/computer%20science/Static-Link/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

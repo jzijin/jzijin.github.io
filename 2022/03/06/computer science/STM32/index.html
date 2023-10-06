@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="讲解外设原理+器件原理+ST官方参考手册+ST标准库 &#x3D; 外设开发 HAL库。  开发板的介绍 视频思路的讲解。  全功能开发板电机开发板 ARM：芯片内核设计公司Advanced RISC Machines Cortex M4RGB-LGBT Cortex M7STM32 - ST公司 电机开发板系列 HAL库： 硬件抽象层抽象思想封装出一层通用性的接口，标准化了一套初始化和使用流程，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="STM32">
+<meta property="og:url" content="http://example.com/2022/03/06/computer%20science/STM32/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="讲解外设原理+器件原理+ST官方参考手册+ST标准库 &#x3D; 外设开发 HAL库。  开发板的介绍 视频思路的讲解。  全功能开发板电机开发板 ARM：芯片内核设计公司Advanced RISC Machines Cortex M4RGB-LGBT Cortex M7STM32 - ST公司 电机开发板系列 HAL库： 硬件抽象层抽象思想封装出一层通用性的接口，标准化了一套初始化和使用流程，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-05T16:30:15.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/03/06/computer%20science/STM32/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/03/06/computer%20science/STM32/","path":"2022/03/06/computer science/STM32/","title":"STM32"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>STM32 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/06/computer%20science/STM32/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="STM32 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          STM32
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-03-06 00:30:15" itemprop="dateCreated datePublished" datetime="2022-03-06T00:30:15+08:00">2022-03-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2022/03/06/computer%20science/STM32/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2022/03/06/computer%20science/STM32/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>讲解<br>外设原理+器件原理+ST官方参考手册+ST标准库 &#x3D; 外设开发</p>
+<p>HAL库。</p>
+<ul>
+<li>开发板的介绍</li>
+<li>视频思路的讲解。</li>
+</ul>
+<p>全功能开发板<br>电机开发板</p>
+<p>ARM：芯片内核设计公司<br>Advanced RISC Machines</p>
+<p>Cortex M4<br>RGB-LGBT</p>
+<p>Cortex M7<br>STM32 - ST公司</p>
+<p>电机开发板系列</p>
+<p>HAL库： 硬件抽象层<br>抽象思想<br>封装出一层通用性的接口，标准化了一套初始化和使用流程，大大提高了代码的通用性。<br>GPIO: function() -&gt; F1\F4\F7\H7</p>
+<p>MIddle level</p>
+<p>CubeMX 只支持HAL库<br>low layer ll 库<br>Hardware Abstraction Layer(HAL)</p>
+<p>中间件，cubemx low layer</p>
+<p>原理介绍：各种协议、各种器件原理<br>搭配CubeMX: 生成代码</p>
+<p>DSP：数字信号处理<br>FPU：浮点运算单元</p>
+<p>IAR CubeIDE keil</p>
+<p>STM32介绍 ST: 意法半导体 M: 微电子 32总线宽度。 MCU微控制器（单片机）微型计算机系统<br>选型和开发介绍。<br>1、参考手册：一般描述这款芯片，软件上怎么使用。<br>2、数据手册：大致的介绍功能等。</p>
+<p>引脚分配<br>电源IO<br>晶振IO<br>下载IO<br>BOOT IO<br>复位IO<br>GPIO</p>
+<p>原理图绘制-&gt;PCB layout-&gt;程序编写。</p>
+<p>寄存器编程</p>
+<p>函数库编程</p>
+<p>寄存器：外设的地址</p>
+<p>FLASH、SRAM地址</p>
+<p>GPIO内部结构框图</p>
+<p>IDE: 为你设置好了堆栈</p>
+<p>配置：<br>1、运行环境管理工具<br>2、从我们的库包中添加。</p>
+<p>Dummy-Robot:<br>startup:<br>启动文件 xxxx.s</p>
+<p>Drivers<br>    CMSIS<br>        Device: CMSIS 的相关东西</p>
+<p>system_stm32f1xx.c f1 的启动文件？</p>
+<p>通过总线的形式，可以很好将各种外设分离开，可以独立将各种外设来控制它的是能与否。控制外设是能与否就是控制这个外设的时钟。时钟频率越高，耗能越高。</p>
+<p>仿真器：<br>JTAG接口<br>SWD接口</p>
+<p>软件开发步骤：<br>1、使能GPIOB的外设时钟。外设基地址：0x40021000 APB2 外设时钟使能寄存器地址：偏移0x18</p>
+<p>2、通过查阅参考手册的GPIO章节，知道了要配置推挽输出模式。通过端口配置表展示的寄存器来进行配置。<br>外设基地址+偏移。GPIOB 0x40010C00 偏移：CRL偏移：0x00 ODR偏移：0x0c</p>
+<p>3、使用HAL库之后，就是用HAL库来初始化就好了吧。</p>
+<p>2、根据需要配置的功能寻找参考手册</p>
+<p>#define GPIOB_CLK (*(volatile unsigned int <em>)(0x40021000 + 0x18))<br>#define GPIOB_CRL (</em>(volatile unsigned int <em>)(0x40021000 + 0x18))<br>#define GPIOB_ODR (</em>(volatile unsigned int *)(0x40021000 + 0x18))</p>
+<p>int main(void)<br>{<br>    &#x2F;&#x2F; 使能GPIO时钟<br>    GPIOB_CLK |&#x3D; (1&lt;&lt;3)</p>
+<pre><code>// 配置推挽输出模式
+GPIOB_CRL &amp;= ~(0xf&lt;&lt;(4*0))
+GPIOB_CRL |= 2 &lt;&lt; 0
+
+// 参考原理图进行相应的配置。
+GPIO_ODR &amp;= ~()
+GPIOB_ODR |= ()
+</code></pre>
+<p>}</p>
+<p>寄存器编程-&gt;库编程</p>
+<p>1、代码可读性差<br>2、二次开发难度大<br>3、每次写程序都要查手册，麻烦</p>
+<p>STM32的外设寄存器组织形式：<br>基于 基地址+寄存器偏移。</p>
+<p>GPIO &#x2F;&#x2F; GPIO初始化结构体。<br>HAL_GPIO_Init()</p>
+<p>1、循环和判断<br>找到GPIO的偏移位置。</p>
+<p>先读<br>先清空对应位<br>写回</p>
+<p>HAL固件包中的内容：<br>1、Documentation<br>说明文档<br>2、Drivers<br>包含BSP\CMSIS\HAL_Driver<br>3、Middlewares中间件<br>4、project<br>官方提供的各种工程实例，包含外设如何使用，以及外设与中间件的耦合。非常又参考价值。<br>5、Utilities<br>通用的一些文件，不重要。</p>
+<p>使用HAL库<br>1、自己移植, .c .h文件<br>2. 使用CubeMx配置</p>
+<p>知识的运用与BSP介绍。</p>
+<p>什么是板级支持包<br>BSP Board Support Package 是介于主板硬件和操作系统中驱动层程序之间的一层，<br>一般认为它属于操作系统一部分，主要是实现对操作系统的支持，为上层的驱动程序提供<br>访问硬件设备寄存器的函数包，使之能够更好的运行于硬件主板。</p>
+<p>用户应用层</p>
+<p>板级支持包: 对板上的资源功能给出实现，并且提供用户程序的接口。以LED等为例，用户应用程序不需要知道GPIO的硬件特点，他只需要知道调用这个函数就可以点亮LED等。<br>应用程序操作灯和按钮，hal程序操作io引脚，板级支持包接收应用程序操作，转化成引脚操作</p>
+<p>底层驱动</p>
+<p>LED灯的板级支持包：<br>初始化GPIO<br>点亮、熄灭 LED</p>
+<p>KEY的板级支持包<br>初始化GPIO(配置为输入，读取GPIO)</p>
+<p>判断按键是否初始化<br>读取GPIO的电平引脚状态。</p>
+<p>板级支持包的构建：看起来实际上就是给上层应用提供一个API</p>
+<p>STM32程序的启动流程。<br>程序的启动流程</p>
+<p>芯片商店以后回触发复位异常。<br>并且回跳转到中断向量表特定偏移位置。获取里面的内容取指执行。</p>
+<p>触发复位异常-&gt;中断向量表-&gt;用户程序。</p>
+<ol>
+<li>初始化堆栈指针</li>
+<li>设置PC指针的值</li>
+<li>设置中断向量表</li>
+<li>设置系统时钟。</li>
+<li>调用C库函数__main 初始化堆栈的工作，最终回跳转到用户程序。</li>
+</ol>
+<p>修改复位异常内的内容，就可以让处理器去执行我们指定的操作</p>
+<p>STM32的RCC外设<br>    RCC-复位和时钟控制</p>
+<p>STM32 RCC知识</p>
+<p>STM32的复位功能<br>    系统复位<br>    电源复位<br>    后备域复位 保存用户配置的。</p>
+<p>时钟频率高。功率高。<br>STM32的时钟<br>    时钟简单理解为 “心跳”。STM会根据程序给定他的时钟节拍来工作。<br>    STM32主时钟</p>
+<p>STM32的时钟树设计</p>
+<p>使用</p>
+<p>对于STM32上的时钟，具体怎么配置，根据需求决定。<br>时钟频率越高，功耗也会更高。<br>另一方面要考虑芯片的工作条件，根据芯片运行的工作条件选取不同的频率。</p>
+<p>F429：<br>外部时钟&#x2F;M（分频因子 ）</p>
+<p>STM32的中断<br>中断是指计算机运行过程中，需要，，，，</p>
+<p>中断优先级。<br>通过 嵌套向量中断控制器。 来实现优先级<br>nvic_enableirq<br>nvic_disableirq</p>
+<p>EXTI扩展中断和事件控制器<br>EXTI工程示例讲解。<br>事件—&gt;中断 事件–&gt;事件</p>
+<p>EXTI外设可以大致概括为两个功能：</p>
+<ul>
+<li>捕获外部输入等事件 </li>
+<li>生成EXTI中断等中断请求</li>
+</ul>
+<p>事件产生中断，然后调用相关的函数。</p>
+<p>外部触发，软件触发，生成中断，唤醒CPU</p>
+<p>工程演示：<br>STM32CubeMX 生成代码。</p>
+<p>How to Use this driver</p>
+<p>HAL_EXTI_SetConfigLine()</p>
+<p>中断-&gt;中断向量表-&gt;偏移：入口地址-&gt;中断服务函数。<br>最终跳转到对应的中断服务函数中寻找。<br>stm32f1xx_it.c 或者放在最后的服务函数。</p>
+<p>通过EXTI线，捕获EXTI线事件，并且生成中断，在中断中反转LED灯的状态，并且清除EXTI中断标志(中断标志要清除。不然会进入死循环)</p>
+<p>SysTick-系统定时器<br>内核的外设<br>外设的原理及功能介绍<br>Systick定时器特性。</p>
+<p>属于COrtex-M内核中的一个外设。内嵌在NVIC中。</p>
+<p>计数宽度：<br>24bit来存储数据，2^24</p>
+<p>向下递减：<br>计数器的工作模式，</p>
+<p>计数器的工作周期：<br>1&#x2F;CLKSource, 1&#x2F;72Mhz</p>
+<p>当重装在数值寄存器的值减到0，可以产生一个中断。</p>
+<p>SysTick系统定时器是属于Cortex-M内核的外设。内核外设。</p>
+<p>功能：<br>用于操作系统，用于产生时基，维持</p>
+<p>延时功能的配置。 HAL_Delay函数就是根据Systick使用的。</p>
+<p>HAL库驱动框架简述</p>
+<ul>
+<li>外设初始化</li>
+<li>外设使用</li>
+</ul>
+<ol>
+<li>对外设的封装</li>
+</ol>
+<ul>
+<li>对外设的封装 xx_HandleTypeDef(XX外设句柄结构体，xx表示任意外设名)<ul>
+<li>instatnce xx_TypeDef类型， 存放基地址，例如GPIO的文件。</li>
+<li>Init成员 xx_InitTypeDef类型</li>
+<li>Hdma *成员(DMA_HandleTypeDef类型，可能一个句柄结构体中有多个)</li>
+<li>其他资源 LOCK STATUS HAL_LockTypeDef 类型 HAL_xx_StateTypeDef类型</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li><p>外设初始化使用方法</p>
+<ul>
+<li>HAL_xx_init, 参数一般为xx外设的句柄结构体</li>
+<li>HAL_xx_MspInit，参数一般为xx外设的句柄结构体 将外设使用到的底层资源初始化完成 Init the low level hardware : GPIO, CLOCK, NVIC… 为一个弱定义，需要我们用户来自己实现。</li>
+<li>其他Init方法：具体参考，HAL库，How to use this Driver</li>
+</ul>
+</li>
+<li><p>外设使用逻辑</p>
+<ul>
+<li>阻塞轮询(Polling)<br>  xx_start<br>  xx_read、write<br>  等等函数</li>
+<li>中断<br>  xx_start_it<br>  xx_read\write_it<br>  xx_xx_it 等等中断启动函数。特指，函数名以IT结尾。</li>
+<li>DMA<br>  xx_start_dma – DMA功能<br>  xx_read\write_dma<br>  xx_xx_dma</li>
+<li>其他功能 标志的查询\清楚 中断使能，失能。</li>
+</ul>
+</li>
+<li><p>全面了解：How to User This Driver</p>
+</li>
+</ol>
+<p>Debug功能及Debug方法简述</p>
+<ul>
+<li>硬件调试</li>
+<li>打印调试</li>
+<li>调试器调试</li>
+</ul>
+<p>通讯的基本概念：<br>全双工，半双工。串行 并行 等。</p>
+<p>USART</p>
+<p>UART主要用来产生相关接口的协议信号。UART广泛引用与串口通信中，扮演者传输器的角色。</p>
+<p>RS-232标准介绍。</p>
+<p>一般开发板上使用的点评标准与通讯使用的电平·标准不同。</p>
+<p>UART外设的使用：</p>
+<ol>
+<li>定义一个UART_HandleTypeDef结构体句柄</li>
+<li>通过HAL_UART_MspInit函数来实现要做的功能<ul>
+<li>使能UART外设的时钟</li>
+<li>配置UART使用的引脚模式</li>
+<li>如使用中断，需要将中断配置好。</li>
+<li>HAL_UART_INIT</li>
+</ul>
+</li>
+</ol>
+<p>DMA-直接存储器访问控制器</p>
+<p>外设与存储器，存储器与存储器之间，提供高速数据传输。</p>
+<p>DMA就是CPU的助手、数据搬运工。<br>DMA控制器的实现基于复杂的总线架构。</p>
+<p>1、DMA请求<br>2、通道选择<br>3、FIFO功能<br>4、数据搬运的目标地址</p>
+<p><strong>DMA的功能就是建立起一个数据传输通道。</strong></p>
+<p>串口DMA，串口接收数据，放到内存中。</p>
+<ol>
+<li><p>建立传输通道<br> 存储器-&gt;存储器<br> 外设-&gt;存储器<br> 存储器-&gt;外设</p>
+</li>
+<li><p>确定传输对象<br> 具体的功能<br> UART-内存<br> 内存数据-UART</p>
+</li>
+<li><p>传输的细节<br> 确定由谁产生DMA请求。外设的DMA请求外设通道<br> 通道的优先级<br> 确定传输数据双方数据的格式<br> 确定数据是否需要一直采集（循环模式）</p>
+</li>
+</ol>
+<p>单次传输<br>突发传输。</p>
+<p>串口外设数据寄存器地址。不能地址。内存地址应该是要递增的。</p>
+<p>HAL库中的DMA功能实例<br>HandleTypeDef instance</p>
+<p>使用cubemx 进行初始化代码。<br>实际的代码逻辑。</p>
+<p>串口外设模式下的演示。</p>
+<p>EEPROM<br>I2C通信协议<br>广泛地使用在系统内多个继承电路间的通讯。<br>支持多设备的总线。<br>一个I2C总线两条总线。SDA SCL</p>
+<p>每个连接到总线的设备都有一个独立的地址，主机可以利用这个地址</p>
+<p>多个主机同时使用总线时，为了防止数据冲突，会利用冲裁的方式。</p>
+<p>I2C的协议层<br>通信的起始，终止信号。</p>
+<p>I2C总线上的每个设备都有自己的独立地址。</p>
+<p>相应。</p>
+<p>如何使用STM32产生I2C协议信号。</p>
+<p>软件模式协议：使用CPU直接控制通讯引脚的点评，产生出符合通讯协议标准的逻辑。</p>
+<p>硬件实现协议：</p>
+<p>STM32的I2C控制器特性介绍<br>I2C 读写EEPROM实验。</p>
+<p>Fat文件系统的移植。<br>1、把FatFS的源码拷贝到工程文件夹目录</p>
+<p>新建一个10x的工程，然后把axf拷贝过去，然后烧录，需要准备keil 安装包。<br>芯片包等。</p>
+<p>SPI QSPI的通信内容<br>FLASH固件来实现</p>
+<p>Serial Peripheral Interface</p>
+<p>SPI的写入过程，手动查出，然后</p>
+<ol>
+<li>初始化通信使用的目标引脚和时钟。</li>
+<li>使能spi外设的时钟。</li>
+<li>配置spi外设的模式，速率，等</li>
+<li>编写按字节收发的函数。<br>将片选信号拉低，<br>等待数据发送完成标志。<br>将数据写入spi数据寄存器中</li>
+</ol>
+<p>CAN 是控制完了过总西南。<br>CAN通信并不是以时钟信号来进行同步的，它是一种异步通信，CAN_High,CAN_Low两条信号线，<br>共同构成一组差分信号线，以差分信号的形式进行通信。</p>
+<p>CAN物理层组要分为闭环和开环总线网络两种，一个适合于告诉通讯，一个适合于远距离通讯。<br>闭环速度快，传输距离段<br>开环</p>
+<p>差分信号的有点，抗干扰，定位精确。</p>
+<p>CAN的波特率及位同步<br>CAN时异步通信，没有时钟信号线。<br>CAN还会使用 “位同步”的方式来抗干扰、吸收误差，实现对总线电平</p>
+<p>通讯的波特率</p>
+<p>CAN使用两个差分信号线，只能表达一个信号，<br>复杂的协议来补充这一点。<br>报文。</p>
+<p>差分信号。<br>数据帧。<br>数据帧<br>遥控帧<br>错误帧<br>过载帧<br>帧间隔</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/01/02/computer%20science/csapp/" rel="prev" title="csapp">
+                  <i class="fa fa-angle-left"></i> csapp
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/09/04/computer%20science/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/" rel="next" title="电子罗盘开发记录">
+                  电子罗盘开发记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2022/03/06/computer%20science/STM32/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

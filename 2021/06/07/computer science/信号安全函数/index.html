@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Overview天啊，怎么改了几行代码就改出了一个惊天大的大Bug。居然导致死锁了，这是怎么回事呢，且让我一一道来。 https:&#x2F;&#x2F;blog.csdn.net&#x2F;hxlawf&#x2F;article&#x2F;details&#x2F;98961011   信号我们首先需要知道信号的概念。信号就是一条小消息，它通知进程系统中发生一个某种类型的事件。信号提供了某种机制，通知用户进程发生了某些异常。 信号是很短的消息，可以被发送">
+<meta property="og:type" content="article">
+<meta property="og:title" content="信号安全函数">
+<meta property="og:url" content="http://example.com/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="Overview天啊，怎么改了几行代码就改出了一个惊天大的大Bug。居然导致死锁了，这是怎么回事呢，且让我一一道来。 https:&#x2F;&#x2F;blog.csdn.net&#x2F;hxlawf&#x2F;article&#x2F;details&#x2F;98961011   信号我们首先需要知道信号的概念。信号就是一条小消息，它通知进程系统中发生一个某种类型的事件。信号提供了某种机制，通知用户进程发生了某些异常。 信号是很短的消息，可以被发送">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-06-07T14:49:28.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.450Z">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/","path":"2021/06/07/computer science/信号安全函数/","title":"信号安全函数"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>信号安全函数 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.</span> <span class="nav-text">信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.</span> <span class="nav-text">信号基本概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E4%B8%AD%E4%BD%BF%E7%94%A8%E4%BF%A1%E5%8F%B7"><span class="nav-number">4.</span> <span class="nav-text">进程中使用信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%B8%AD%E4%BD%BF%E7%94%A8%E4%BF%A1%E5%8F%B7%E3%80%82"><span class="nav-number">5.</span> <span class="nav-text">线程中使用信号。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E7%BC%96%E5%86%99%E5%90%88%E9%80%82%E7%9A%84%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-number">6.</span> <span class="nav-text">如何编写合适的信号处理函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">7.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E6%9C%AF%E8%AF%AD"><span class="nav-number">7.1.</span> <span class="nav-text">信号术语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E4%BF%A1%E5%8F%B7"><span class="nav-number">7.2.</span> <span class="nav-text">发送信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E6%94%B6%E4%BF%A1%E5%8F%B7"><span class="nav-number">7.3.</span> <span class="nav-text">接收信号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%92%8C%E8%A7%A3%E9%99%A4%E9%98%BB%E5%A1%9E"><span class="nav-number">7.4.</span> <span class="nav-text">阻塞和解除阻塞</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F"><span class="nav-number">8.</span> <span class="nav-text">编写信号处理程序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%A8%8B%E5%BA%8F%E4%B8%AD%E4%BD%BF%E7%94%A8%E4%BF%A1%E5%8F%B7"><span class="nav-number">9.</span> <span class="nav-text">多线程程序中使用信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#POSIX%E4%BF%A1%E5%8F%B7%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BA%94%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">POSIX信号和多线程应用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%99%E6%8C%87%E5%AE%9A%E7%BA%BF%E7%A8%8B%E5%8F%91%E9%80%81%E4%BF%A1%E5%8F%B7"><span class="nav-number">11.</span> <span class="nav-text">给指定线程发送信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A7%E7%94%9F%E4%BF%A1%E5%8F%B7"><span class="nav-number">12.</span> <span class="nav-text">产生信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E4%BF%A1%E5%8F%B7-1"><span class="nav-number">13.</span> <span class="nav-text">发送信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90%E2%80%93localtime-r%E5%AF%BC%E8%87%B4%E7%9A%84%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E3%80%82"><span class="nav-number">14.</span> <span class="nav-text">案例分析–localtime_r导致的死锁问题。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%9E%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0%E5%B8%A6%E6%9D%A5%E7%9A%84%E9%A3%8E%E9%99%A9%E3%80%82%E6%AD%BB%E9%94%81%E9%A3%8E%E9%99%A9%E5%88%86%E6%9E%90"><span class="nav-number">15.</span> <span class="nav-text">非信号安全函数带来的风险。死锁风险分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">16.</span> <span class="nav-text">结语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyTorch-Code"><span class="nav-number">17.</span> <span class="nav-text">PyTorch Code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">18.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="信号安全函数 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          信号安全函数
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-07 22:49:28" itemprop="dateCreated datePublished" datetime="2021-06-07T22:49:28+08:00">2021-06-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>19 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>天啊，怎么改了几行代码就改出了一个惊天大的大Bug。居然导致死锁了，这是怎么回事呢，且让我一一道来。</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/hxlawf/article/details/98961011">https://blog.csdn.net/hxlawf/article/details/98961011</a></p>
+<!---more--->
+
+<h1 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h1><p>我们首先需要知道信号的概念。<strong>信号</strong>就是一条小消息，它通知进程系统中发生一个某种类型的事件。信号提供了某种机制，通知用户进程发生了某些异常。</p>
+<p>信号是很短的消息，可以被发送到一个进程或一组进程。信号是事件发生时对进程的通知机制，有时也称之为软件中断。信号与硬件中断的相似之处在于打断了程序执行的正常流程，大多数情况下，无法预测信号到达的精确时间。一般来说，使用sigaction设置信号处理程序，当收到信号时，会调用信号处理器程序，可能会随时打断主程序流程；内核代表进程来调用处理器程序，当处理器返回时，主程序会在处理器打断的位置恢复执行。与 signal()相比， sigaction()系统调用在设置信号处置方面提供了更多控制，且更具灵活性。signal有可移植性的风险，尽量使用sigaction来设置信号处理程序。</p>
+<p>20-1的图贴上去。<br>archlinux打印出来的kill -l打印出来的信号</p>
+<ol>
+<li>SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP</li>
+<li>SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1</li>
+<li>SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM</li>
+<li>SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP</li>
+<li>SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ</li>
+<li>SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR</li>
+<li>SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3</li>
+<li>SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8</li>
+<li>SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13</li>
+<li>SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12</li>
+<li>SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7</li>
+<li>SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2</li>
+<li>SIGRTMAX-1  64) SIGRTMAX</li>
+</ol>
+<p>1<del>31号为常规信号，同种类型的常规信号并不排队，如果一个常规信号被连续发送多次，那么，只有其中的一个发送到接收进程。。32</del>64为实时信号。实时信号与常规信号有很大不同，因为它们必须排队以便发送的多个信号都能被接收到。前者为标准信号。后者为实时信号。</p>
+<p>一般而言，将信号处理函数设计得越简单越好。这将降低引发竞争条件的风险。</p>
+<h1 id="信号基本概念"><a href="#信号基本概念" class="headerlink" title="信号基本概念"></a>信号基本概念</h1><h1 id="进程中使用信号"><a href="#进程中使用信号" class="headerlink" title="进程中使用信号"></a>进程中使用信号</h1><h1 id="线程中使用信号。"><a href="#线程中使用信号。" class="headerlink" title="线程中使用信号。"></a>线程中使用信号。</h1><h1 id="如何编写合适的信号处理函数"><a href="#如何编写合适的信号处理函数" class="headerlink" title="如何编写合适的信号处理函数"></a>如何编写合适的信号处理函数</h1><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>死锁风险<br>可重入性问题。</p>
+<h2 id="信号术语"><a href="#信号术语" class="headerlink" title="信号术语"></a>信号术语</h2><h2 id="发送信号"><a href="#发送信号" class="headerlink" title="发送信号"></a>发送信号</h2><p>通过kill系统调用发送信号。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">kill</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>pid &gt; 0，那么会发送信号给由 pid 指定的进程所属的线程组。</li>
+<li>pid = 0，那么会发送信号给与调用进程同组的每个进程，包括调用进程自身。</li>
+<li>pid &lt; -1，那么会向组 ID 等于该 pid 绝对值的进程组内所有下属进程发送信号。</li>
+<li>pid = -1，调用进程有权将信号发往的每个目标进程，除去swapper(PID 0)，init (PID 1) 和自身进程。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigqueue</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig, <span class="type">const</span> <span class="keyword">union</span> sigval value)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>sigqueue系统调用可以发送实时信号。其使用方式同kill，略有不同的是，sigqueue不能通过将pid指定为负值而向整个进程组发送信号。在调用sigaction设置信号处理程序时，可以指定SA_SIGINFO标志位，就能额外收到value数据了。</p>
+<h2 id="接收信号"><a href="#接收信号" class="headerlink" title="接收信号"></a>接收信号</h2><p>当内核把进程p从内核态切换到用户态时(例如系统调用返回，或者完成了一次上下文切换(时间片开始处))，会去检查进程p的所有未被阻塞的待处理信号。(pending &amp; ~blocked)，如果这个集合非空，那么内核选择集合中某个信号k(通常是最小的k)，并且强制p接收k。进程p收到k信号后会有如下几种方式对k信号做出应答。收到这个信号会触发某些操作。如果用sigaction注册了信号处理函数，则执行相关信号处理函数，否则执行信号的默认操作。<br>信号默认操作表。</p>
+<ol>
+<li>显示地忽略信号。</li>
+<li>执行信号的缺省操作。由内核定义，详见表xxxx</li>
+<li>通过调用相应的信号处理函数捕获信号。</li>
+</ol>
+<h2 id="阻塞和解除阻塞"><a href="#阻塞和解除阻塞" class="headerlink" title="阻塞和解除阻塞"></a>阻塞和解除阻塞</h2><p>内核会为每个进程维护一个信号掩码，即一组信号，并将阻塞其针对该进程的传递。如果将遭阻塞的信号发送给某进程，那么对该信号的传递将延后，直至从进程信号掩码中移除该信号，从而解除阻塞为止。</p>
+<ol>
+<li>阻塞当前正在处理的信号。即，如果当前接收到s信号，正在执行S信号处理函数处理，此时又来了一个s信号，则s会变成待处理没有被接收。</li>
+<li>调用sigprocmask及其相关函数，明确地阻塞或解除阻塞信号。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigprocmask</span><span class="params">(<span class="type">int</span> how, <span class="type">const</span> <span class="type">sigset_t</span> *restrict set, <span class="type">sigset_t</span> *restrict oset)</span></span>; <span class="comment">// </span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigemptyset</span><span class="params">(<span class="type">sigset_t</span> *set)</span></span>; <span class="comment">// 初始化set为空集合</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigfillset</span><span class="params">(<span class="type">sigset_t</span> *set)</span></span>; <span class="comment">// 将每个信号都加到set中</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigaddset</span><span class="params">(<span class="type">sigset_t</span> *set, <span class="type">int</span> signum)</span></span>; <span class="comment">// 将signum信号添加到set中</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigdelset</span><span class="params">(<span class="type">sigset_t</span> *set, <span class="type">int</span> signum)</span></span>; <span class="comment">// 从set中删除signum信号</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">sigismember</span><span class="params">(<span class="type">const</span> <span class="type">sigset_t</span> *set, <span class="type">int</span> signum)</span></span>; <span class="comment">// 检查signum信号是否在set信号集中。</span></span><br></pre></td></tr></table></figure>
+
+<p>sigprocmask改变当前阻塞的信号集合。取决于<code>how</code>参数的设定。<br>SIG_BLOCK: 将set指向信号集内的指定信号添加到信号掩码中。<br>SIG_UNBLOCK: 将set指向信号集中的信号从信号掩码中移除。即使要解除阻塞的信号当前并未处于阻塞状态，也不会返回错误<br>SIG_SETMASK: 将 set 指向的信号集赋给信号掩码。</p>
+<p>如下代码展示如何临时阻塞接收SIGINT</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sigset_t block_set, prev_set;</span><br><span class="line"></span><br><span class="line"><span class="built_in">sigempty</span>(&amp;block_set);</span><br><span class="line"><span class="built_in">sigaddset</span>(&amp;block_set, SIGINT);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 阻塞SIGINT，保存先前的信号掩码 */</span></span><br><span class="line"><span class="built_in">sigprocmask</span>(SIG_BLOCK, &amp;blcok_set, &amp;prev_set);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在此执行代码，不会被SIGINT打断。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 恢复先前的信号掩码 */</span></span><br><span class="line"><span class="built_in">sigprocmask</span>(SIG_SETMASK, &amp;prev_mask, NULL);</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/258885880">https://zhuanlan.zhihu.com/p/258885880</a></p>
+<h1 id="编写信号处理程序"><a href="#编写信号处理程序" class="headerlink" title="编写信号处理程序"></a>编写信号处理程序</h1><p>信号处理是Linux系统编程最棘手的一个问题。处理程序又几个属性使得它们很难推理分析：</p>
+<ul>
+<li>处理程序与主程序并发运行，共享同样的全局变量。因此可能与主程序和其他信号处理程序互相干扰</li>
+<li>如何以及何时接收信号的规则常常有违人的直觉</li>
+<li>不同的系统有不同的信号处理语义</li>
+</ul>
+<p>图8-31.<br>信号处理程序很麻烦的是因为他们和主程序以及其他信号处理程序并发的执行。如果这些程序都需要访问修改同样的全局变量。将导致不可预知的结果。</p>
+<p>《深入理解计算机系统》提出了安全的编写信号处理程序的几个建议：</p>
+<ol>
+<li>处理程序要尽可能简单。例如，信号处理程序只设置全局标志位并立即返回。</li>
+<li>在主程序只调用异步信号安全函数。异步信号安全函数是指那些可重入函数或者不能被信号中断的函数。</li>
+<li>保存和恢复errno。许多Linux异步信号安全函数都会在返回时设置errno。在信号处理程序中调用这样的函数会干扰主程序中其他依赖errno的部分。</li>
+<li>阻塞所有信号，保护对共享全局数据结构的访问。</li>
+<li>用volatile生命全局变量。volatile强制编译器每次在代码中引用被其修饰的变量时都要从内存重新读取。</li>
+<li>用sig_atomic_t生命标志。C语言提供整型数据类型sig_atomic_t，对它的读写保证是原子性的。</li>
+</ol>
+<p>eg： libevent中的信号处理：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> __cdecl</span></span><br><span class="line"><span class="function"><span class="title">evsig_handler</span><span class="params">(<span class="type">int</span> sig)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="comment">// 保存错误码</span></span><br><span class="line">    <span class="type">int</span> save_errno = errno;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN32</span></span><br><span class="line">    <span class="type">int</span> socket_errno = <span class="built_in">EVUTIL_SOCKET_ERROR</span>();</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">ev_uint8_t</span> msg;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (evsig_base == <span class="literal">NULL</span>) {</span><br><span class="line">        <span class="built_in">event_warnx</span>(</span><br><span class="line">            <span class="string">"%s: received signal %d, but have no base configured"</span>,</span><br><span class="line">            __func__, sig);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> EVENT__HAVE_SIGACTION</span></span><br><span class="line">    <span class="built_in">signal</span>(sig, evsig_handler);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Wake up our notification mechanism */</span></span><br><span class="line">    msg = sig;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN32</span></span><br><span class="line">    <span class="built_in">send</span>(evsig_base_fd, (<span class="type">char</span>*)&amp;msg, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    {</span><br><span class="line">    <span class="comment">// 向读端fd，写入一个字节信号值。write是信号安全函数。</span></span><br><span class="line">        <span class="type">int</span> r = <span class="built_in">write</span>(evsig_base_fd, (<span class="type">char</span>*)&amp;msg, <span class="number">1</span>);</span><br><span class="line">        (<span class="type">void</span>)r; <span class="comment">/* Suppress 'unused return value' and 'unused var' */</span></span><br><span class="line">    }</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    errno = save_errno;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN32</span></span><br><span class="line">    <span class="built_in">EVUTIL_SET_SOCKET_ERROR</span>(socket_errno);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<p>libevent的信号处理程序遵守了1，2，3规则。信号处理程序很简单，仅仅往一个文件描述符中写入一个字节数据。只调用write信号安全函数，避免调用一些非信号安全的函数。因为write系统调用可能会改变errno，因此保存回复了errno的值。</p>
+<p>信号处理时只是记录了下产生了什么信号,并没有进行实际处理,处理过程还是交给主程序本身,避免调用一些非信号安全的函数。因此我们再编写信号处理函数的时候也只要记录下信号状态，对errno这种全局变量，进行保存，处理结束后恢复变量值，尽量避免使用锁。</p>
+<p>注：</p>
+<ol>
+<li>创建一个管道(Libevent实际上使用的是socketpair)</li>
+<li>为这个socketpair的一个读端创建一个event，并将之加入到多路IO复用函数的监听之中</li>
+<li>设置信号捕抓函数</li>
+<li>有信号发生，就往socketpair写入一个字节<br>这里只展示libevent如何处理信号，需更深入了解libevent对信号的处理，可参考如下博客，或libevent源码。<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/luotuo44/article/details/38538991">https://blog.csdn.net/luotuo44/article/details/38538991</a></li>
+</ol>
+<p>程序。<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ourroad/p/4834383.html">https://www.cnblogs.com/ourroad/p/4834383.html</a><br>如图8-31.<br>主程序收到s信号。执行s信号处理程序S。在S执行过程中，收到t信号，t信号终端S程序，转而执行T信号处理程序。T返回时，S从它被中断的地方继续执行。最后S返回，主程序从被中断的地方继续执行。</p>
+<p>操作系统内核使用一种成为上下文切换的较高层形式的异常控制流来实现多任务。内核为每个进程维持一个上下文。上下文就是内核重新启动一个被抢占进程所需的状态。<br>上下文切换：1. 保存当前进程的上下文。2. 回复某个先前被抢占的进程被保存的上下文。3. 将控制权传递给这个回复的进程。</p>
+<h1 id="多线程程序中使用信号"><a href="#多线程程序中使用信号" class="headerlink" title="多线程程序中使用信号"></a>多线程程序中使用信号</h1><p>本来编写信号处理程序就很难了，多线程程序本身也很难，多线程+信号简直是强人锁男，男上加男嘛。应该尽量避免将两者结合起来使用，不然写出了Bug，就只能一言难尽了。</p>
+<h1 id="POSIX信号和多线程应用"><a href="#POSIX信号和多线程应用" class="headerlink" title="POSIX信号和多线程应用"></a>POSIX信号和多线程应用</h1><p>POSIX 1003.1标准对多线程应用的信号处理有一些严格的要求：</p>
+<ul>
+<li><strong>信号处理程序必须在多线程应用的所有线程之间共享</strong>；不过，每个线程必须有自己的挂起信号掩码和阻塞掩码</li>
+<li>POSIX库函数<strong>kill()<strong>和</strong>sigqueue()<strong>必须向</strong>所有</strong>的多线程应用而不是某个特殊的线程发送信号。所有由内核产生的信号同样如此(如：SIGCHLD、SIGINT或SIGQUIT)</li>
+<li>每个发送给多线程应用的信号仅传递给一个线程，这个线程是由内核在从<strong>不会阻塞该信号的线程</strong>中随意选择出来的。</li>
+<li>如果向多线程应用发送了一个致命的信号，那么内核将<strong>杀死该应用的所有线程</strong>，而不仅仅是杀死接收信号的那个线程。</li>
+</ul>
+<p>如果一个挂起的信号发送给了某个特定的进程，那么这个信号就是私有的；如果被发送给了整个线程组，它就是共享的。<br>每种信号类型对应一个元素，Linux中可以声明的信号的最大数是64。没有值为0的信号，因此，信号的编号对应于sigset_t类型变量中的相应位下标加1</p>
+<h1 id="给指定线程发送信号"><a href="#给指定线程发送信号" class="headerlink" title="给指定线程发送信号"></a>给指定线程发送信号</h1><ol>
+<li>pthread_kill类似kill，但pthread_kill给<strong>指定的线程</strong>发送信号。kill会给所有的线程发送信号。</li>
+<li>pthread_sigqueue类似sigqueue，但pthread_sigqueue给<strong>指定的线程</strong>发送实时信号。sigqueue会给所有的线程发送实时信号。</li>
+</ol>
+<p>将信号发给指定线程和发给线程组有很大不同。信号发送给指定线程，由<strong>指定线程</strong>调用信号处理程序对其进行处理；信号发给线程组，且该线程组已然为此信号创建了信号处理程序时，内核会<strong>任选一条线程来接收</strong>这一信号，并在<strong>该线程</strong>中调用信号处理程序对其进行处理。</p>
+<h1 id="产生信号"><a href="#产生信号" class="headerlink" title="产生信号"></a>产生信号</h1><p>发送给进程一个信号，这个信号可能来自内核，也可能来自另一个进程。内核通过表所示的某个函数进行调用而产生信号。最后都会调用specific_send_sig_info函数。</p>
+<p>当一个信号被发往整个线程组时，这个信号可能来自内核，也可能来自另一个进程。最终都调用group_send_sig_info函数。<br>__group_complete_signal 扫描线程组中的进程，查找能接收新信号的进程。满足以下条件可能被选中。<br>每当从内核态向用户态转换时，内核态堆栈都被清空。</p>
+<p>系统调用重新执行。系统调用执行到一半时接收到一个信号，去执行信号处理函数。</p>
+<h1 id="发送信号-1"><a href="#发送信号-1" class="headerlink" title="发送信号"></a>发送信号</h1><h1 id="案例分析–localtime-r导致的死锁问题。"><a href="#案例分析–localtime-r导致的死锁问题。" class="headerlink" title="案例分析–localtime_r导致的死锁问题。"></a>案例分析–localtime_r导致的死锁问题。</h1><p>这里分析由我的一个提交引入的死锁问题。</p>
+<p>localtime_r是线程安全函数，但不是信号安全函数。进程A执行过程中使用localtime_r，信号处理程序也调用了localtime_r函数localtime_r会调用到tz_convert上锁。如果进程A调用localtime_r已经上锁了，此时进程A收到信号去执行信号处理函数，信号处理函数也调用localtime_r，就会导致死锁发生。<br>如下程序模拟了在信号处理程序中调用localtime_r导致的死锁问题。主线程创建子线程和发送信号线程，注册信号处理程序，在信号处理程序中调用localtime_r函数。子线程处理函数中频繁调用localtime_r。发送信号线程每隔1s给指定线程id的线程发送信号。<br>从实验的结果来看：</p>
+<ol>
+<li>给子线程发送信号会导致死锁。</li>
+<li>给主线程和发送信号线程发送信号不会导致死锁。<br>原因在于，子线程处理程序频繁调用localtime_r函数。信号处理函数也调用localtime_r函数。当子线程处理函数调用localtime_r上锁后还没来得及释放锁，此时收到信号。执行信号处理程序又调用localtime_r请求上锁。从而导致死锁。<br>而主线程和发送信号线程由于没有调用localtime_r，因而给主线程和信号发送线程发送信号不会导致死锁。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">struct</span> <span class="title class_">tm</span> *</span><br><span class="line"><span class="built_in">localtime_r</span> (<span class="type">const</span> <span class="type">time_t</span> *t, <span class="keyword">struct</span> tm *tp)</span><br><span class="line">{</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">tm</span> *l = <span class="built_in">localtime</span> (t);</span><br><span class="line">  <span class="keyword">if</span> (! l)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  *tp = *l;</span><br><span class="line">  <span class="keyword">return</span> tp;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">tm</span> *</span><br><span class="line">__localtime64_r (<span class="type">const</span> <span class="type">__time64_t</span> *t, <span class="keyword">struct</span> tm *tp)</span><br><span class="line">{</span><br><span class="line">  <span class="keyword">return</span> __tz_convert (*t, <span class="number">1</span>, tp);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>pthread_kill发出的信号，只有该线程收到信号并处理。<br>如果<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/coding-my-life/p/4782529.html">https://www.cnblogs.com/coding-my-life/p/4782529.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_34067049/article/details/87957176">https://blog.csdn.net/weixin_34067049/article/details/87957176</a></p>
+<h1 id="非信号安全函数带来的风险。死锁风险分析"><a href="#非信号安全函数带来的风险。死锁风险分析" class="headerlink" title="非信号安全函数带来的风险。死锁风险分析"></a>非信号安全函数带来的风险。死锁风险分析</h1><p>死锁概念以及如何避免死锁，已有博客说明，这里不再详细说明。<br>localtime_r带来的死锁风险。<br>测试代码：注：该程序运行在Linux archlinux 5.10.43-1-lts 中</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">pthread_t</span> g_main_thread_id;</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_t</span> g_sub_thread_id;</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_t</span> g_send_sig_thread_id;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">sig_handler</span><span class="params">(<span class="type">int</span> signum)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">time_t</span> time_s = <span class="built_in">time</span>(<span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">tm</span> now_time;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 信号处理程序调用localtime_r非信号安全函数。</span></span><br><span class="line">    <span class="built_in">localtime_r</span>(&amp;time_s, &amp;now_time);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"get signum %d, the thread_id is %lu\n"</span>, signum, <span class="built_in">pthread_self</span>());</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> *<span class="title">send_sig_func</span><span class="params">(<span class="type">void</span> *)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    {</span><br><span class="line">        <span class="comment">// 发送给main线程处理，不会导致死锁。</span></span><br><span class="line">        <span class="comment">// pthread_kill(g_main_thread_id, SIGUSR1);</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送给send_sig线程，不会导致死锁。</span></span><br><span class="line">        <span class="comment">// pthread_kill(g_send_sig_thread_id, SIGUSR1);</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送给子线程处理，会导致死锁。子线程处理函数和信号处理都调用了localtime_r</span></span><br><span class="line">        <span class="built_in">pthread_kill</span>(g_sub_thread_id, SIGUSR1);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">sleep</span>(<span class="number">1</span>);</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> *<span class="title">call_localtime_r</span><span class="params">(<span class="type">void</span> *)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">time_t</span> time_s = <span class="built_in">time</span>(<span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">tm</span> now_time;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    {</span><br><span class="line">        <span class="built_in">localtime_r</span>(&amp;time_s, &amp;now_time);</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">sigaction</span> act;</span><br><span class="line">    <span class="type">sigset_t</span> block_set;</span><br><span class="line"></span><br><span class="line">    act.sa_flags = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">sigemptyset</span>(&amp;act.sa_mask);</span><br><span class="line">    act.sa_handler = sig_handler;</span><br><span class="line">    <span class="built_in">sigaction</span>(SIGUSR1, &amp;act, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 获取主线程的线程id */</span></span><br><span class="line">    g_main_thread_id = <span class="built_in">pthread_self</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"g_main_thread_id = %lu\n"</span>, g_main_thread_id);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">pthread_create</span>(&amp;g_sub_thread_id, <span class="literal">NULL</span>, call_localtime_r, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"g_sub_thread_id = %lu\n"</span>, g_sub_thread_id);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 发送信号线程 */</span></span><br><span class="line">    <span class="built_in">pthread_create</span>(&amp;g_send_sig_thread_id, <span class="literal">NULL</span>, send_sig_func, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"g_send_sig_thread_id = %lu\n"</span>, g_send_sig_thread_id);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 注意，省略了错误检查 */</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">pthread_join</span>(g_sub_thread_id, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">pthread_join</span>(g_send_sig_thread_id, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>打印</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">(gdb) thread apply all bt</span><br><span class="line"></span><br><span class="line">Thread <span class="number">3</span> (Thread <span class="number">0</span>x7fcb80b84640 (LWP <span class="number">3602</span>) <span class="string">"a.out"</span>): <span class="comment">// g_send_sig_thread_id</span></span><br><span class="line">#<span class="number">0</span>  <span class="number">0</span>x00007fcb8144fa95 in clock_nanosleep@GLIBC_2.<span class="number">2.5</span> () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0</span>x00007fcb81454c77 in nanosleep () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0</span>x00007fcb81454bae in sleep () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">3</span>  <span class="number">0</span>x000055c310a54276 in send_sig_func () at test_localtime_r.c:<span class="number">42</span></span><br><span class="line">#<span class="number">4</span>  <span class="number">0</span>x00007fcb8155e259 in start_thread () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libpthread.so.<span class="number">0</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0</span>x00007fcb814875e3 in clone () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line"></span><br><span class="line">Thread <span class="number">2</span> (Thread <span class="number">0</span>x7fcb81385640 (LWP <span class="number">3601</span>) <span class="string">"a.out"</span>): <span class="comment">// g_sub_thread_id</span></span><br><span class="line">#<span class="number">0</span>  <span class="number">0</span>x00007fcb8140e0ab in __lll_lock_wait_private () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0</span>x00007fcb81445fb1 in __tz_convert () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0</span>x000055c310a54214 in sig_handler (signum=<span class="number">10</span>) at test_localtime_r.c:<span class="number">25</span></span><br><span class="line">#<span class="number">3</span>  &lt;signal handler called&gt;</span><br><span class="line">#<span class="number">4</span>  <span class="number">0</span>x00007fcb81445940 in __tzset_parse_tz () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">5</span>  <span class="number">0</span>x00007fcb81447403 in __tzfile_compute () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">6</span>  <span class="number">0</span>x00007fcb81445e66 in __tz_convert () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line">#<span class="number">7</span>  <span class="number">0</span>x000055c310a542b4 in call_localtime_r () at test_localtime_r.c:<span class="number">52</span></span><br><span class="line">#<span class="number">8</span>  <span class="number">0</span>x00007fcb8155e259 in start_thread () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libpthread.so.<span class="number">0</span></span><br><span class="line">#<span class="number">9</span>  <span class="number">0</span>x00007fcb814875e3 in clone () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libc.so.<span class="number">6</span></span><br><span class="line"></span><br><span class="line">Thread <span class="number">1</span> (Thread <span class="number">0</span>x7fcb81386740 (LWP <span class="number">3600</span>) <span class="string">"a.out"</span>): <span class="comment">// g_main_thread_id</span></span><br><span class="line">#<span class="number">0</span>  <span class="number">0</span>x00007fcb8156a8ca in __futex_abstimed_wait_common64 () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libpthread.so.<span class="number">0</span></span><br><span class="line">#<span class="number">1</span>  <span class="number">0</span>x00007fcb8155f743 in __pthread_clockjoin_ex () <span class="keyword">from</span> <span class="regexp">/usr/</span>lib/libpthread.so.<span class="number">0</span></span><br><span class="line">#<span class="number">2</span>  <span class="number">0</span>x000055c310a543d1 in main () at test_localtime_r.c:<span class="number">79</span></span><br></pre></td></tr></table></figure>
+
+<p>glibc中tz_convet代码<br>struct tm *<br>__tz_convert (__time64_t timer, int use_localtime, struct tm *tp)<br>{<br>  long int leap_correction;<br>  int leap_extra_secs;</p>
+<p>  __libc_lock_lock (tzset_lock);</p>
+<p>  /* Update internal database according to current TZ setting.<br>     POSIX.1 8.3.7.2 says that localtime_r is not required to set tzname.<br>     This is a good idea since this allows at least a bit more parallelism.  */<br>  tzset_internal (tp == &amp;_tmbuf &amp;&amp; use_localtime);</p>
+<p>  if (__use_tzfile)<br>    __tzfile_compute (timer, use_localtime, &amp;leap_correction,<br>              &amp;leap_extra_secs, tp);<br>  else<br>    {<br>      if (! __offtime (timer, 0, tp))<br>    tp = NULL;<br>      else<br>    __tz_compute (timer, tp, use_localtime);<br>      leap_correction = 0L;<br>      leap_extra_secs = 0;<br>    }</p>
+<p>  __libc_lock_unlock (tzset_lock);</p>
+<p>  if (tp)<br>    {<br>      if (! use_localtime)<br>    {<br>      tp-&gt;tm_isdst = 0;<br>      tp-&gt;tm_zone = “GMT”;<br>      tp-&gt;tm_gmtoff = 0L;<br>    }</p>
+<pre><code>  if (__offtime (timer, tp-&gt;tm_gmtoff - leap_correction, tp))
+    tp-&gt;tm_sec += leap_extra_secs;
+  else
+tp = NULL;
+}
+</code></pre>
+<p>  return tp;<br>}</p>
+<p>从以上分析就能知道为什么我这个提交会导致死锁了。这个提交，将pthread_kill改成了sigqueue。<br>原本是由xxxx线程执行信号处理程序。变成内核会<strong>任选一条线程来接收</strong>这一信号。main线程没有阻塞xxx信号。很有可能学到main程序来执行信号处理程序。main程序本身也有调用localtime_r，信号处理程序也调用localtime_r。这样就导致了死锁。</p>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>不知道哪位名人说过：未经反省的人生是不值得过的。由于写了一个Bug，因而写了这边博客反省一下。博文若有不正确的地方还请各位同事指出，让我在反省反省~</p>
+<h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="">论文地址</a><br><a href="">参考代码</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/05/26/computer%20science/Linux-kernel-module/" rel="prev" title="Linux kernel module">
+                  <i class="fa fa-angle-left"></i> Linux kernel module
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/07/08/computer%20science/USB%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/" rel="next" title="USB网络设备驱动">
+                  USB网络设备驱动 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2021/06/07/computer%20science/%E4%BF%A1%E5%8F%B7%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

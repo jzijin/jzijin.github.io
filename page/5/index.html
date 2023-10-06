@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="computer science">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SRCNN">
+<meta property="og:url" content="http://example.com/page/5/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="computer science">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Z.J. Jiang">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/page/5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"page/5/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">SRCNN</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives" rel="section">归档</a></li><li class="menu-item menu-item-about"><a href="/about" rel="section">关于</a></li><li class="menu-item menu-item-categories"><a href="/categories" rel="section">分类</a></li><li class="menu-item menu-item-tags"><a href="/tags" rel="section">标签</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Z.J. Jiang</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/17/computer%20science/mysql-e5-bf-85-e7-9f-a5-e5-bf-85-e4-bc-9a/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/17/computer%20science/mysql-e5-bf-85-e7-9f-a5-e5-bf-85-e4-bc-9a/" class="post-title-link" itemprop="url">MySQL 必知必会</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-17 21:41:04" itemprop="dateCreated datePublished" datetime="2019-03-17T21:41:04+08:00">2019-03-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9C%AA%E5%88%86%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">未分类</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/03/17/computer%20science/mysql-e5-bf-85-e7-9f-a5-e5-bf-85-e4-bc-9a/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/03/17/computer%20science/mysql-e5-bf-85-e7-9f-a5-e5-bf-85-e4-bc-9a/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>11k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>18 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <pre><code>chapter 1 了解MySQL
+1.1 数据库基础
+1.1.1 什么是数据库
+    数据库(database)：保存有组织的数据的容器（通常是一个文件或一组文件）。
+1.1.2 表
+    表(table) 某种特定类型数据的结构化清单
+    模式(schema) 关于数据库和表的布局及特性的信息
+1.1.3 列和数据类型
+    列(column) 表中的一个字段。所有表都是由一个或多个列组成的
+    数据类型(datatype) 所容许的数据的类型。每个表列都有相应的数据类型，
+    它限制（或容许）该列中存储的数据
+</code></pre>
+<!---more--->
+<pre><code>1.1.4 行
+    行(row) 表中的一个记录
+1.1.5 主键
+    主键(primary key) 一列（或一组列），其值能够唯一区分表中每个行
+    应该总是定义主键 虽然并不总是都需要主键，但大多数数据库设计人员都
+    应保证他们创建的每个表具有一个主键，以便于以后的数据操纵和管理
+
+    表中的任何列都可以作为主键，只要它满足以下条件：
+        任何两行都不具有相同的主键值；
+        每个行都必须具有一个主键值
+
+    主键的最好习惯：
+        不更新主键列中的值
+        不重用主键列的值
+        不在主键列中使用可能会更改的值
+
+1.2 什么是SQL
+    SQL是结构化查询语言(Structured Query language)的缩写
+    SQL的优点：
+        SQL不是某个特定数据库供应商专有的语言。
+        SQL简单易学
+        SQL尽管看上去简单，但它实际上是一种强有力的语言。
+
+chapter 2 MySQL简介
+2.1 什么是MySQL
+    MySQL 是一种DBMS，它是一种数据库软件
+2.1.1 客户机-服务器软件
+    DBMS可分为两类：一类基于共享文件系统的DBMS，另一类为基于
+客户机-服务器的DBMS。
+2.1.2 MySQL 版本
+2.2 MySQL 工具
+2.2.1 MySQL命令行使用程序
+2.2.2 MySQL Administrator 图形交互机
+2.2.3 MySQL Query Browser
+
+chapter 3 使用MySQL
+3.1 连接 mysql -uuser_name -p
+3.2 选择数据库 use database_name;
+3.3 了解数据库和表： show tables; show columns form table_name
+
+chapter 4 检索数据
+4.1 SELECT 语句
+4.2 检索单个列：select prod_name form table_names;
+4.3 检索多个列：SELECT a,b from some_table;
+4.4 检索所有列：SELECT * FROM   some_tales;
+4.5 检索不同的行： SELECT DISTINCT vend_id FROM table;
+    SELECT DISTINCT 只返回不同（唯一）的id
+4.6 限制结果： SELECT something FROM tables LIMIT 5；
+    SELECT something FROM tables LIMIT 5，5；第一个数
+    为开始位置。第二个数为要检索的行数。
+4.7 使用完全限定的表名：SELECT products.name FROM products
+
+chapter 5 排序检索数据
+5.1 排序数据 SELECT * FROM table order by name;
+    子句(clause) SQL语句由子句构成，有的子句是必须的，而
+    有的是可选的。一个子句通常有一个关键字和所提供的数据组成。
+    子句的乐子有SELECT语句的FROM子句。
+5.2 按多个列排序
+    SELECT * FROM table ORDER BY id, name;
+5.3 指定排序方向
+    SELECT * FROM table ORDER BY price DESC（ASC）;
+    SELECT * FROM table ORDER BY price DESC（ASC）, name
+    在多个列上降序排序 如果想在多个列上进行降序排序，必须对
+    没格列都指定DESC关键字
+
+    ORDER BY 和 LIMIT 结合
+    SELECT *  FROM table ORDER BY price DESC（ASC）LIMIT 1;
+
+chapter 6 过滤数据
+6.1 使用WHERE子句 SELECT * FROM table WHERE price = 2.5
+    WHERE 子句的位置， 在同时使用 ORDER BY 和 WHERE 子句时
+    ORDER BY 位于 WHERE 之后。否则会产生错误
+6.2 WHERE 子句操作符
+= &lt;&gt;(不等于) ！=（不等于） &lt; &gt; &lt;= &gt;=  BETWEEN(指定两个值之间)
+6.2.1 检查单个值
+    SELECT * FROM table WHERE name = &#39;&#39;;
+    SELECT * FROM table WHERE price &gt; 10;
+6.2.2 不匹配查询
+    SELECT * FROM table WHERE id &lt;&gt;10;
+6.2.3 范围值检查
+    SELECT * FROM table WHERE price BETWEEN 5 AND 10;
+6.2.4 空值检查
+    NULL 无值(no value)，它与字段包括0、空字符串或仅仅包含空格不同
+    SELECT * FROM table WHERE price IS NULL
+
+chapter 7 数据过滤
+7.1 组合WHERE子句
+7.1.1 AND 操作符
+    SELECT * FROM table WHERE price&gt;10 AND price &lt;20
+7.1.2 OR 操作符
+    SELECT * FROM table WHERE price &gt; 10 OR price &lt; 20;
+7.2 IN 操作符
+    SELECT * FROM table WHERE id IN (1002, 1003) ORDER BY name;
+7.3 NOT 操作符
+    SELECT * FROM table WHERE id NOT IN (1002, 1003) ORDER BY name
+
+chapter 8 用通配符进行过滤
+8.1 LIKE操作符
+8.1.1 %通配符
+    SELECT * FROM table WHERE name LIKE &#39;jet%&#39;
+    SELECT * FROM table WHERE name LIKE &#39;%dd%&#39;
+8.1.2 _通配符
+    用途和%一样，但下划线只匹配单个字符而不是多个字符
+    SELECT * FROM table WHERE name LIKE &#39;_ a b&#39;
+8.2 通配符使用技巧
+    通配符的处理一般要比前面讨论的其他搜索花更多的时间。
+    不要过度使用通配符
+    在确实需要使用通配符的地方使用
+    仔细注意通配符的位置
+
+chapter 9 用正则表达式进行搜索
+9.1 介绍
+9.2 使用MySQL正则表达式
+9.2.1 基本字符匹配
+    SELECT * FROM table WHERE name REGEXP &#39;.100&#39;
+    注意区别 LIKE 和 REGEXP 的区别
+9.2.2进行 OR 匹配
+    SELECT * FROM table WHERE name REGEXP &#39;1000|2000&#39;
+9.2.3 匹配几个字符之一
+    SELECT * FROM table WHERE name REGEXP &#39;[123] jon&#39;
+    [123] 定义一组字符，意思是匹配1或2或3
+9.2.4 匹配范围
+    SELECT * FROM table WHERE name REGEXP &#39;[1-9] a&#39;
+9.2.5 匹配特殊字符
+    SELECT * FROM table WHERE name REGEXP &#39;\\.jjj&#39;
+    特殊字符要经过转译 匹配 \ 要使用 \\\
+9.2.6 匹配字符类
+9.2.7 实例
+
+chapter 10 创建计算字段
+10.1 计算字段
+    如果想在一个字段既显示公司名，又公司的地址，但这两个信息一般包含在
+    不同的列表中？
+
+    字段(field) 基本上与列(column)的意思相同，经常互换使用，不过
+    数据库列一般称为列，而术语字段通常用在计算字段连接上。
+10.2 拼接字段
+    SELECT Concat(name, &#39;(&#39;, country, &#39;)&#39;) FROM table;
+    MySQL 使用Concat 来实现连接
+    SELECT Concat((RTrim(name)), &#39;(&#39;, country, &#39;)&#39;) FROM table
+    RTrim() 函数去掉右边的所有空格 LTrim Trim
+    
+    使用别名
+    SELECT Concat(name, &#39;(&#39;, country, &#39;)&#39;) AS vend_title FROM table
+
+10.3 执行算术计算
+    SELECT price*(+-/)num as total FROM table
+
+chapter 11 使用数据处理函数
+11.1 函数
+    SQL 支持利用函数来处理数据。函数一般是在数据上执行的，
+    它给数据的转换和处理提供了方便
+11.2 使用函数
+11.2.1 文本处理函数
+    SELECT Upper(name) AS new_name FROM table
+    Left() Length() Locate()&lt;找出子串&gt; Lower() LTrim() RIght(返回串的右边)
+11.2.2 日期和时间处理函数
+    AddDate()
+    AddTime()
+    CurDate()......
+    SELECT * FROM table WHERE Date(order_date) = &#39;2015-09-10&#39;
+    SELECT * FROM table WHERE Year(order_date) = 2005 AND Month(order_date) = 9
+11.2.3 数值处理函数
+    abs() cos() exp() mod() pi() sin() .....
+
+chapter 12 汇总数据
+12.1 聚集函数
+    AVG() 列平均值 COUNT() 行数 MAX() 列最大值
+    MIN() 列最小值 SUM() 列总和
+
+chapter 13 分组数据
+13.1 数据分组
+13.2 创建分组
+    分组是在 SELECT 语句中的 GROUP BY 子句中建立的。
+    SELECT id, COUNT(*) as num_prods FROM table GROUP BY id;
+13.3 过滤分组
+    HAVING 子句过滤 分组 HAVING 非常类似 WHERE。但是 WHERE 过滤行
+    HAVING 过滤分组
+    SELECT id COUNT(*) FROM table GROUP BY id HAVING COUNT(*) &gt;=2;
+    HAVING 和 WHERE 的差别： WHERE在数据分组前过滤 HAVING 在数据分组后过滤
+13.4 分组和排序
+    GROUP BY 和 ORDER BY 经常完成相同的工作，但它们是非常不同的。
+    一般在使用 GROUP BY 子句时， 应该也给出 ORDER BY 子句。这是保证数据正确
+    排序的唯一方法。千万不要仅依赖 GROUP BY 的排序数据
+
+chapter 14 使用子查询
+14.1 子查询
+    嵌套在其他查询中的查询。
+14.2 使用子查询过滤
+
+chapter 15 联结表
+15.1 联结
+    SQL最强大的功能之一就是能在数据检索查询的执行中联结(join)
+15.1 关系表
+    外键(foreign key) 外键为某个表中的一列，它包含另一个表的主键值
+    定义了两个表之间的关系。
+    可伸缩性(scale) 能够适应不断增加的工作量而不失败。设计良好的数据库
+    或应用程序称之为可伸缩性好(scale well)
+15.1.2 为什么要使用联结？
+    联结是一种机制，用来在一条 SELECT 语句中关联表。可以联结多个表返回一组输出
+15.2 创建联结
+    SELECT a, b, c FROM table1, table2 WHERE table1.id = table2.id
+
+    笛卡尔积(cartesian product) 由没有联结条件的表关系返回的结果为笛卡尔积。
+    检索出的行的数目将是第一个表中的行数乘以第二个表中的行数
+15.2.2 内部联结
+    SELECT a ,bc FROM table1 INNER JOIN table2 on table1.id = table2.id
+15.2.3 联结过个表
+    性能考虑： 联结需要非常仔细，不要联结不必要的表。联结的表越多，性能下降的越厉害
+
+chapter 16 创建高级联结
+16.1 使用表别名
+    SELECT name, id FROM table1 as a table2 as b WHERE a.id = b.id
+16.2 使用不同类型的联结
+16.2.1 自联结
+    SELECT p1.prod_id, p1.prod_name
+    FROM products AS p1, products AS p2
+    WHERE p1.vend_id = p2.vend_id
+    AND p2.prod_id = &#39;DTNTR&#39;
+
+    自联结常用作外部语句替代从相同的表查询数据的子查询
+16.2.2 自然联结
+16.2.3 外部联结
+    LEFT OUTER JOIN RIGHT OUTER JOIN 
+16.3 使用带聚集函数的联结
+
+chapter 17 组合查询
+    具有多个 WHERE子句的 SELECT 语句都可以作为一个组合查询给出
+17.2 创建组合查询
+    可用UNION操作符来组合数条SQL查询。
+17.2.1 使用UNION
+    SELECT a,b,c FROM table1 UNION SELECT * FROM table2
+17.2.2 UNION规则
+    UNION 必须由两条或两条以上的　SELECT 语句组成
+    UNION 中的每个查询必须包含相同的列、表达式或聚集函数
+    列数据类型必须兼容
+17.2.3 包含或取消重复的行
+    UNION 从查询结果自动去除了重复的行
+    如果不想去重 UNION ALL
+    UNION maybe = WHERE but UNION ALL != WHERE
+17.2.4 对组合查询结果排序
+    ORDER BY 接在最后一条 SELECT 语句之后。不允许多条 ORDER BY
+
+chapter 18 全文本搜索
+18.2.1 启动全文本搜索
+    CREATE TABLE (note_text char(10)..... FULLTEXT(note_text))ENGINE=MYIsam
+18.2.2 进行全文本搜索
+    SELECT note_text ,Match(note_text) Against(&#39;rabbit&#39;) AS rank FROM table
+    Match() 和 Against() 执行全文本搜索 Match() 指定被搜索的列
+    Against() 指定要使用的搜索表达式
+    使用完整的Match() 说明 传递给Match() 的值必须与 FULLTEXT() 定义
+    中的相同。如果指定多个列，则必须列出它们（而且次序正确）
+18.2.3 使用查询扩展
+    SELECT note_text ,Match(note_text) Against(&#39;rabbit&#39; WITH QUERY EXPANSION) AS rank FROM table
+    查询扩展极大地增加了返回的行数，但这样做也增加了你实际上并不想要的行的数目
+18.2.4 布尔文本搜索
+    布尔搜索 即使没有FULLTEXT也可以使用
+
+chapter 19 插入数据
+19.2 插入完整的行
+    INSERT INTO table VALUES(a,b,b...)
+19.3 插入多个行
+19.4 插入检索出的数据
+    INSERT INTO table(a,b) SELECT a,b FROM table;
+
+chapter 20 更新和删除数据
+    为了更新（修改）表中的数据，可使用UPDATE语句。可采用两种
+方式使用UPDATE
+    更新表中特定行
+    更新表中所有行
+    不要省略 WHERE 子句， 在使用UPDATE是一定要细心注意。
+    UPDATE与安全 可以限制控制UPDATE语句的使用。
+    UPDATE table SET name = &#39;xxx&#39; WHERE id = 5;
+
+    在UPDATE语句使用子查询： UPDATE语句中可以使用子查询
+    是的能用 SELECT 语句检索出的数据更新列数据
+
+    IGNORE关键字 如果用UPDATE语句更新多行，并且在更新这些行
+    中的一行或多行时出现一个错误，则整个UPDATE操作被取消。为
+    即使是发生错误，也继续更新，可使用IGNORE关键字；
+    UPDATE IGNORE table...
+
+    为了删除某个列的值，可设置它为NULL（假如表定义允许NULL值）
+20.2 删除数据
+    为了从一个表中删除（去掉）数据，使用DELETE语句。可以两种
+    方式使用DELETE:
+        从表中删除特定的行
+        从表中删除所有行
+    不要省略 WHERE 子句， 在使用DELETE是一定要细心注意。
+    DELETE与安全 可以限制控制DELETE语句的使用。
+    DELETE FROM table WHERE id = 5;
+    DELETE 不需要列名或通配符。DELETE 删除整行而不是删除列
+    如果需要删除列，使用　UPDATE
+
+    删除表的内容而不是表　DELETE 语句从表中删除行，甚至是删除
+    表中所有的行。但是　DELETE 不删除表本身
+
+    更快的删除　如果想清空一个表　用TRUNCATE table
+
+    建议在 UPDATE 和　DELETE 之前先用　SELECT 语句检查正确性
+
+chapter 21 创建和操纵表
+21.1 创建表
+    CREATE TABLE (......)ENGINE=InnoDB;
+21.1.3 主键再介绍
+    主键必须唯一。表中的每一行必须具有唯一的主键值。
+    主键只能使用不允许NULL值的列，允许NULL值的列不能作为唯一标识
+21.1.4 使用 AUTO_INCREMENT
+    自动增量，每个表只允许一个 AUTO_INCREMENT 列，而且它必须被索引
+    SELECT last_insert_id() 函数可以返回最后一个 AUTO_INCREMENT的值
+21.1.5 指定默认值
+    如果在插入行是没有给出值，MySQL 允许指定此时使用的默认值
+    DEFAULT 
+    MySQL 不允许使用函数作为默认值，它只支持常亮
+    使用默认值而不是NULL值 许多数据库开发人员使用默认值而不是NULL值，
+    特别是对计算或数据分组的列更是如此
+21.1.6 引擎类型
+    InnoDB 可靠的事物处理引擎，它不支持全文本搜索
+    MEMORY 在功能上等同与 MyISAM,但由于数据存储在内存
+    （不是磁盘）中，速度更快（特别适合临时表）
+    MyISAM 是一个性能极高的引擎，它支持全文搜索，但不支持事物
+
+    注意：外键不能跨引擎
+21.2 更新表
+    ALTER TABLE mytable ADD name varcha(20);
+    删除列
+    ALTER TABLE mytable DROP COLUMN name
+21.3 删除表
+    DROP TABLE mytable
+21.4 重命名表
+    RENAME TABLE mytable to mytablebak
+
+chapter 22 使用视图
+    视图是虚拟的表。和包含数据的表不一样，视图只包含使用时动态检索数据的查询
+22.1.1为什么使用视图
+    重用SQL语句
+    简化复杂的SQL操作。
+    使用表的组成部分而不是整个表
+    保护数据
+    更改数据格式和表示
+22.1.2视图的规则和限制
+    视图必须唯一命名
+    可以创建的视图数目没有限制
+    为了创建驶入，必须具有足够的访问权限
+    视图可以嵌套
+    ORDER BY可以用在视图中
+    视图不能索引
+    视图可以和表一起使用
+22.2 使用视图
+    视图用 CREATE VIEW 语句来创建
+    使用 SHOW CREATE VIEW viewname 来查看创建视图的语句
+    用 DROP 删除视图， 其语法为 DROP VIEW viewname
+    更新视图时，可以先用DROP再用CREATE，也可以直接用CREATE OR 
+    REPLACE VIEW
+22.2.1 利用视图简化复杂的联结
+    CREATE VIEW produ AS SELECT name FROM table WHERE
+    创建可重用的视图 创建不受特定数据限制的视图是一种好方法。
+22.2.2 用视图重新格式化检索出的数据
+22.2.3 用视图过滤不想要的数据
+
+chapter 23 使用存储过程
+23.2 为什么要使用存储过程
+    通过把处理封装在容易使用的单元中，简化复杂的操作
+    由于不要求反复建立一系列处理步骤，保证了数据的完整性
+    简化对变动的管理
+    提高性能
+    简单、安全、高性能
+
+    缺陷：
+        一般来说，存储过程的编写比基本SQL语句复杂， 编写存储过程需要更高
+        的技能，更丰富的经验
+        你可能没有创建存储过程的安全访问权限
+23.3 使用存储过程
+23.3.1 执行存储过程
+    CALL productpricing(
+        @pricelow,
+        @pricehigh,
+        @priceaverage
+    )
+23.3.2 创建存储过程
+    CREATE PROCEDURE producpricing()
+    BEGIN
+        SELECT Avg(prod_price)  AS priceaverage
+        FROM products;
+    END;
+
+    如何使用这个存储过程呢？ 
+    CALL productpricing
+23.3.3 删除存储过程
+    DROP PROCEDURE (IF EXISTS) producpricing;
+23.3.4 使用参数
+    变量（variale）内存中一个特定的位置，用来临时存储数据
+    CREATE PROCEDURE producpricing(OUT p1 DECIMAL(8,2)...)
+    BEGIN
+        SELECT Avg(prod_price)  AS priceaverage
+        FROM products;
+
+    END;
+    CALL producpricing(@pricelow,...)
+    变量名： 所有 MySQL 变量都必须以 @ 开始
+23.3.5 建立只能存储过程
+23.3.6 检查存储过程
+    SHOW CREATE PROCEDURE
+
+chapter 24 使用游标
+    游标(corsor)是一个存储在 MySQL 服务器上的数据库查询
+    它不是一条SELECT语句，而是被该语句检索出来的结果集。在
+    存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据
+    只能用于存储过程！！！！
+24.2 使用游标
+    在能够使用游标前，必须声明（定义）它。
+    一旦声明后，必须打开游标以供使用。
+    对于填有数据的游标，根据需要取出（检索）各行
+    在结束游标使用时，必须关闭游标
+24.2.1 创建游标
+    CREATE PROCEDURE processorders()
+    BEGIN
+        DECLARE ordernumbers CURSOR
+        FOR 
+        SELECT order_num FROM orders;
+    END;
+24.2.4 打开和关闭游标
+    OPEN ordernumbers
+    CLOSE ordernumbers
+    隐含关闭 如果你不明确关闭游标， MySQL讲会在到达END语句时关闭它
+24.2.3 使用游标数据
+    在一个游标被打开后，可以使用 FETCH 语句分别访问它的每一行。
+    FETCH 指定检索什么数据，检索出来的数据存储在什么地方
+
+chapter 25 触发器
+    触发器是MySQL响应以下任何语句而自动执行的一条MySQL 语句
+    DELETE
+    INSERT
+    UPDATE
+25.2 创建触发器
+    唯一的触发器名
+    触发器关联的表
+    触发器应该响应什么的活动(DELETE INSERT UPDATE)
+    触发器何时执行（处理之前还是之后）
+    CREATE TRIGGER newproduct AFTER INSERT ON products
+    FOR EACH ROW SELECT &#39;product added&#39;
+    触发器在插入后和查找前执行
+    仅支持表 只有表才支持触发器，视图和临时表不支持。
+    单一触发器不能与多个时间或多个表关联，所以，如果你需要一个对
+    INSERT 和 UPDATE 操作的触发器，则应该定义两个触发器
+25.3 删除触发器
+    DROP TRIGGER newproduct
+    触发器不能更新或覆盖。为了修改一个触发器，必须先删除它，然后在重新创建
+25.4 使用触发器 
+25.4.1 INSERT 触发器
+    CREATE TRIGGER neworder AFTER INSERT On orders
+    FOR EACH ROW SELECT NEW.order_num
+25.4.2 DELETE 触发器
+
+chapter 26 管理事物处理
+    事物处理（transition processing）可以用来维护数据库
+    的完整性，它保证成批的MySQL操作要么完全执行，要么完全不执行
+
+    事务（transaction） 指一组SQL语句
+    回退（rollback）指撤销指定SQL语句的过程
+    提交（commit）指讲未存储的SQL语句结果写入数据表中
+    保留点（savepoint）指事务处理中设置的临时占位符，你可以对它发布回退
+
+26.2控制事务处理
+    START TRANSACTION 标识事务的开始
+26.2.1 使用 ROLLBACK
+    START TRANSACTION
+    DELETE FROM table
+    ROLLBACK
+    SELECT * FROM table
+26.2.2 使用COMMIT
+    事务中提交不会隐含执行必须自己手动提交
+    隐含事务关闭 当 COMMIT 或 ROLLBACK 语句执行后，事务会自动关闭
+    （将来的更改会隐含提交）
+26.2.3 使用保留点
+    为了支持回退部分事务处理，必须能在事务处理块中合适的位置放置占位符
+    这样，如果需要回退，可以回退到某个占位符
+    这些占位符成为保留点。为了创建占位符，可以使用 SAVEPOINT
+    SAVEPOINT name
+    ROLLBACK to name 可以回退到这个节点
+
+    保留点越多越好 你可以按照你的意愿自由回退
+26.2.4 更改默认的提交行为
+    为指示 MySQL 不自动提交更改，需要使用
+    SET autocommit = 0;
+    autocommit 标志决定是否自动提交更改，不管有没有COMMIT语句
+    知道 autocommit 被设置为真为止
+    标志为链接专用 autocommit 标志是针对每个连接而不是服务器的
+
+chapter 27 全球化和本地化
+27.1 字符集和校对顺序
+    字符集为字母和符号的集合
+    编码为某个字符集成员的内部表示
+    校对为规定字符如何比较的指令
+
+chapter 28 安全管理
+28.1 访问控制
+    MySQL服务器的安全基础是: 用户应该对他们需要的数据具有适当的访问权
+    ，既不能多也不能少。
+28.2 管理用户
+    MySQL用户账号和信息存储在名为mysql的MySQL数据库中。一般
+    不需要直接访问mysql数据库和表。要直接访问的话
+    USE mysql
+    SELECT user FROM user;
+28.2.1 创建用户账号
+    CREATE USER ben IDENTIFIED BY &#39;p@$$w0rd&#39;;
+    指定散列口令 IDENTIFIED BY 指定的口令为纯文本，
+    MySQL将在保存到user表之前对其进行加密。为了作为散列值
+    指定口令，使用 IDENTIFIED BY PASSWORD
+    重命名：
+        RENAME USER ben TO shabi
+28.2.2 删除用户账号
+    DROP USER shabi;
+28.2.3 设置访问权限
+    SHOW GRANTS FOR shabi
+    设置权限，使用 GRANT 语句
+        要授予的权限
+        要被授予访问权限的数据库或表
+        用户名
+    GRANT SELECT ON table .* TO shabi;
+    REVOKE 取消赋予的权限
+28.2.4 更改口令
+    SET PASSWORD FOR shabi  = Password(&#39;jjsd&#39;);
+    新口令必须传递到Password() 函数进行加密
+
+chapter 29 数据库维护
+29.1 备份数据
+    mysqldump mysqlhotcopy BACKUP TABLE SELECT INTO OUTFILE
+    首先刷新未写数据 为了保证所有数据被写到磁盘（包括索引数据）
+    可能需要在备份前使用FLUSH TABLE语句
+29.2 进行数据库维护
+    ANALYZE TABLE mytable 用来检查表键是否正确。
+    CHECK TABLE mytable 用来针对许多问题对表进行检查
+29.3 诊断启动问题
+    --help 显示帮助
+    --safe-mode 装载减去某些最佳配置的服务器
+    --version 版本
+    --verbose 显示全文本消息
+29.4 查看日志文件
+    错误日志。hostname.err, 位于data 目录。此文件名可以
+    用--log-error 命令行选项来更改
+    查询日志。hostname.log data 名字可以用--log更改
+    二进制日志。hostname-BEGIN data 用--log-bin 更改
+    缓慢查询文件 对数据库优化很有用，hostname-slow.log data --log-slow-queries 更改
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/" class="post-title-link" itemprop="url">排序大杂烩 各种各样的排序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-12 16:34:07" itemprop="dateCreated datePublished" datetime="2019-03-12T16:34:07+08:00">2019-03-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/03/12/computer%20science/%E6%8E%92%E5%BA%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>各种排序算法</p>
+<!---more--->
+<p><img src="https://upload-images.jianshu.io/upload_images/1156494-62f859c2ac6f95ff.png"></p>
+<p>先上一张图</p>
+<p>再来直接上代码。</p>
+<pre><code>//https://www.cnblogs.com/hokky/p/8529042.html
+//https://blog.csdn.net/m0_37962600/article/details/81475585
+/*
+如果排序算法能保证：对于待排序的序列里任一对排序吗相同的记录a,b，在排序之后的序列中a,b的前后顺序
+保持不变，就称这种排序是稳定的。也就是说，稳定的算法能够维持序列中的所有排序码相同的记录的相对位置
+。如果一份排序算法不能保证上述条件，它就是不稳定的。
+*/
+// 插入排序
+/*
+void insertSort(int *arr[],int len)&#123;
+    int i;
+    int j;
+    int temp;  //定义一个临时变量，用于交换数据时存储 
+    for(i=1;i&lt;len;i++)&#123;  //因为我们要对该待排序列的每一个元素都和前面的已排好序的序列进行插入，所以我们会对序列进行遍历 
+        for(j=0;j&lt;i;j++)&#123;  //第二层循环主要用于对已排好序的序列进行扫描，和要插入进来的数据进行逐一比较，然后决定插入到哪里 
+        ////从前往后对已排好序的元素和待插入元素进行大小比较，然后直到找到一个元素比被插入元素大，则交换位置 
+            if(arr[j]&gt;arr[i])&#123;
+                temp=arr[i];
+                arr[i]=arr[j];
+                arr[j]=temp;
+            &#125;
+        &#125;
+    &#125;
+&#125;
+*/
+// 选择排序
+/*
+给定数组：int[] arr=&#123;里面n个数据&#125;；第1趟排序，在待排序数据arr[1]~arr[n]中选出最小的数据，将它与arrr[1]交换；第2趟，在待排序数据arr[2]~arr[n]中选出最小的数据，将它与r[2]交换；以此类推，第i趟在待排序数据arr[i]~arr[n]中选出最小的数据，将它与r[i]交换，直到全部排序完成。
+*/
+void selectsort(int *arr)
+&#123;
+    for(int i=0; i&lt;size-1; i++)
+    &#123;
+        int k=i;
+        for (int j=k+1; j&lt;size; j++)
+        &#123;
+            if(arr[j] &lt; arr[k])
+            &#123;
+                k = j; // 记录目前找到的最小元素的位置
+            &#125;
+        &#125;
+        // 内层循环后，也就是找到本轮循环的最小的数之后，在进行交换
+        if(i != k)
+        &#123;
+            int temp = arr[i];
+            arr[i] = arr[k];
+            arr[k] = temp;
+        &#125;
+    &#125;
+&#125;
+// 快速排序
+void quicksort(int left, int right)
+&#123;
+    int i, j, t, temp;
+    if (left &gt; right)
+    &#123;
+        return;
+    &#125;
+    temp = a[left]; // temp 中存的就是基准数
+    i = left;
+    j = right;
+    while (i != j)
+    &#123;
+        // 顺序很重要， 要先从右往左找
+        while (a[j] &gt;= temp &amp;&amp; i &lt; j)
+        &#123;
+            j--;
+        &#125;
+        while (a[i] &lt;= temp &amp;&amp; i &lt; j)
+        &#123;
+            i++;
+        &#125;
+        // 交换两个数在数组中的位置
+        if (i &lt; j)
+        &#123; // 当哨兵i和哨兵j没有相遇时
+            t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+        &#125;
+    &#125;
+    // 最终基准数归位
+
+    a[left] = a[i];
+    a[i] = temp;
+    quicksort(left, i - 1);  // 继续处理左边的 这是递归的过程
+    quicksort(i + 1, right); // 处理右边的， 这也是一个递归的过程
+&#125;
+
+// 桶排序
+/*
+输入是由一个随机过程产生的[0, 1)区间上均匀分布的实数。将区间[0, 1)划分为n个大小相等的子区间（桶），每桶大小1/n：[0, 1/n)， [1/n, 2/n)， [2/n, 3/n)，…，[k/n, (k+1)/n )，…将n个输入元素分配到这些桶中，对桶中元素进行排序，然后依次连接桶输入0 ≤A[1..n] &lt;1辅助数组B[0..n-1]是一指针数组，指向桶（链表）。
+*/
+
+/* 当数比较集中的时候非常适合用桶排序 可以极大的节省时间
+一年的全国高考考生人数为500 万，分数使用标准分，最低100 ，最高900 ，没有小数，要求对这500 万元素的数组进行排序。
+分析：对500W数据排序，如果基于比较的先进排序，平均比较次数为O(5000000*log5000000)≈1.112亿。但是我们发现，这些数据都有特殊的条件： 100=&lt;score&lt;=900。那么我们就可以考虑桶排序这样一个“投机取巧”的办法、让其在毫秒级别就完成500万排序。
+方法：创建801(900-100)个桶。将每个考生的分数丢进f(score)=score-100的桶中。这个过程从头到尾遍历一遍数据只需要500W次。然后根据桶号大小依次将桶中数值输出，即可以得到一个有序的序列。而且可以很容易的得到100分有***人，501分有***人。
+实际上，桶排序对数据的条件有特殊要求，如果上面的分数不是从100-900，而是从0-2亿，那么分配2亿个桶显然是不可能的。所以桶排序有其局限性，适合元素值集合并不大的情况。
+*/
+
+// 冒泡排序
+void bubble_sort(int a[], int n)
+&#123;
+    int i, j, temp;
+    for (j = 0; j &lt; n - 1; j++)// 外层循环控制排序的趟数
+        for (i = 0; i &lt; n - 1 - j; i++)// 内层循环控制每一趟排序多少次
+        &#123;
+            if (a[i] &gt; a[i + 1])
+            &#123;
+                temp = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = temp;
+            &#125;
+        &#125;
+&#125;
+
+// 归并排序
+//https://www.cnblogs.com/skywang12345/p/3602369.html
+// python 代码的实现
+def merge(lfrom, lto, low, mid, high):
+    i, j, k = low, m, high
+    while i&lt;mid and j&lt;high:   # 反复复制两分段首记录中较小的
+        if lfrom[i].key &lt;= lfrom[j].key:
+            lto[k] = lfrom[i]
+            i += 1
+        else:
+            lto[k] = lfrom[j]
+            j += 1
+        k += 1
+    while i &lt; mid:    # 复制第一段剩余记录
+        lto[k] = lfrom[i]
+        i += 1
+        k += 1
+    while j&lt;high:    # 复制第二段剩余记录
+        lto[k] = lfrom[j]
+        j += 1
+        k += 1
+def merge_pass(lfrom, lto, llen, slen):
+    i = 0
+    while i+2*slen &lt; llen:    # 归并长slen的两段
+        merge(lfrom, lto, i, i+slen, i+2*slen)
+        i += 2*slen
+    if i+slen &lt; llen   # 剩下两段， 后段长度小于slen
+        merge(lfrom, lto, i, i+slen, llen)
+    else:              # 只剩下一段， 复制到表lto
+        for j in range(i, llen):
+            lto[j] = lfrom[j]
+
+
+def merge_sort(lst):
+    slen, llen = 1, len(lst)
+    templst = [None] * llen
+    while slen &lt; llen 
+        merge_pass(lst, templst, llen, slen)
+        slen *= 2
+        merge_pass(templst, lst, llen, slen)  # 结果存回原位
+        slen *= 2
+
+// c语言代码实现
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+void Merge(int sourceArr[], int tempArr[], int startIndex, int midIndex, int endIndex)
+&#123;
+    int i = startIndex, j = midIndex + 1, k = startIndex;
+    while (i != midIndex + 1 &amp;&amp; j != endIndex + 1) // 从小到大记录数据
+    &#123;
+        if (sourceArr[i] &gt; sourceArr[j])
+            tempArr[k++] = sourceArr[j++];
+        else
+            tempArr[k++] = sourceArr[i++];
+    &#125;
+    while (i != midIndex + 1) // 记录前面一段的剩余部分
+        tempArr[k++] = sourceArr[i++];
+    while (j != endIndex + 1) // 记录后面一段的剩余部分
+        tempArr[k++] = sourceArr[j++];
+    for (i = startIndex; i &lt;= endIndex; i++)
+        sourceArr[i] = tempArr[i]; // 重新写回
+&#125;
+
+//内部使用递归 需要开辟和sourceArr一样大小的空间
+void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex)
+&#123;
+    int midIndex;
+    if (startIndex &lt; endIndex)
+    &#123;
+        midIndex = startIndex + (endIndex - startIndex) / 2; //避免溢出int
+        MergeSort(sourceArr, tempArr, startIndex, midIndex);
+        MergeSort(sourceArr, tempArr, midIndex + 1, endIndex);
+        Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
+    &#125;
+&#125;
+
+int main(int argc, char *argv[])
+&#123;
+    int a[8] = &#123;50, 10, 20, 30, 70, 40, 80, 60&#125;;
+    int i, b[8];
+    MergeSort(a, b, 0, 7);
+    for (i = 0; i &lt; 8; i++)
+        printf(&quot;%d &quot;, a[i]);
+    printf(&quot;\n&quot;);
+    return 0;
+&#125;
+// 堆排序
+// https://www.cnblogs.com/MOBIN/p/5374217.html
+// https://www.jianshu.com/p/938789fde325
+/*
+A[i]的左节点为A[2i+1],右节点为A[2i+2]，父节点为A[i/2]，它从数组索引的角度描述了数字与数字在二叉树中的位置关系。
+（1、在应用此结论时需确认A[i]存在相应的左节点、右节点、根节点；
+2、此结论在后面会反复用到；
+3、此结论实际上是完全二叉树的一个基本性质，这也是为什么堆的结构性要求其满足完全二叉树的形式，就是为了使用此结论）
+
+*/
+
+/*堆序性说得通俗一点儿就是，父节点中的元素不小于（不大于）任意子节点的元素。
+这里的元素在本文中是以数字体现的。注：本文只讨论“大根堆”，即父节点中的元素不小于任意子节点的元素这种情形。
+所以，在一个大根堆中，一个节点的元素在其子树所有元素组成的集合中必定是最大值。这一结论至关重要。
+以下给出了两个大根堆的示例：
+*/
+/*
+下面开始进入正题了，堆排序算法究竟是怎么实现的呢？其实只需要简单的两步就可以实现堆排序：1）根据无序数组创建一个大根堆；2）不断调整大根堆，使其到达有序。
+*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+ 
+void swap(int* a, int* b) &#123;
+    int temp = *b;
+    *b = *a;
+    *a = temp;
+&#125;
+ 
+void max_heapify(int arr[], int start, int end) &#123;
+    //建立父节点指标和子节点指标
+    int dad = start;
+    int son = dad * 2 + 1;
+    while (son &lt;= end) &#123; //若子节点指标在范围内才做比较
+        if (son + 1 &lt;= end &amp;&amp; arr[son] &lt; arr[son + 1]) //先比较两个子节点大小，选择最大的
+            son++;
+        if (arr[dad] &gt; arr[son]) //如果父节点大於子节点代表调整完毕，直接跳出函数
+            return;
+        else &#123; //否则交换父子内容再继续子节点和孙节点比较
+            swap(&amp;arr[dad], &amp;arr[son]);
+            dad = son;
+            son = dad * 2 + 1;
+        &#125;
+    &#125;
+&#125;
+ 
+void heap_sort(int arr[], int len) &#123;
+    int i;
+    //初始化，i从最後一个父节点开始调整
+    for (i = len / 2 - 1; i &gt;= 0; i--)
+        max_heapify(arr, i, len - 1);
+    //先将第一个元素和已排好元素前一位做交换，再重新调整，直到排序完毕
+    for (i = len - 1; i &gt; 0; i--) &#123;
+        swap(&amp;arr[0], &amp;arr[i]);
+        max_heapify(arr, 0, i - 1);
+    &#125;
+&#125;
+ 
+int main() &#123;
+    int arr[] = &#123; 3, 5, 3, 0, 8, 6, 1, 5, 8, 6, 2, 4, 9, 4, 7, 0, 1, 8, 9, 7, 3, 1, 2, 5, 9, 7, 4, 0, 2, 6 &#125;;
+    int len = (int) sizeof(arr) / sizeof(*arr);
+    heap_sort(arr, len);
+    int i;
+    for (i = 0; i &lt; len; i++)
+        printf(&quot;%d &quot;, arr[i]);
+    printf(&quot;\n&quot;);
+    return 0;
+&#125;
+
+// 剃须刀排序 双向冒泡排序
+vector&lt;int&gt; shaker_sort(const vector&lt;int&gt; &amp;v)
+&#123;
+    vector&lt;int&gt; res = v;
+    int start = 0, end = res.size() - 1, shift = 1;
+    while(start &lt; end)
+    &#123;
+        for(auto i = start; i&lt;end; ++i)
+        &#123;
+            if(res[i] &gt; res[i+1])
+            &#123;
+                swap(res[i], res[i+1]);
+                shift = i;
+            &#125;
+        &#125;
+        // 到shift 以后的元素已经排好序了
+        end = shift;
+        for(auto j=end-1; j&gt;=start; --j)
+        &#123;
+            if(res[j] &gt; res[j+1])
+            &#123;
+                swap(res[j], res[j+1]);
+                shift = j + 1;
+            &#125;
+        &#125;
+        // 到shift之前的元素已经都排好序了。
+        start = shift;
+    &#125;
+    return res;
+&#125;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/11/computer%20science/%E7%BA%A6%E7%91%9F%E5%A4%AB%E7%8E%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/11/computer%20science/%E7%BA%A6%E7%91%9F%E5%A4%AB%E7%8E%AF/" class="post-title-link" itemprop="url">c语言 用循环链表实现约瑟夫环</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-11 16:20:06" itemprop="dateCreated datePublished" datetime="2019-03-11T16:20:06+08:00">2019-03-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/03/11/computer%20science/%E7%BA%A6%E7%91%9F%E5%A4%AB%E7%8E%AF/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/03/11/computer%20science/%E7%BA%A6%E7%91%9F%E5%A4%AB%E7%8E%AF/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>819</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>用C语言实现约瑟夫环</p>
+<!---more--->
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+// 链表结构体
+struct ListNode
+&#123;
+    int val;
+    struct ListNode * next;
+&#125;;
+
+// 创建循环链表
+struct ListNode * create(int n)
+&#123;
+    struct ListNode * head = (struct ListNode *)malloc(sizeof(struct ListNode));
+    struct ListNode *q = head;
+    head-&gt;val = 1;
+    head-&gt;next = NULL;
+    int i = 2;
+    while(i&lt;=n)&#123;
+        struct ListNode *p = (struct ListNode *)malloc(sizeof(struct ListNode));
+        p-&gt;val = i;
+        p-&gt;next = NULL;
+        q-&gt;next = p;
+        q = p;
+        i++;
+    &#125;
+
+    q-&gt;next = head;
+    return head;
+    
+&#125;
+
+int main()
+&#123;
+    struct ListNode * head = create(2);
+    struct ListNode * p = head;
+    struct ListNode * q = head;
+    int i=1;
+    while(1)
+    &#123;
+        
+        if(i%3==0)
+        &#123;
+            if(p-&gt;next == q)
+            &#123;
+                q-&gt;next = NULL;
+                break;
+            &#125;
+            q-&gt;next = p-&gt;next;
+            i=1;
+        &#125;
+        else
+        &#123;
+            i++;
+        &#125;
+        q = p;
+        p = p-&gt;next;        
+        
+    &#125;
+    
+    // q就是最后剩下的
+    printf(&quot;%d &quot;, q-&gt;val);
+
+    return 0;
+&#125;
+</code></pre>
+<p>主要的思想就是用循环链表来实现。但其他语言 例如 pyhon&#x2F;php 有更简单的实现方法。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/02/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/02/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86/" class="post-title-link" itemprop="url">二叉树的遍历 先序 中序 后序 层序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-02 19:38:32" itemprop="dateCreated datePublished" datetime="2019-03-02T19:38:32+08:00">2019-03-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/03/02/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/03/02/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>总结二叉树中序 前序 后序 层序遍历的 递归 非递归写法</p>
+<!---more--->
+
+<pre><code>//https://leetcode-cn.com/problems/construct-string-from-binary-tree/
+//https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/
+//https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/
+//https://leetcode-cn.com/problems/diameter-of-binary-tree/
+//https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode &#123;
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * &#125;;
+ */
+// 递归写法
+//1、前序
+void PreOrder(struct TreeNode *root)
+&#123;
+    if (root == NULL)                 //若结点为空
+    &#123;
+        printf(&quot;# &quot;);
+        return;
+    &#125;
+    printf(&quot;%c&quot;, root-&gt;data);        // 处理根节点的数据
+    PreOrder(root-&gt;left);             //前序访问左子树
+    PreOrder(root-&gt;right);            //前序访问右子树
+&#125;
+// 2、 中序
+void InOrder(struct TreeNode *root)
+&#123;
+    if (root == NULL)                 //若结点为空
+    &#123;
+        printf(&quot;# &quot;);
+        return;
+    &#125;
+    InOrder(root-&gt;left);             //前序访问左子树
+    printf(&quot;%c&quot;, root-&gt;data);        // 处理根节点的数据
+    InOrder(root-&gt;right);            //前序访问右子树
+&#125;
+// 3、后序
+void PostOrder(struct TreeNode *root)
+&#123;
+    if (root == NULL)                 //若结点为空
+    &#123;
+        printf(&quot;# &quot;);
+        return;
+    &#125;
+    PostOrder(root-&gt;left);             //前序访问左子树
+    PostOrder(root-&gt;right);            //前序访问右子树
+    printf(&quot;%c&quot;, root-&gt;data);        // 处理根节点的数据
+&#125;
+
+// 层序遍历不能用递归来实现
+
+// 非递归实现
+// 1、前序
+void PreOrder(struct TreeNode *root)
+&#123;
+    if (root == NULL)                 //若结点为空
+    &#123;
+        printf(&quot;# &quot;);
+        return;
+    &#125;
+    s = STACK()
+    while(root != NULL || ! s.is_empty())
+    &#123;
+        while(root != NULL)
+        &#123;
+            proc(root-&gt;val) // 处理节点数据
+            s.push(root-&gt;right); // 把右子树入栈
+            root = root-&gt;left;// 沿着左分支继续
+        &#125;
+        root = s.pop();// 遇到空树回溯
+        
+    &#125;
+
+&#125;
+
+//2、中序
+void InOrder(struct TreeNode *root)
+&#123;
+    if(root == NULL)
+    &#123;
+        return；
+    &#125;
+    TreeNode *cur, *top, *last = NULL;
+    cur = root;
+    s = STACK()
+    while (cur != NULL || !s.empty())
+    &#123;
+        while (cur != NULL)
+        &#123;
+            s.push(cur);
+            cur = cur-&gt;left;
+        &#125;
+
+        top = s.top();
+
+        if (top-&gt;right == NULL || top-&gt;right == last)&#123;
+            s.pop();
+            printf(&quot;%c &quot;, top-&gt;data);
+            last = top;
+        &#125;
+        else &#123;
+            cur = top-&gt;right;
+        &#125;
+    &#125;
+&#125;
+
+//3、 后序
+void PostOrder(struct TreeNode *root)
+&#123;
+    s = STACK()
+    while(root != NULL || ！s.is_empty())
+    &#123;
+        while(root != NULL) // 直到栈顶的两子树为空
+        &#123;
+            s.push(root)
+            root = root-&gt;left if root-&gt;left != NULL else root-&gt;right // 能左则左 否则向右
+        &#125;
+        root = s.pop()// 弹出栈顶数据
+        proc(root-&gt;val);// 处理数据
+        if(!s.is_empty() &amp;&amp; s.top()-&gt;left = root)
+        &#123;
+            root = s.top()-&gt;right; // 栈不空且当前节点是栈顶的左子节点
+        &#125;
+        else
+        &#123;
+            root = NULL;// 没有右子树或右子树遍历完毕，强迫退栈
+        &#125;
+        
+    &#125;
+&#125;
+// 4、 层序 遍历 需要用到队列 https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/
+void LevelOrder(struct TreeNode *root)
+&#123;
+    if(root == NULL)
+    &#123;
+        return;
+    &#125;
+
+    s = queue();
+    queue.push(root)
+    while(! queue.is_empty())
+    &#123;
+        proc(queue.pop());
+        next_node = queue.pop(0)
+        if next_node.left is not None:
+            queue.push(next_node.left)
+        if next_node.right is not None:
+            queue.push(next_node.right)
+    &#125;
+&#125;
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/02/25/computer%20science/ResNet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/02/25/computer%20science/ResNet/" class="post-title-link" itemprop="url">ResNet</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-25 18:31:49" itemprop="dateCreated datePublished" datetime="2019-02-25T18:31:49+08:00">2019-02-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/SISR/" itemprop="url" rel="index"><span itemprop="name">SISR</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/02/25/computer%20science/ResNet/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/02/25/computer%20science/ResNet/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>更深层次的神经网络更难训练。我们提出了一个残差学习框架来简化网络的训练，这些网络比以前使用的网络要深刻得多。我们明确地将层作为参考层输入的剩余函数来重新组织，而不是学习未引用的函数。我们提供了全面的经验证据表明，这些剩余网络更容易优化，并可以获得精度从大幅增加的深度。在ImageNet数据集上，我们对剩余网进行了评估，其深度比VGG网深152层，但复杂度仍然较低。这些残差网的集合在ImageNet测试集上的误差达到3.57%，该结果在ILSVRC 2015分类任务中获得了第一名。我们还对CIFAR-10进行了100层和1000层的分析。</p>
+<!---more--->
+<p>当更深层次的网络能够开始收敛时，一个退化的问题就暴露出来了:随着网络深度的增加，精度达到饱和(这可能并不奇怪)，然后迅速退化。出乎意料的是，这种退化并不是由过度拟合造成的，在一个合适的深度模型上增加更多的层会导致更高的训练误差，正如文献[10,41]所报道的，我们的实验也完全验证了这一点。图1给出了一个典型的例子.</p>
+<p>在本文中，我们通过引入一个深度残差学习框架来解决退化问题。我们不希望每个堆叠的层直接适合一个期望的底层映射，而是显式地让这些层适合一个剩余的映射。形式上，我们将期望的底层映射表示为H(x)，我们让堆叠的非线性层适合F(x)的另一个映射:= H(x) x。我们假设优化剩余映射比优化原始的未引用映射更容易。在极端情况下，如果一个身份映射是最优的，那么将残差推到零要比通过一堆非线性层来适应一个身份映射更容易</p>
+<p>我们在ImageNet上进行了综合实验并对我们的方法进行了评价。结果表明:1)极深剩余网格易于优化，而相对的“纯”网格(简单的叠加层)在深度增加时训练误差较大;2)我们的深度残差网可以很容易地从深度的大幅增加中获得精度增益，产生的结果大大优于以前的网络。</p>
+<h1 id="Deep-Residual-Learning"><a href="#Deep-Residual-Learning" class="headerlink" title="Deep Residual Learning"></a>Deep Residual Learning</h1><h2 id="Residual-Learning"><a href="#Residual-Learning" class="headerlink" title="Residual Learning"></a>Residual Learning</h2><p>在深层网络中，残差学习不让每个堆叠的网络层直接学习一个底层原始特征，而是显式地让这些层学习一个残余特征。对于一个堆积层结构网络（几层堆积而成）当输入为x时其学习到的特征记为H(x)，现在改变思路让其学习残差F(x)=H(x)-x，而不是直接学习原始特征H(x)，这样其实原始的学习特征是F(x)+x。之所以这样是因为残差学习相比原始特征直接学习更容易。当残差为0时，H(x)=x，此时堆积层仅仅做了恒等映射，至少网络性能不会下降，实际上残差不会为0，这也会使得堆积层在输入特征基础上学习到新的特征，从而拥有更好的性能。残差学习的结构如图（序号）所示。从直观上看，残差一般会比较小，残差学习需要学习的内容少，学习难度小，因此，残差学习更容易收敛。</p>
+<h1 id="Training-Detail"><a href="#Training-Detail" class="headerlink" title="Training Detail"></a>Training Detail</h1><h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="">论文地址</a><br><a href="">参考代码</a></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/02/21/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Z.J. Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/02/21/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92/" class="post-title-link" itemprop="url">二叉树中的递归</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-21 12:34:51" itemprop="dateCreated datePublished" datetime="2019-02-21T12:34:51+08:00">2019-02-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2019/02/21/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2019/02/21/computer%20science/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>198</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>1 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>二叉树这种数据结构非常适合用地柜来求解。类似像树这种结构都很适合用递归来求解。例如：可以用递归得到一个文件夹下所有文件夹和文件。</p>
+<!---more--->
+
+<p>在leetcode中。</p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/symmetric-tree/submissions/">https://leetcode-cn.com/problems/symmetric-tree/submissions/</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/same-tree/comments/">https://leetcode-cn.com/problems/same-tree/comments/</a></p>
+<p>是两个非常常见的例子。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Z.J. Jiang</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">209k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:48</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/page/5/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>
