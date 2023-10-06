@@ -19,26 +19,42 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="about the single image super-resolution and face hallucination">
-<meta property="og:type" content="website">
-<meta property="og:title" content="SRCNN">
-<meta property="og:url" content="http://example.com/index.html">
+    <meta name="description" content="前言最近一段时间负责电子罗盘的开发，其中涉及到磁传感器的校准和倾斜补偿的电子罗盘的开发。因此在这边进行相关的记录。  磁传感器误差来源磁传感器在IPC中使用时，会受到电机和周围磁场环境的影响，扰动磁场的误差主要包括硬磁误差和软磁误差，在IPC使用前需要重新校准。硬磁误差是由于磁传感器附近的永磁体等的磁场引起，造成影响类似于零偏。软磁误差为外部地磁场与磁传感器周围的铁磁性材料相互作用，诱导干扰磁场而">
+<meta property="og:type" content="article">
+<meta property="og:title" content="电子罗盘开发记录">
+<meta property="og:url" content="http://example.com/2022/09/04/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/index.html">
 <meta property="og:site_name" content="SRCNN">
-<meta property="og:description" content="about the single image super-resolution and face hallucination">
+<meta property="og:description" content="前言最近一段时间负责电子罗盘的开发，其中涉及到磁传感器的校准和倾斜补偿的电子罗盘的开发。因此在这边进行相关的记录。  磁传感器误差来源磁传感器在IPC中使用时，会受到电机和周围磁场环境的影响，扰动磁场的误差主要包括硬磁误差和软磁误差，在IPC使用前需要重新校准。硬磁误差是由于磁传感器附近的永磁体等的磁场引起，造成影响类似于零偏。软磁误差为外部地磁场与磁传感器周围的铁磁性材料相互作用，诱导干扰磁场而">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-04-22-46-51_9ebfe30f.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-04-23-48-13_9ad25df8.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-04-23-54-01_4256ac5d.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-05-23-26-23_3a24bf13.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-06-23-04-31_1b416ff6.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-07-00-01-31_2838eb96.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-07-00-01-48_72c653f6.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-08-00-12-23_18c4d509.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-08-00-26-39_7f645729.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-00-26-37_07e8ea94.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-22-52-38_97e5ab89.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-22-52-46_15edb5db.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-22-56-22_15edb5db.png">
+<meta property="article:published_time" content="2022-09-04T14:26:57.000Z">
+<meta property="article:modified_time" content="2023-10-06T07:11:33.493Z">
 <meta property="article:author" content="Z.J. Jiang">
 <meta property="article:tag" content="SISR, FH">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-04-22-46-51_9ebfe30f.png">
 
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2022/09/04/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/09/04/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/","path":"2022/09/04/电子罗盘开发记录/","title":"电子罗盘开发记录"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>SRCNN</title>
+<title>电子罗盘开发记录 | SRCNN</title>
   
 
 
@@ -68,7 +84,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">SRCNN</h1>
+      <p class="site-title">SRCNN</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">SISR-FH</p>
@@ -122,7 +138,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -135,6 +151,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E4%BC%A0%E6%84%9F%E5%99%A8%E8%AF%AF%E5%B7%AE%E6%9D%A5%E6%BA%90"><span class="nav-number">2.</span> <span class="nav-text">磁传感器误差来源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E4%BC%A0%E6%84%9F%E5%99%A8%E6%95%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">磁传感器数学模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A1%AC%E7%A3%81%E8%AF%AF%E5%B7%AE"><span class="nav-number">3.1.</span> <span class="nav-text">硬磁误差</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E7%A3%81%E8%AF%AF%E5%B7%AE"><span class="nav-number">3.2.</span> <span class="nav-text">软磁误差</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5"><span class="nav-number">3.3.</span> <span class="nav-text">旋转矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E4%BC%A0%E6%84%9F%E5%99%A8%E8%AF%BB%E6%95%B0%E6%95%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.4.</span> <span class="nav-text">磁传感器读数数学模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A4%AD%E7%90%83%E6%8B%9F%E5%90%88"><span class="nav-number">4.</span> <span class="nav-text">椭球拟合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A4%AD%E7%90%83%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">椭球表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%9F%E5%90%88%E8%BF%87%E7%A8%8B"><span class="nav-number">4.2.</span> <span class="nav-text">拟合过程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98"><span class="nav-number">5.</span> <span class="nav-text">电子罗盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%BE%E6%96%9C%E8%A1%A5%E5%81%BF%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E7%AE%97%E6%B3%95"><span class="nav-number">5.1.</span> <span class="nav-text">倾斜补偿电子罗盘算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-pmatrix-G-px-G-py-G-pz-end-pmatrix"><span class="nav-number">6.</span> <span class="nav-text">\begin{pmatrix}G_{px}\G_{py}\G_{pz}\\end{pmatrix}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rightarrow-begin-pmatrix-cos-theta-sin-theta-sin-phi-sin-theta-cos-phi-0-cos-phi-sin-phi-sin-theta-cos-theta-sin-phi-cos-theta-cos-phi-end-pmatrix-begin-pmatrix-G-px-G-py-G-pz-end-pmatrix"><span class="nav-number">7.</span> <span class="nav-text">$$\Rightarrow\begin{pmatrix}cos\theta &amp; sin\theta sin\phi &amp; sin\theta cos\phi \0 &amp; cos\phi &amp; -sin\phi \-sin\theta &amp; cos\theta sin\phi &amp; cos\theta cos\phi \\end{pmatrix}\begin{pmatrix}G_{px}\G_{py}\G_{pz}\\end{pmatrix}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-pmatrix-cos-theta-0-sin-theta-0-1-0-sin-theta-0-cos-theta-end-pmatrix-begin-pmatrix-1-0-0-0-cos-phi-sin-phi-0-sin-phi-cos-phi-end-pmatrix-begin-pmatrix-B-px-B-py-B-pz-end-pmatrix-tag-43"><span class="nav-number">8.</span> <span class="nav-text">\begin{pmatrix}cos\theta &amp; 0 &amp; sin\theta \0 &amp; 1 &amp; 0 \-sin\theta &amp; 0 &amp; cos\theta \\end{pmatrix}\begin{pmatrix}1 &amp; 0 &amp; 0 \0 &amp; cos\phi &amp; -sin\phi \0 &amp; sin\phi &amp; cos\phi \\end{pmatrix}\begin{pmatrix}B_{px} \B_{py} \B_{pz} \\end{pmatrix}\tag{43}$$$$</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-pmatrix-B-px-B-py-B-pz-end-pmatrix-tag-44-begin-pmatrix-B-px-cos-theta-B-py-sin-theta-sin-phi-B-pz-sin-theta-cos-phi-B-py-cos-phi-B-pz-sin-phi-B-px-sin-theta-B-py-cos-theta-sin-phi-B-pz-cos-theta-cos-phi-end-pmatrix"><span class="nav-number">9.</span> <span class="nav-text">\begin{pmatrix}B_{px} \B_{py} \B_{pz} \\end{pmatrix}\tag{44}$$$$\begin{pmatrix}B_{px}cos\theta + B_{py}sin\theta sin\phi + B_{pz} sin\theta cos\phi \B_{py}cos\phi -B_{pz}sin\phi \-B_{px}sin\theta + B_{py}cos\theta sin\phi + B_{pz}cos\theta cos\phi \\end{pmatrix}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BD%AF%E7%A3%81%E8%AF%AF%E5%B7%AE%E5%92%8C%E7%A1%AC%E7%A3%81%E8%AF%AF%E5%B7%AE%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">10.</span> <span class="nav-text">软磁误差和硬磁误差详细介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A1%AC%E7%A3%81%E5%81%8F%E5%B7%AE"><span class="nav-number">10.1.</span> <span class="nav-text">硬磁偏差</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AF%E7%A3%81%E5%81%8F%E5%B7%AE"><span class="nav-number">10.2.</span> <span class="nav-text">软磁偏差</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E8%A7%92%E5%BA%A6%E4%BC%B0%E8%AE%A1%E5%92%8C%E6%8C%87%E5%90%91%E6%AD%A3%E5%8C%97%E6%96%B9%E5%90%91%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90"><span class="nav-number">11.</span> <span class="nav-text">电子罗盘角度估计和指向正北方向误差分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%92%E5%BA%A6%E4%BC%B0%E8%AE%A1%E5%9C%A8eCompass%E5%92%8C3D%E6%8C%87%E9%92%88"><span class="nav-number">11.1.</span> <span class="nav-text">角度估计在eCompass和3D指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E8%AF%AF%E5%B7%AE%E5%BC%95%E8%B5%B7%E6%A8%AA%E6%BB%9A%E8%A7%92%E5%92%8C%E4%BF%AF%E4%BB%B0%E8%A7%92%E6%B5%8B%E9%87%8F%E8%AF%AF%E5%B7%AE"><span class="nav-number">11.2.</span> <span class="nav-text">加速度计误差引起横滚角和俯仰角测量误差</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E6%B3%A8AN4248%E4%B8%AD%E7%9A%84%E5%85%AC%E5%BC%8F3%E7%BB%99%E5%87%BA%E4%BA%86%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E8%BE%93%E5%87%BAGp%E5%9C%A8%E7%9C%9F%E6%96%B9%E4%BD%8D%E8%A7%92%CF%860%E5%92%8C%CE%B80%E6%98%AFAN4248%E6%96%B9%E7%A8%8B5%E5%92%8C6%E4%B8%AD%E5%AE%9A%E4%B9%89%E7%9A%84%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5Rx-%CF%860-%E5%92%8CRy-%CE%B80-%E7%9A%84%E5%87%BD%E6%95%B0%E3%80%82%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E9%94%99%E8%AF%AF%E5%90%91%E9%87%8F-%CE%94Gpx%EF%BC%8C-%CE%94Gpy%EF%BC%8C-%CE%94Gpz-%E6%89%A9%E5%B1%95AN4248%E6%96%B9%E7%A8%8B3-G-p-R-x-phi-R-y-theta-R-z-psi-begin-pmatrix-0-0-g-end-pmatrix-begin-pmatrix-Delta-G-px-Delta-G-py-Delta-G-pz-end-pmatrix"><span class="nav-number">12.</span> <span class="nav-text">应用注AN4248中的公式3给出了加速度计输出Gp在真方位角φ0和θ0是AN4248方程5和6中定义的旋转矩阵Rx (φ0)和Ry (θ0)的函数。添加一个加速度计错误向量{ΔGpx， ΔGpy， ΔGpz}扩展AN4248方程3:$$G_p &#x3D; R_x(\phi)R_y(\theta)R_z(\psi)\begin{pmatrix}0 \ 0 \ g \\end{pmatrix}+\begin{pmatrix}\Delta G_{px} \\Delta G_{py} \\Delta G_{pz} \\end{pmatrix}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%AA%E6%BB%9A%E8%A7%92%E5%92%8C%E4%BF%AF%E4%BB%B0%E8%A7%92%E8%AE%A1%E7%AE%97%E7%9A%84%E4%B8%8D%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="nav-number">12.1.</span> <span class="nav-text">横滚角和俯仰角计算的不稳定性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-pmatrix-cos-psi-0-sin-psi-0-0-sin-psi-0-cos-psi-0-0-0-0-1-end-pmatrix-tag-58"><span class="nav-number">13.</span> <span class="nav-text">\begin{pmatrix}cos\psi_0 &amp; -sin\psi_0 &amp; 0 \-sin\psi_0 &amp; cos\psi_0 &amp; 0 \0 &amp; 0 &amp; 1 \\end{pmatrix}\tag{58}$$$$</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-pmatrix-0-0-1-sin-psi-0-phi-0-cos-psi-0-phi-0-0-cos-psi-0-phi-0-sin-psi-0-phi-0-0-end-pmatrix"><span class="nav-number">14.</span> <span class="nav-text">\begin{pmatrix}0 &amp; 0 &amp; 1\-sin(\psi_0 - \phi_0) &amp; cos(\psi_0 - \phi_0) &amp; 0 \cos(\psi_0 - \phi_0) &amp; sin(\psi_0 - \phi_0) &amp; 0 \\end{pmatrix}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E9%80%9F%E5%BA%A6%E8%AE%A1%E7%9A%84%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90"><span class="nav-number">14.1.</span> <span class="nav-text">加速度计的误差分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A1%AC%E7%A3%81%E8%AF%AF%E5%B7%AE%E5%AF%BC%E8%87%B4%E7%BD%97%E7%BB%8F%E8%A7%92%E7%9A%84%E8%AE%A1%E7%AE%97%E8%AF%AF%E5%B7%AE"><span class="nav-number">14.2.</span> <span class="nav-text">硬磁误差导致罗经角的计算误差</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -169,97 +186,17 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/06/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Z.J. Jiang">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SRCNN">
-      <meta itemprop="description" content="about the single image super-resolution and face hallucination">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | SRCNN">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/10/06/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-10-06 13:47:30" itemprop="dateCreated datePublished" datetime="2023-10-06T13:47:30+08:00">2023-10-06</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/04/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -273,13 +210,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | SRCNN">
+      <meta itemprop="name" content="电子罗盘开发记录 | SRCNN">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/09/04/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">电子罗盘开发记录</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          电子罗盘开发记录
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -308,8 +245,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近一段时间负责电子罗盘的开发，其中涉及到磁传感器的校准和倾斜补偿的电子罗盘的开发。因此在这边进行相关的记录。</p>
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近一段时间负责电子罗盘的开发，其中涉及到磁传感器的校准和倾斜补偿的电子罗盘的开发。因此在这边进行相关的记录。</p>
 <!---more--->
 <h1 id="磁传感器误差来源"><a href="#磁传感器误差来源" class="headerlink" title="磁传感器误差来源"></a>磁传感器误差来源</h1><p>磁传感器在IPC中使用时，会受到电机和周围磁场环境的影响，扰动磁场的误差主要包括硬磁误差和软磁误差，在IPC使用前需要重新校准。硬磁误差是由于磁传感器附近的永磁体等的磁场引起，造成影响类似于零偏。软磁误差为外部地磁场与磁传感器周围的铁磁性材料相互作用，诱导干扰磁场而产生的误差。磁传感器校准主要通过计算一组校正参数，对硬磁误差和软磁误差进行补偿。</p>
 <p>&#x2F;&#x2F; TODO: 图片显示问题</p>
@@ -450,7 +386,6 @@
 <p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-22-52-46_15edb5db.png" alt="2022-09-12-22-52-46"></p>
 <p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-09-12-22-56-22_15edb5db.png" alt="2022-09-12-22-56-22"></p>
 <h2 id="硬磁误差导致罗经角的计算误差"><a href="#硬磁误差导致罗经角的计算误差" class="headerlink" title="硬磁误差导致罗经角的计算误差"></a>硬磁误差导致罗经角的计算误差</h2>
-      
     </div>
 
     
@@ -458,11 +393,22 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/10/06/hello-world/" rel="next" title="Hello World">
+                  Hello World <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
     </footer>
   </article>
 </div>
+
 
 
 
