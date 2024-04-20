@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="音频处理流程 直播客户端的处理流程 音视频采集-&gt;音视频编码: 固件端 音视频解码-&gt;音视频渲染: APP端   音频数据的流转  PCM-&gt;aac&#x2F;mp3-&gt;mp4 声音是如何产生的震动-&gt;传播 声音的三要素音调，音量，音色 模数转换离散数学，量化采样。 音频原始数据 pcm wav  量化的基本概念采样大小(位深): 一个采样用多少bit存放。常用的是1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="音视频基础">
+<meta property="og:url" content="http://example.com/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="音频处理流程 直播客户端的处理流程 音视频采集-&gt;音视频编码: 固件端 音视频解码-&gt;音视频渲染: APP端   音频数据的流转  PCM-&gt;aac&#x2F;mp3-&gt;mp4 声音是如何产生的震动-&gt;传播 声音的三要素音调，音量，音色 模数转换离散数学，量化采样。 音频原始数据 pcm wav  量化的基本概念采样大小(位深): 一个采样用多少bit存放。常用的是1">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/image_40f63e6d.png">
+<meta property="article:published_time" content="2024-01-11T00:14:07.000Z">
+<meta property="article:modified_time" content="2024-02-20T15:56:19.795Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="音视频基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image.png">
+
+
+<link rel="canonical" href="http://example.com/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/","path":"2024/01/11/音视频/音视频基础/","title":"音视频基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>音视频基础 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">音频处理流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E9%9F%B3%E6%98%AF%E5%A6%82%E4%BD%95%E4%BA%A7%E7%94%9F%E7%9A%84"><span class="nav-number">2.</span> <span class="nav-text">声音是如何产生的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E9%9F%B3%E7%9A%84%E4%B8%89%E8%A6%81%E7%B4%A0"><span class="nav-number">3.</span> <span class="nav-text">声音的三要素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%95%B0%E8%BD%AC%E6%8D%A2"><span class="nav-number">4.</span> <span class="nav-text">模数转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9F%B3%E9%A2%91%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE"><span class="nav-number">5.</span> <span class="nav-text">音频原始数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8F%E5%8C%96%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">5.1.</span> <span class="nav-text">量化的基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%81%E7%8E%87%E8%AE%A1%E7%AE%97"><span class="nav-number">5.2.</span> <span class="nav-text">码率计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9F%B3%E9%A2%91%E9%87%87%E9%9B%86"><span class="nav-number">6.</span> <span class="nav-text">音频采集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FFmpeg%E9%87%87%E9%9B%86%E9%9F%B3%E9%A2%91"><span class="nav-number">6.1.</span> <span class="nav-text">FFmpeg采集音频</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9F%B3%E9%A2%91%E5%8E%8B%E7%BC%A9"><span class="nav-number">7.</span> <span class="nav-text">音频压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E6%8D%9F%E7%BC%96%E7%A0%81"><span class="nav-number">8.</span> <span class="nav-text">无损编码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%86%B5%E7%BC%96%E7%A0%81"><span class="nav-number">8.1.</span> <span class="nav-text">熵编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9F%B3%E9%A2%91%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">8.2.</span> <span class="nav-text">常见的音频编码器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AAC%E6%A0%BC%E5%BC%8F"><span class="nav-number">8.3.</span> <span class="nav-text">AAC格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87ffmpeg%E7%94%9F%E6%88%90AAC%E6%96%87%E4%BB%B6"><span class="nav-number">8.4.</span> <span class="nav-text">通过ffmpeg生成AAC文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%A2%91"><span class="nav-number">8.5.</span> <span class="nav-text">视频</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F"><span class="nav-number">8.5.1.</span> <span class="nav-text">图像</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E6%98%BE%E7%A4%BA%E5%99%A8"><span class="nav-number">8.6.</span> <span class="nav-text">屏幕显示器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E7%9A%84%E6%98%BE%E7%A4%BA"><span class="nav-number">8.7.</span> <span class="nav-text">图像的显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFyuv"><span class="nav-number">8.8.</span> <span class="nav-text">什么是yuv</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yuv%E5%B8%B8%E8%A7%81%E6%A0%BC%E5%BC%8F"><span class="nav-number">8.9.</span> <span class="nav-text">yuv常见格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YUV%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F"><span class="nav-number">8.10.</span> <span class="nav-text">YUV存储格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90YUV"><span class="nav-number">8.11.</span> <span class="nav-text">生成YUV</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#h264-%E7%BC%96%E7%A0%81"><span class="nav-number">9.</span> <span class="nav-text">h264 编码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A7%E5%86%85%E5%8E%8B%E7%BC%A9%E7%9A%84%E7%90%86%E8%AE%BA"><span class="nav-number">9.1.</span> <span class="nav-text">帧内压缩的理论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A7%E9%97%B4%E5%8E%8B%E7%BC%A9%E5%8E%9F%E7%90%86"><span class="nav-number">9.2.</span> <span class="nav-text">帧间压缩原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E6%8D%9F%E5%8E%8B%E7%BC%A9"><span class="nav-number">10.</span> <span class="nav-text">无损压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#H264%E7%A0%81%E6%B5%81"><span class="nav-number">11.</span> <span class="nav-text">H264码流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%81%E6%B5%81%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">11.1.</span> <span class="nav-text">码流基本概念</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SPS-PPS-Slice-Header"><span class="nav-number">12.</span> <span class="nav-text">SPS&#x2F;PPS&#x2F;Slice Header</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sps"><span class="nav-number">12.1.</span> <span class="nav-text">sps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pps-slice-header"><span class="nav-number">12.2.</span> <span class="nav-text">pps slice header</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7"><span class="nav-number">13.</span> <span class="nav-text">常见分析工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ffmpeg%E8%A7%86%E9%A2%91%E7%BC%96%E7%A0%81"><span class="nav-number">14.</span> <span class="nav-text">ffmpeg视频编码</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="音视频基础 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          音视频基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-01-11 08:14:07" itemprop="dateCreated datePublished" datetime="2024-01-11T08:14:07+08:00">2024-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-02-20 23:56:19" itemprop="dateModified" datetime="2024-02-20T23:56:19+08:00">2024-02-20</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="音频处理流程"><a href="#音频处理流程" class="headerlink" title="音频处理流程"></a>音频处理流程</h2><ol>
+<li>直播客户端的处理流程<ul>
+<li>音视频采集-&gt;音视频编码: 固件端</li>
+<li>音视频解码-&gt;音视频渲染: APP端</li>
+</ul>
+</li>
+<li>音频数据的流转</li>
+</ol>
+<p>PCM-&gt;aac&#x2F;mp3-&gt;mp4</p>
+<h2 id="声音是如何产生的"><a href="#声音是如何产生的" class="headerlink" title="声音是如何产生的"></a>声音是如何产生的</h2><p>震动-&gt;传播</p>
+<h2 id="声音的三要素"><a href="#声音的三要素" class="headerlink" title="声音的三要素"></a>声音的三要素</h2><p>音调，音量，音色</p>
+<h2 id="模数转换"><a href="#模数转换" class="headerlink" title="模数转换"></a>模数转换</h2><p>离散数学，量化采样。</p>
+<h2 id="音频原始数据"><a href="#音频原始数据" class="headerlink" title="音频原始数据"></a>音频原始数据</h2><ul>
+<li>pcm</li>
+<li>wav</li>
+</ul>
+<h3 id="量化的基本概念"><a href="#量化的基本概念" class="headerlink" title="量化的基本概念"></a>量化的基本概念</h3><p>采样大小(位深): 一个采样用多少bit存放。常用的是16bit<br>采样率: 采样频率8k, 16k 48k…<br>声道数: 单声道，双声道，多声道。</p>
+<h3 id="码率计算"><a href="#码率计算" class="headerlink" title="码率计算"></a>码率计算</h3><p>采样率<em>采样大小</em>声道数</p>
+<p>wav header</p>
+<h2 id="音频采集"><a href="#音频采集" class="headerlink" title="音频采集"></a>音频采集</h2><h3 id="FFmpeg采集音频"><a href="#FFmpeg采集音频" class="headerlink" title="FFmpeg采集音频"></a>FFmpeg采集音频</h3><p>通过命令方式<br>ffmpeg -f avfoundation -i :0 out.wav</p>
+<h2 id="音频压缩"><a href="#音频压缩" class="headerlink" title="音频压缩"></a>音频压缩</h2><ul>
+<li>消除冗余信息</li>
+<li>无损压缩</li>
+</ul>
+<p>频域遮蔽，时域遮蔽</p>
+<h2 id="无损编码"><a href="#无损编码" class="headerlink" title="无损编码"></a>无损编码</h2><h3 id="熵编码"><a href="#熵编码" class="headerlink" title="熵编码"></a>熵编码</h3><ul>
+<li>哈夫曼编码</li>
+<li>算术编码</li>
+<li>香农编码</li>
+</ul>
+<h3 id="常见的音频编码器"><a href="#常见的音频编码器" class="headerlink" title="常见的音频编码器"></a>常见的音频编码器</h3><p>OPUS, AAC G.711 等<br>OPUS &gt; AAC &gt; G.711</p>
+<h3 id="AAC格式"><a href="#AAC格式" class="headerlink" title="AAC格式"></a>AAC格式</h3><p>ADTS每一个帧率都有一个同步字。</p>
+<p>ADTS格式：<br>ADTS由7&#x2F;9字节组成</p>
+<h3 id="通过ffmpeg生成AAC文件"><a href="#通过ffmpeg生成AAC文件" class="headerlink" title="通过ffmpeg生成AAC文件"></a>通过ffmpeg生成AAC文件</h3><p>ffmpeg -i xxx.mp4 -vn -c:a libfdk_aac -ar 44100 -channels 2 -profile:a aac_he_v2 3.acc</p>
+<h3 id="视频"><a href="#视频" class="headerlink" title="视频"></a>视频</h3><ul>
+<li>由一组图像组成</li>
+<li>为了传输、占用更小的空间而被压缩</li>
+<li>在显示设备</li>
+</ul>
+<h4 id="图像"><a href="#图像" class="headerlink" title="图像"></a>图像</h4><p>像素<br>RGB<br>分辨率</p>
+<p>像素的位深<br>RGB888（24位）<br>RGBA(32)</p>
+<h3 id="屏幕显示器"><a href="#屏幕显示器" class="headerlink" title="屏幕显示器"></a>屏幕显示器</h3><p>像素</p>
+<p>图像数据经过驱动程序让屏幕显示图像</p>
+<p>RGB的色彩问题</p>
+<ul>
+<li>RGB与BGR</li>
+<li>BMP使用的是BGR格式，需要进行转换</li>
+</ul>
+<p>屏幕指标<br>ppi pixel per inch<br>DPI<br>PPI &gt; 300 就属于视网膜级别</p>
+<p>码流的计算<br>分辨率<br>帧率</p>
+<p>未编码视频的RGB码流<br>RGB码流 &#x3D; 分辨率 * 3 * 帧率</p>
+<h3 id="图像的显示"><a href="#图像的显示" class="headerlink" title="图像的显示"></a>图像的显示</h3><h3 id="什么是yuv"><a href="#什么是yuv" class="headerlink" title="什么是yuv"></a>什么是yuv</h3><p>yuv ycbcr y表示明亮度，uv的作用是描述影响色彩及饱和度</p>
+<p>yuv4:2:0 yuv4:2:2 yuv4:4:4</p>
+<p>RGB与YUV的关系</p>
+<ul>
+<li>RGB用于屏幕图像的展示</li>
+<li>YUV用于采集与编码</li>
+</ul>
+<h3 id="yuv常见格式"><a href="#yuv常见格式" class="headerlink" title="yuv常见格式"></a>yuv常见格式</h3><p>YUV4:4:4<br>YUV4:2:2<br>YUV4:2:0 &#x2F;&#x2F; 最标准格式 YUV &#x3D; Y * 1.5</p>
+<h3 id="YUV存储格式"><a href="#YUV存储格式" class="headerlink" title="YUV存储格式"></a>YUV存储格式</h3><p>plannar yyyyyy uu vv  yuv420p</p>
+<p>未编码视频的YUV码流<br>YUV码流 &#x3D; 分辨率 * 1.5 * 帧率</p>
+<h3 id="生成YUV"><a href="#生成YUV" class="headerlink" title="生成YUV"></a>生成YUV</h3><p>ffmpeg -i input.mp4 -an -c:v rawvideo -pix_fmt yuv420p out.yuv</p>
+<p>播放<br>ffplay -pix_fmt yuv420p -s 608x368 out.yuv<br>ffplay -pix_fmt yuv420p -s 608x368 extractplanes&#x3D;’y’ out.yuv</p>
+<h2 id="h264-编码"><a href="#h264-编码" class="headerlink" title="h264 编码"></a>h264 编码</h2><p>H264 压缩比：1&#x2F;100 大概是100</p>
+<p>GOP: Group of picture: 相关性较强的一组帧率</p>
+<p>I&#x2F;P&#x2F;B帧<br>I帧，关键帧，采用帧内压缩技术。IDR帧属于I帧<br>P向前参考帧。压缩时，只参考前面已经处理的帧，采用帧间压缩技术。他站I帧的一半大小。<br>B帧：双向参考帧。压缩时，既参考前面已经处理的帧，也参考后面的帧，占I帧的1&#x2F;4左右。</p>
+<p>IDR(Instantaneous Decoder Refresh)解码器立即刷新<br>每当遇到IDR帧，解码器会清空解码器参考buffer中的内容<br>每个GOP中的第一真就是IDR帧<br>IDR帧是一种特殊的I帧</p>
+<p>SPS和PPS<br>SPS 序列参数集<br>PPS 图像参数集</p>
+<p>H264压缩技术</p>
+<ul>
+<li>帧内压缩，解决的是空域数据冗余问题</li>
+<li>帧间压缩，解决的是时域数据冗余问题</li>
+<li>整数离散余弦变换</li>
+<li>CABAC压缩</li>
+</ul>
+<p>宏块</p>
+<p>字块划分</p>
+<p>宏块的尺寸</p>
+<h3 id="帧内压缩的理论"><a href="#帧内压缩的理论" class="headerlink" title="帧内压缩的理论"></a>帧内压缩的理论</h3><ul>
+<li>相邻像素差别不大， 所以可以进行宏块预测</li>
+<li>人们对亮度的敏感度超过色度</li>
+<li>YUV很容易将亮度与色度分开</li>
+</ul>
+<p>9种帧内预测模式</p>
+<p>帧内预测残差值计算</p>
+<p>原始图与预测图进行残差值计算<br>预测模式信息与残差值压缩</p>
+<p>预测图像+残差值就可以还原原来的数据</p>
+<p>帧内压缩的帧类型<br>I帧<br>IDR帧</p>
+<h3 id="帧间压缩原理"><a href="#帧间压缩原理" class="headerlink" title="帧间压缩原理"></a>帧间压缩原理</h3><p>GOP<br>参考帧<br>运功估计(宏块匹配+运动矢量)<br>运动补偿</p>
+<p>帧间压缩的帧类型<br>P帧<br>B帧</p>
+<p>视频花屏原因<br>如果GOP分组中有帧丢失，会造成解码</p>
+<p>视频卡顿原因：<br>有丢帧，丢弃GOP内的所有帧，直到下一个IDR帧重新刷新图像。</p>
+<h2 id="无损压缩"><a href="#无损压缩" class="headerlink" title="无损压缩"></a>无损压缩</h2><p>DCT变换</p>
+<h2 id="H264码流"><a href="#H264码流" class="headerlink" title="H264码流"></a>H264码流</h2><p>H264码流分层<br>NAL层<br>    Network Abstraction Layer, 视频数据网络抽象层<br>VCL层<br>    Video Coding Layer, 视频数据编码层</p>
+<h3 id="码流基本概念"><a href="#码流基本概念" class="headerlink" title="码流基本概念"></a>码流基本概念</h3><p>SODB 二进制数据穿<br>原始数据比特流，长度不一定是8的背书，故需要补齐<br>它是由VCL层产生的。<br>RBSP<br>SODB + trailing bits<br>算法是如果SODB最后一个字节不对齐，则补1和多个0<br>NALU<br>NAL Header(1B) + RBSP</p>
+<p><img src="/image.png" alt="alt text"><br><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/image_40f63e6d.png" alt="alt text"></p>
+<h2 id="SPS-PPS-Slice-Header"><a href="#SPS-PPS-Slice-Header" class="headerlink" title="SPS&#x2F;PPS&#x2F;Slice Header"></a>SPS&#x2F;PPS&#x2F;Slice Header</h2><h3 id="sps"><a href="#sps" class="headerlink" title="sps"></a>sps</h3><p>H264 profile<br>对视频压缩特性的描述，profile越高，就说明采用了越高级的压缩类型</p>
+<p>H264 level<br>描述与图像相关的特性</p>
+<p>帧相关<br>帧数 log2_max_frame_num_minus4<br>参考帧数 max_num_ref_frames<br>显示帧序号 pic_order_cnt_type</p>
+<p>帧率的计算<br>framerate &#x3D; sps-&gt;vui.vui_time_scale &#x2F; sps-&gt;vui.vui_num_units_in_tick &#x2F; 2</p>
+<h3 id="pps-slice-header"><a href="#pps-slice-header" class="headerlink" title="pps slice header"></a>pps slice header</h3><p>slice header<br>帧类型<br>GOP中解码帧序号<br>预测权重<br>滤波</p>
+<h2 id="常见分析工具"><a href="#常见分析工具" class="headerlink" title="常见分析工具"></a>常见分析工具</h2><p>Elecard Stream Eye<br>CodecVisa<br>雷神开发的工具</p>
+<h2 id="ffmpeg视频编码"><a href="#ffmpeg视频编码" class="headerlink" title="ffmpeg视频编码"></a>ffmpeg视频编码</h2>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/" rel="tag"># 音视频基础</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/09/01/computer_network/A_top_down_proach/" rel="prev" title="计算机网络自顶向下">
+                  <i class="fa fa-angle-left"></i> 计算机网络自顶向下
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/02/06/libevent/" rel="next" title="libevent">
+                  libevent <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2024/01/11/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E8%A7%86%E9%A2%91%E5%9F%BA%E7%A1%80/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

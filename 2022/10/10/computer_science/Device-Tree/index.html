@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言之前开发加速度计和磁传感器的I2C驱动时，代码还有很多可以优化的空间，具体有以下两个问题：  不满足Linux驱动模型，设备和驱动耦合在一起了 使用到的I2C地址和I2C总线控制器写死了，不方便移植  其中第二个问题虽然也可以使用ds数据模型将地址和总线序号提取成配置，通过配置文件配置，但仍无法解决设备和驱动耦合在一起的问题。因此最终考虑使用设备树解决上面两个问题。对此，本文简要介绍设备树(d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Device-Tree">
+<meta property="og:url" content="http://example.com/2022/10/10/computer_science/Device-Tree/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="前言之前开发加速度计和磁传感器的I2C驱动时，代码还有很多可以优化的空间，具体有以下两个问题：  不满足Linux驱动模型，设备和驱动耦合在一起了 使用到的I2C地址和I2C总线控制器写死了，不方便移植  其中第二个问题虽然也可以使用ds数据模型将地址和总线序号提取成配置，通过配置文件配置，但仍无法解决设备和驱动耦合在一起的问题。因此最终考虑使用设备树解决上面两个问题。对此，本文简要介绍设备树(d">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-20-03_0460c062.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-23-35_2da8b7aa.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-31-29_a24c47bf.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-12-23-23-34_9b5b5990.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-12-00-01-56_8c5e85cf.png">
+<meta property="article:published_time" content="2022-10-10T14:47:37.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-20-03_0460c062.png">
+
+
+<link rel="canonical" href="http://example.com/2022/10/10/computer_science/Device-Tree/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/10/10/computer_science/Device-Tree/","path":"2022/10/10/computer_science/Device-Tree/","title":"Device-Tree"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Device-Tree | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dts%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">dts文件格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dts%E4%BD%BF%E7%94%A8demo"><span class="nav-number">2.1.</span> <span class="nav-text">dts使用demo</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dtb%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">dtb文件格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dtb%E7%9A%84%E7%BC%96%E8%AF%91%E5%92%8C%E5%8F%8D%E7%BC%96%E8%AF%91"><span class="nav-number">3.1.</span> <span class="nav-text">dtb的编译和反编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dtb%E7%9A%84%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">dtb的文件格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ftd-header"><span class="nav-number">3.2.1.</span> <span class="nav-text">ftd_header</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memory-reservation-block"><span class="nav-number">3.2.2.</span> <span class="nav-text">memory reservation block</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-block"><span class="nav-number">3.2.3.</span> <span class="nav-text">struct block</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#string-block"><span class="nav-number">3.2.4.</span> <span class="nav-text">string block</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dtb%E8%BD%AC%E5%8C%96%E6%88%90device-node"><span class="nav-number">4.</span> <span class="nav-text">dtb转化成device node</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#device-node%E4%B8%8Edevice%E7%9A%84%E7%BB%91%E5%AE%9A"><span class="nav-number">5.</span> <span class="nav-text">device node与device的绑定</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/10/computer_science/Device-Tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Device-Tree | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Device-Tree
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-10-10 22:47:37" itemprop="dateCreated datePublished" datetime="2022-10-10T22:47:37+08:00">2022-10-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2022/10/10/computer_science/Device-Tree/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2022/10/10/computer_science/Device-Tree/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>19 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前开发加速度计和磁传感器的I2C驱动时，代码还有很多可以优化的空间，具体有以下两个问题：</p>
+<ul>
+<li>不满足Linux驱动模型，设备和驱动耦合在一起了</li>
+<li>使用到的I2C地址和I2C总线控制器写死了，不方便移植</li>
+</ul>
+<p>其中第二个问题虽然也可以使用ds数据模型将地址和总线序号提取成配置，通过配置文件配置，但仍无法解决设备和驱动耦合在一起的问题。<br>因此最终考虑使用设备树解决上面两个问题。对此，本文简要介绍设备树(dts)，dtb的文件格式，以及Linux kernel启动时如何将dtb展开成一系列的platform device。</p>
+<h1 id="dts文件格式"><a href="#dts文件格式" class="headerlink" title="dts文件格式"></a>dts文件格式</h1><p>现在有很多文章对dts的文件格式已经有详细的介绍，并且对于每个平台的dts的node和property可能还不一样，基本上使用的时候查找一下相关的手册即可，本文对于dts不做详细介绍。对于dts的文件格式可参考以下资料：<br>{博文}<br>pdf文档<br>并且对于如何将传统驱动模型转成dts驱动模型的demo在我之前的博文也有提到了。<br>{之前的博文, 是不是不要列出来比较好}</p>
+<h2 id="dts使用demo"><a href="#dts使用demo" class="headerlink" title="dts使用demo"></a>dts使用demo</h2><p>为了加深印象，这边还是写了一个小demo。可以找一个板子的dts文件，在文件的末尾追加一个仅用于调试用的device节点。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">node</span><span class="title">-debug</span> { //just for debug <span class="keyword">node</span></span><br><span class="line">               <span class="title">compatible</span> = <span class="string">"silan, sc7a20"</span>;</span><br><span class="line">               status = <span class="string">"okay"</span>;</span><br><span class="line">               a-<span class="keyword">string</span>-<span class="keyword">property</span><span class="title"> </span>= <span class="string">"node-debug:accel test"</span>;</span><br><span class="line">               sub-<span class="keyword">node</span><span class="title">-debug</span> {</span><br><span class="line">                       a-<span class="keyword">string</span>-list-<span class="keyword">property</span><span class="title"> </span>= <span class="string">"sub-node-debug:accel test"</span>, <span class="string">"sub-node-debug:accel test!"</span>;</span><br><span class="line">               };</span><br><span class="line">       };</span><br></pre></td></tr></table></figure>
+<p>重新编译，这样Linux内核启动的时候就会自动将这个节点信息转化成一个platform device。在写一个platform driver驱动与之匹配，如下所示：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kernel.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/platform_device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/of.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DTS_DEMO_DRIVER         <span class="string">"accel_demo_driver"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">accel_demo_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">        <span class="built_in">printk</span>(<span class="string">"%s:\n"</span>, __func__);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">printk</span>(<span class="string">"node name : %s\n"</span>, pdev-&gt;dev.of_node-&gt;name);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">accel_demo_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">        <span class="built_in">printk</span>(<span class="string">"%s:\n"</span>, __func__);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="keyword">struct</span> <span class="title class_">of_device_id</span> accel_demo_of_match_table[] = {</span><br><span class="line">        { .compatible = <span class="string">"silan, sc7a20"</span>, },</span><br><span class="line">        { },</span><br><span class="line">};</span><br><span class="line"><span class="built_in">MODULE_DEVICE_TABLE</span>(of, accel_demo_of_match_table);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">struct</span> <span class="title class_">platform_driver</span> accel_demo_driver = {</span><br><span class="line">        .probe          = accel_demo_probe,</span><br><span class="line">        .remove         = accel_demo_remove,</span><br><span class="line">        .driver         = {</span><br><span class="line">                .name   = DTS_DEMO_DRIVER,</span><br><span class="line">                .owner  = THIS_MODULE,</span><br><span class="line">                .of_match_table = accel_demo_of_match_table,</span><br><span class="line">        },</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">module_platform_driver</span>(accel_demo_driver);</span><br><span class="line"><span class="built_in">MODULE_LICENSE</span>(<span class="string">"GPL v2"</span>);</span><br></pre></td></tr></table></figure>
+<p>交叉编译该文件生成一个.ko文件，执行insmod命令，将该驱动加载进系统。Linux系统会自动执行platform总线的匹配规则，将该驱动和设备树新增的设备匹配到一起，匹配之后会执行probe函数，可以看到最后系统会输出：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">accel_demo_probe:</span><br><span class="line"><span class="keyword">node</span> <span class="title">name</span> : <span class="keyword">node</span><span class="title">-debug</span></span><br></pre></td></tr></table></figure>
+<p>当然这些内容在之前介绍platform时已经详细介绍过了，这里简单列举在加深一下印象。</p>
+<p>另外，Linux 内核启动的时候会解析设备树中各个节点的信息，并且在根文件系统的/proc/device-tree 目录下根据节点名字创建不同文件夹</p>
+<p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-20-03_0460c062.png" alt="2022-10-11-23-20-03"></p>
+<p>进入node-debug查看相关信息。</p>
+<p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-23-35_2da8b7aa.png" alt="2022-10-11-23-23-35"></p>
+<p>可以看到实际上，改文件夹下的内容实际上就是将node-debug节点下所有的属性以及子节点。其字段里面的值与设备树设置的是一模一样的。</p>
+<h1 id="dtb文件格式"><a href="#dtb文件格式" class="headerlink" title="dtb文件格式"></a>dtb文件格式</h1><p>Linux kernel启动的时候是通过不是直接解析dts文件，而是解析dtb将其中符合一定规则的设备展开成platform device的。dtb是dts经过dtc工具编译生成的二进制格式的设备树描述。类比c程序，dts相当于源代码，dtb相当于ELF可执行程序，dtc相当于gcc编译器。</p>
+<h2 id="dtb的编译和反编译"><a href="#dtb的编译和反编译" class="headerlink" title="dtb的编译和反编译"></a>dtb的编译和反编译</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dtc -I dts -O dtb -o xxx<span class="selector-class">.dtb</span> xxx<span class="selector-class">.dts</span> <span class="comment">// 编译 dts 为 dtb</span></span><br><span class="line">dtc -I dtb -O dts -o xxx<span class="selector-class">.dts</span> xxx<span class="selector-class">.dtb</span> <span class="comment">// 反编译 dtb 为 dts</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="dtb的文件格式"><a href="#dtb的文件格式" class="headerlink" title="dtb的文件格式"></a>dtb的文件格式</h2><p>dtb格式如下图所示，主要由一个ftd_header头部信息和三个可变长度的block组成：memory reservation block、struct block和strings block</p>
+<p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-11-23-31-29_a24c47bf.png" alt="2022-10-11-23-31-29"></p>
+<h3 id="ftd-header"><a href="#ftd-header" class="headerlink" title="ftd_header"></a>ftd_header</h3><p>dtb的头部由一下结构体定义。所有报头字段都是32位整数，以大端格式存储。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">fdt_header</span> {</span><br><span class="line">	<span class="type">fdt32_t</span> magic;			 <span class="comment">/* magic word FDT_MAGIC */</span></span><br><span class="line">	<span class="type">fdt32_t</span> totalsize;		 <span class="comment">/* total size of DT block */</span></span><br><span class="line">	<span class="type">fdt32_t</span> off_dt_struct;		 <span class="comment">/* offset to structure */</span></span><br><span class="line">	<span class="type">fdt32_t</span> off_dt_strings;		 <span class="comment">/* offset to strings */</span></span><br><span class="line">	<span class="type">fdt32_t</span> off_mem_rsvmap;		 <span class="comment">/* offset to memory reserve map */</span></span><br><span class="line">	<span class="type">fdt32_t</span> version;		 <span class="comment">/* format version */</span></span><br><span class="line">	<span class="type">fdt32_t</span> last_comp_version;	 <span class="comment">/* last compatible version */</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* version 2 fields below */</span></span><br><span class="line">	<span class="type">fdt32_t</span> boot_cpuid_phys;	 <span class="comment">/* Which physical CPU id we're</span></span><br><span class="line"><span class="comment">					    booting on */</span></span><br><span class="line">	<span class="comment">/* version 3 fields below */</span></span><br><span class="line">	<span class="type">fdt32_t</span> size_dt_strings;	 <span class="comment">/* size of the strings block */</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* version 17 fields below */</span></span><br><span class="line">	<span class="type">fdt32_t</span> size_dt_struct;		 <span class="comment">/* size of the structure block */</span></span><br><span class="line">};</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>magic</td>
+<td>魔术，固定为0xd00dfeed</td>
+</tr>
+<tr>
+<td>totalsize</td>
+<td>整个dtb的总大小，实际占用空间</td>
+</tr>
+<tr>
+<td>off_dt_struct</td>
+<td>struct block的偏移地址</td>
+</tr>
+<tr>
+<td>off_dt_strings</td>
+<td>strings block的偏移地址</td>
+</tr>
+<tr>
+<td>off_mem_rsvmap</td>
+<td>memory reservation block 的偏移地址</td>
+</tr>
+<tr>
+<td>version</td>
+<td>设备树的版本，截至目前的最新版本为17.</td>
+</tr>
+<tr>
+<td>last_comp_version</td>
+<td>最新兼容版本</td>
+</tr>
+<tr>
+<td>boot_cpuid_phys</td>
+<td>启动时使用的cpuid</td>
+</tr>
+<tr>
+<td>size_dt_strings</td>
+<td>字符串block的大小</td>
+</tr>
+<tr>
+<td>size_dt_struct</td>
+<td>struct block的大小</td>
+</tr>
+<tr>
+<td>根据以上描述，可以得到dtb文件格式类似如下图所示：</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-12-23-23-34_9b5b5990.png" alt="2022-10-12-23-23-34"></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>以上文提到的最简单的设备树为例，将其编译成dtb，然后用hexdump来查看一下。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">00000000</span>  d0 <span class="number">0</span>d fe ed <span class="number">00</span> <span class="number">00</span> <span class="number">01</span> <span class="number">47</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">38</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span> <span class="number">0</span>c  |.......G...<span class="number">8</span>....|</span><br><span class="line"><span class="attribute">00000010</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">28</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">11</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">10</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  |...(............|</span><br><span class="line"><span class="attribute">00000020</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">3</span>b <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> d4  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  |...;............|</span><br><span class="line"><span class="attribute">00000030</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  |................|</span><br><span class="line"><span class="attribute">00000040</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span> <span class="number">6</span>e <span class="number">6</span>f <span class="number">64</span> <span class="number">65</span>  <span class="number">2</span>d <span class="number">64</span> <span class="number">65</span> <span class="number">62</span> <span class="number">75</span> <span class="number">67</span> <span class="number">00</span> <span class="number">00</span>  |....node-debug..|</span><br><span class="line"><span class="attribute">00000050</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">03</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">0</span>e  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">73</span> <span class="number">69</span> <span class="number">6</span>c <span class="number">61</span>  |............sila|</span><br><span class="line"><span class="attribute">00000060</span>  <span class="number">6</span>e <span class="number">2</span>c <span class="number">20</span> <span class="number">73</span> <span class="number">63</span> <span class="number">37</span> <span class="number">61</span> <span class="number">32</span>  <span class="number">30</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">03</span>  |n, sc7a20.......|</span><br><span class="line"><span class="attribute">00000070</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">05</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">0</span>b  <span class="number">6</span>f <span class="number">6</span>b <span class="number">61</span> <span class="number">79</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  |........okay....|</span><br><span class="line"><span class="attribute">00000080</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">03</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">16</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">12</span> <span class="number">6</span>e <span class="number">6</span>f <span class="number">64</span> <span class="number">65</span>  |............node|</span><br><span class="line"><span class="attribute">00000090</span>  <span class="number">2</span>d <span class="number">64</span> <span class="number">65</span> <span class="number">62</span> <span class="number">75</span> <span class="number">67</span> <span class="number">3</span>a <span class="number">61</span>  <span class="number">63</span> <span class="number">63</span> <span class="number">65</span> <span class="number">6</span>c <span class="number">20</span> <span class="number">74</span> <span class="number">65</span> <span class="number">73</span>  |-debug:accel tes|</span><br><span class="line"><span class="attribute">000000a0</span>  <span class="number">74</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span>  <span class="number">73</span> <span class="number">75</span> <span class="number">62</span> <span class="number">2</span>d <span class="number">6</span>e <span class="number">6</span>f <span class="number">64</span> <span class="number">65</span>  |t.......sub-node|</span><br><span class="line"><span class="attribute">000000b0</span>  <span class="number">2</span>d <span class="number">64</span> <span class="number">65</span> <span class="number">62</span> <span class="number">75</span> <span class="number">67</span> <span class="number">00</span> <span class="number">00</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">03</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">35</span>  |-debug.........<span class="number">5</span>|</span><br><span class="line"><span class="attribute">000000c0</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">24</span> <span class="number">73</span> <span class="number">75</span> <span class="number">62</span> <span class="number">2</span>d  <span class="number">6</span>e <span class="number">6</span>f <span class="number">64</span> <span class="number">65</span> <span class="number">2</span>d <span class="number">64</span> <span class="number">65</span> <span class="number">62</span>  |...$sub-node-deb|</span><br><span class="line"><span class="attribute">000000d0</span>  <span class="number">75</span> <span class="number">67</span> <span class="number">3</span>a <span class="number">61</span> <span class="number">63</span> <span class="number">63</span> <span class="number">65</span> <span class="number">6</span>c  <span class="number">20</span> <span class="number">74</span> <span class="number">65</span> <span class="number">73</span> <span class="number">74</span> <span class="number">00</span> <span class="number">73</span> <span class="number">75</span>  |ug:accel test.su|</span><br><span class="line"><span class="attribute">000000e0</span>  <span class="number">62</span> <span class="number">2</span>d <span class="number">6</span>e <span class="number">6</span>f <span class="number">64</span> <span class="number">65</span> <span class="number">2</span>d <span class="number">64</span>  <span class="number">65</span> <span class="number">62</span> <span class="number">75</span> <span class="number">67</span> <span class="number">3</span>a <span class="number">61</span> <span class="number">63</span> <span class="number">63</span>  |b-node-debug:acc|</span><br><span class="line"><span class="attribute">000000f0</span>  <span class="number">65</span> <span class="number">6</span>c <span class="number">20</span> <span class="number">74</span> <span class="number">65</span> <span class="number">73</span> <span class="number">74</span> <span class="number">21</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span>  |el test!........|</span><br><span class="line"><span class="attribute">00000100</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">02</span>  <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">09</span> <span class="number">63</span> <span class="number">6</span>f <span class="number">6</span>d <span class="number">70</span>  |............comp|</span><br><span class="line"><span class="attribute">00000110</span>  <span class="number">61</span> <span class="number">74</span> <span class="number">69</span> <span class="number">62</span> <span class="number">6</span>c <span class="number">65</span> <span class="number">00</span> <span class="number">73</span>  <span class="number">74</span> <span class="number">61</span> <span class="number">74</span> <span class="number">75</span> <span class="number">73</span> <span class="number">00</span> <span class="number">61</span> <span class="number">2</span>d  |atible.status.a-|</span><br><span class="line"><span class="attribute">00000120</span>  <span class="number">73</span> <span class="number">74</span> <span class="number">72</span> <span class="number">69</span> <span class="number">6</span>e <span class="number">67</span> <span class="number">2</span>d <span class="number">70</span>  <span class="number">72</span> <span class="number">6</span>f <span class="number">70</span> <span class="number">65</span> <span class="number">72</span> <span class="number">74</span> <span class="number">79</span> <span class="number">00</span>  |string-property.|</span><br><span class="line"><span class="attribute">00000130</span>  <span class="number">61</span> <span class="number">2</span>d <span class="number">73</span> <span class="number">74</span> <span class="number">72</span> <span class="number">69</span> <span class="number">6</span>e <span class="number">67</span>  <span class="number">2</span>d <span class="number">6</span>c <span class="number">69</span> <span class="number">73</span> <span class="number">74</span> <span class="number">2</span>d <span class="number">70</span> <span class="number">72</span>  |a-string-list-pr|</span><br><span class="line"><span class="attribute">00000140</span>  <span class="number">6</span>f <span class="number">70</span> <span class="number">65</span> <span class="number">72</span> <span class="number">74</span> <span class="number">79</span> <span class="number">00</span>                              |operty.|</span><br><span class="line"><span class="attribute">00000147</span></span><br></pre></td></tr></table></figure>
+<p>将fdt_header的头部信息截取出来。<br><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2022-10-12-00-01-56_8c5e85cf.png" alt="2022-10-12-00-01-56"></p>
+<p>可以看到magic是0xd00dfeed；totalsize是0x147，恰好就等于该dtb总大小；off_dt_struct为0x38，size_dt_struct为0xd4，说明从0x38开始长度为0xd4的区域就是struct block；off_dt_strings为0x10c，size_dt_strings为0x3b，说明从0x10c开始长度为0x3b的区域就是strings block。</p>
+<h3 id="memory-reservation-block"><a href="#memory-reservation-block" class="headerlink" title="memory reservation block"></a>memory reservation block</h3><p>设备树预留内存区域，用于存放并保护一些重要的数据，与特定平台的实现相关，本文不讨论。</p>
+<h3 id="struct-block"><a href="#struct-block" class="headerlink" title="struct block"></a>struct block</h3><p>structure block区域描述了设备树本身的结构和内容，由一系列块组成，每个块以一个大端32位整数标记开始。所有的标记位都需要32位对齐。</p>
+<ul>
+<li>FDT_BEGIN_NODE：标记一个节点开始。</li>
+<li>FDT_END_NODE：标记一个节点结束。</li>
+<li>FDT_PROP：标记一个节点属性开始。其后的跟着这个属性的长度和名称，通过以下结构体表示：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> {</span><br><span class="line">	<span class="type">uint32_t</span> len;</span><br><span class="line">	<span class="type">uint32_t</span> nameoff;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+len字段给出了属性值的长度的长度，nameoff字段给出了属性名在string block中的偏移量，从该偏移量开始到空字符结束为该属性的名称。</li>
+<li>FDT_NOP：标记忽略，解析时会忽略该节点</li>
+<li>FDT_END: 标记整个sturcture block结束<br>可以使用ftpdump命令解析整个dtb的格式。可使用如下命令解析上一小节编译出来的dtb文件。<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">fdtdump -sd xxx.dtb</span><br><span class="line"></span><br><span class="line"><span class="regexp">/dts-v1/</span>;</span><br><span class="line"><span class="regexp">//</span> magic:               <span class="number">0</span>xd00dfeed</span><br><span class="line"><span class="regexp">//</span> totalsize:           <span class="number">0</span>x147 (<span class="number">327</span>)</span><br><span class="line"><span class="regexp">//</span> off_dt_struct:       <span class="number">0</span>x38</span><br><span class="line"><span class="regexp">//</span> off_dt_strings:      <span class="number">0</span>x10c</span><br><span class="line"><span class="regexp">//</span> off_mem_rsvmap:      <span class="number">0</span>x28</span><br><span class="line"><span class="regexp">//</span> version:             <span class="number">17</span></span><br><span class="line"><span class="regexp">//</span> last_comp_version:   <span class="number">16</span></span><br><span class="line"><span class="regexp">//</span> boot_cpuid_phys:     <span class="number">0</span>x0</span><br><span class="line"><span class="regexp">//</span> size_dt_strings:     <span class="number">0</span>x3b</span><br><span class="line"><span class="regexp">//</span> size_dt_struct:      <span class="number">0</span>xd4</span><br><span class="line"></span><br><span class="line"><span class="regexp">//</span> <span class="number">0038</span>: tag: <span class="number">0</span>x00000001 (FDT_BEGIN_NODE)</span><br><span class="line">/ {</span><br><span class="line"><span class="regexp">//</span> <span class="number">0040</span>: tag: <span class="number">0</span>x00000001 (FDT_BEGIN_NODE)</span><br><span class="line">    node-debug {</span><br><span class="line"><span class="regexp">//</span> <span class="number">0050</span>: tag: <span class="number">0</span>x00000003 (FDT_PROP)</span><br><span class="line"><span class="regexp">//</span> <span class="number">010</span>c: string: compatible</span><br><span class="line"><span class="regexp">//</span> <span class="number">005</span>c: value</span><br><span class="line">        compatible = <span class="string">"silan, sc7a20"</span>;</span><br><span class="line"><span class="regexp">//</span> <span class="number">006</span>c: tag: <span class="number">0</span>x00000003 (FDT_PROP)</span><br><span class="line"><span class="regexp">//</span> <span class="number">0117</span>: string: status</span><br><span class="line"><span class="regexp">//</span> <span class="number">0078</span>: value</span><br><span class="line">        status = <span class="string">"okay"</span>;</span><br><span class="line"><span class="regexp">//</span> <span class="number">0080</span>: tag: <span class="number">0</span>x00000003 (FDT_PROP)</span><br><span class="line"><span class="regexp">//</span> <span class="number">011</span>e: string: a-string-property</span><br><span class="line"><span class="regexp">//</span> <span class="number">008</span>c: value</span><br><span class="line">        a-string-property = <span class="string">"node-debug:accel test"</span>;</span><br><span class="line"><span class="regexp">//</span> <span class="number">00</span>a4: tag: <span class="number">0</span>x00000001 (FDT_BEGIN_NODE)</span><br><span class="line">        sub-node-debug {</span><br><span class="line"><span class="regexp">//</span> <span class="number">00</span>b8: tag: <span class="number">0</span>x00000003 (FDT_PROP)</span><br><span class="line"><span class="regexp">//</span> <span class="number">0130</span>: string: a-string-list-property</span><br><span class="line"><span class="regexp">//</span> <span class="number">00</span>c4: value</span><br><span class="line">            a-string-list-property = <span class="string">"sub-node-debug:accel test"</span>, <span class="string">"sub-node-debug:accel test!"</span>;</span><br><span class="line"><span class="regexp">//</span> <span class="number">00</span>fc: tag: <span class="number">0</span>x00000002 (FDT_END_NODE)</span><br><span class="line">        };</span><br><span class="line"><span class="regexp">//</span> <span class="number">0100</span>: tag: <span class="number">0</span>x00000002 (FDT_END_NODE)</span><br><span class="line">    };</span><br><span class="line"><span class="regexp">//</span> <span class="number">0104</span>: tag: <span class="number">0</span>x00000002 (FDT_END_NODE)</span><br><span class="line">};</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>结合hexdump打印内容分析。我们可以知道0x38位置标志根节点开始。紧接着0x40位置开始了node_debug节点，其compatible属性的长度是0x0e，刚好等于”silan, sc7a20”字符串的长度，然后其名称在string block的偏移量为0x0，说明名称位于string block的首地址。从header头部的解析，可知string block的首地址是0x10C，看到0x10C的位置，刚好就是以”compatible”这个字符串开头。同理status属性的长度是0x05，刚好等于”okay”字符串的长度，然后其名称在string block的偏移量是0x0b, string block的首地址是0x10C，说明”status”存储在<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="21.796ex" height="1.756ex" role="img" focusable="false" viewBox="0 -694 9634 776"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path></g><g data-mml-node="mi" transform="translate(500,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mn" transform="translate(1072,0)"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path></g><g data-mml-node="mi" transform="translate(1572,0)"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="mo" transform="translate(2223.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mn" transform="translate(3223.4,0)"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path></g><g data-mml-node="mi" transform="translate(3723.4,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mn" transform="translate(4295.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g><g data-mml-node="mi" transform="translate(5295.4,0)"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g><g data-mml-node="mo" transform="translate(6006.2,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(7062,0)"><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path></g><g data-mml-node="mi" transform="translate(7562,0)"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mn" transform="translate(8134,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z" transform="translate(500,0)"></path><path data-c="37" d="M55 458Q56 460 72 567L88 674Q88 676 108 676H128V672Q128 662 143 655T195 646T364 644H485V605L417 512Q408 500 387 472T360 435T339 403T319 367T305 330T292 284T284 230T278 162T275 80Q275 66 275 52T274 28V19Q270 2 255 -10T221 -22Q210 -22 200 -19T179 0T168 40Q168 198 265 368Q285 400 349 489L395 552H302Q128 552 119 546Q113 543 108 522T98 479L95 458V455H55V458Z" transform="translate(1000,0)"></path></g></g></g></svg></mjx-container>的地方。与ftdpdump展示的是相同的。其中node_debug节点下的compatible属性如以下所示：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">00 </span><span class="number">00</span> <span class="number">00</span> <span class="number">03</span>: FDT_PROP</span><br><span class="line"><span class="symbol">00 </span><span class="number">00</span> <span class="number">00</span> <span class="number">0</span>e: compatible属性值的长度，即<span class="string">"silan, sc7a20"</span>字符串长度</span><br><span class="line"><span class="symbol">00 </span><span class="number">00</span> <span class="number">00</span> <span class="number">00</span>: compatible属性名在string block中的偏移量。</span><br><span class="line"><span class="symbol">73 </span><span class="number">69</span> <span class="number">6</span>c <span class="number">61</span> <span class="number">6</span>e <span class="number">2</span>c <span class="number">20</span> <span class="number">73</span> <span class="number">63</span> <span class="number">37</span> <span class="number">61</span> <span class="number">32</span> <span class="number">30</span>: compatible属性的值</span><br></pre></td></tr></table></figure>
+<h3 id="string-block"><a href="#string-block" class="headerlink" title="string block"></a>string block</h3><p>通过上一小节的分析，想必string block存储的内容已经很显而易见了。string block较为简单，可以类比elf文件的strtab的作用。其存储了设备树中所有属性名称的字符串，这些字符串简单存放在一起，通过偏移量在struct block中使用。</p>
+<h1 id="dtb转化成device-node"><a href="#dtb转化成device-node" class="headerlink" title="dtb转化成device node"></a>dtb转化成device node</h1><p>知道dtb的格式之后，又有一个问题：Linux是如何解析dtb，将其转化成一个个platform设备呢？经过一番搜索资料后发现，uboot启动的时候会将存放dtb的地址作为参数传递给Linux内核，之后Linux执行start_kernel启动时就可以获取到dtb文件进行解析了。<br>以下是内核解析dtb的函数调用关系：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">start_kernel</span><br><span class="line">--&gt;	setup_arch</span><br><span class="line">	--&gt;	setup_machine_fdt <span class="regexp">//</span> 获取内核前期初始化所需的bootargs，cmd_line等系统引导参数</span><br><span class="line">		--&gt;	early_init_dt_scan_nodes 预初始化一些必要节点信息</span><br><span class="line">			--&gt;	of_scan_flat_dt(early_init_dt_scan_chosen, boot_command_line); <span class="regexp">//</span> 扫描<span class="regexp">/chosen或者/</span>chose@<span class="number">0</span>节点下面的bootargs属性值到boot_command_line，此外，还处理initrd相关的property，并保存在initrd_start和initrd_end这两个全局变量中；</span><br><span class="line">			--&gt;	of_scan_flat_dt(early_init_dt_scan_root, NULL); <span class="regexp">//</span> 解析root节点的 <span class="comment">#size-cells 和 #address-cells节点</span></span><br><span class="line">			--&gt;	of_scan_flat_dt(early_init_dt_scan_memory, NULL); <span class="regexp">//</span> 解析memory节点</span><br><span class="line">	--&gt;	unflatten_device_tree <span class="regexp">//</span> 解析设备树所有节点</span><br><span class="line">		--&gt;	__unflatten_device_tree <span class="regexp">//</span> 创建device_node tree</span><br><span class="line">			--&gt;	fdt_check_header <span class="regexp">//</span> 检查头部信息</span><br><span class="line">			--&gt;	unflatten_dt_nodes <span class="regexp">//</span> 第一遍扫描，获取需要分配的内存大小</span><br><span class="line">			--&gt;	dt_alloc <span class="regexp">//</span> 分配内存用于存储 device_nodes tree</span><br><span class="line">			--&gt;	unflatten_dt_nodes <span class="regexp">//</span> 第二遍扫描，根据dtb内容，创建device_nodes tree</span><br><span class="line">				--&gt;	populate_node <span class="regexp">//</span> 填充 device node</span><br><span class="line">					--&gt;	populate_properties <span class="regexp">//</span> 填充节点下面的所有属性</span><br></pre></td></tr></table></figure>
+<p>总的来说，dtb中的每一个node节点经过kernel处理都会生成一个struct device_node的结构体；</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">device_node</span> {</span><br><span class="line">	<span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">	phandle phandle;</span><br><span class="line">	<span class="type">const</span> <span class="type">char</span> *full_name;</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">fwnode_handle</span> fwnode;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">property</span> *properties;</span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">property</span> *deadprops;	<span class="comment">/* removed properties */</span></span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">device_node</span> *parent;</span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">device_node</span> *child;</span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">device_node</span> *sibling;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_KOBJ)</span></span><br><span class="line">	<span class="keyword">struct</span>	<span class="title class_">kobject</span> kobj;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> _flags;</span><br><span class="line">	<span class="type">void</span>	*data;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_SPARC)</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> unique_id;</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">of_irq_controller</span> *irq_trans;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">};</span><br></pre></td></tr></table></figure>
+<p>每一个property属性都会被处理生成一个struct property结构体。 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">property</span> {</span><br><span class="line">	<span class="type">char</span>	*name;</span><br><span class="line">	<span class="type">int</span>	length;</span><br><span class="line">	<span class="type">void</span>	*value;</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">property</span> *next;</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_DYNAMIC) || defined(CONFIG_SPARC)</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> _flags;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_PROMTREE)</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> unique_id;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined(CONFIG_OF_KOBJ)</span></span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">bin_attribute</span> attr;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">};</span><br></pre></td></tr></table></figure>
+
+<p>梳理整个解析流程，可以知道，内核解析dtb主要完成了以下工作：</p>
+<ol>
+<li>首先在内核入口处将从u-boot传递过来的dtb地址。</li>
+<li>通过调用early_init_dt_scan()函数来获取内核前期初始化所需的bootargs，cmd_line等系统引导参数。</li>
+<li>调用unflatten_device_tree()函数来解析dtb文件，构建一个由device_node结构连接而成的单项链表，并使用全局变量of_root指针来保存这个链表的头指针。</li>
+</ol>
+<h1 id="device-node与device的绑定"><a href="#device-node与device的绑定" class="headerlink" title="device node与device的绑定"></a>device node与device的绑定</h1><p>上一小节已经知道dtb文件中的所有节点会被解析成device node链表，头节点通过of_roots保存。在start_kernel的后续初始化过程中，device_node还会进一步和各种device进行绑定，有虚拟的platform bus的platform device，也有spi，i2c这些有物理总线下的从设备。到此时，我就产生了一个困惑，Linux Kernel是怎么把device node转化成这类device呢？经过一通搜索分析，发现是of_platform_default_populate_init这个函数干的好事！以下简单列出了device node转换成platform device的流程。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">of_platform_default_populate_init <span class="regexp">//</span> </span><br><span class="line">--&gt; of_platform_default_populate <span class="regexp">//</span> 填充除reserve_mem和firmware的其他节点</span><br><span class="line">    --&gt; of_platform_populate <span class="regexp">//</span> 从设备树数据填充platform device</span><br><span class="line">		--&gt; of_platform_bus_create <span class="regexp">//</span> 遍历root节点所有子节点，创建platform device, 并且有选择性的递归所有子节点，创建platform device. 需要有compatible属性才会创建。</span><br><span class="line">            --&gt; of_platform_device_create_pdata <span class="regexp">//</span> 分配，初始化和注册platform_device</span><br><span class="line">                --&gt; of_device_alloc <span class="regexp">//</span> 分配和初始化platform device，填充resource table</span><br><span class="line">                --&gt; of_device_add <span class="regexp">//</span> 将platform device 添加到系统中</span><br><span class="line">            --&gt; of_match_node <span class="regexp">//</span> 当前总线是否是<span class="string">"simple-bus"</span>,<span class="string">"simple-mfd"</span>,<span class="string">"isa"</span>,<span class="string">"arm,amba-bus"</span>中的一种？</span><br><span class="line">                --&gt; 如果是：对子节点递归调用of_platform_bus_create</span><br><span class="line">                --&gt; 不是：则退出</span><br></pre></td></tr></table></figure>
+
+<p>通过上面的流程我们已经知道，内核主要是将以下两类节点转换为platform_device</p>
+<ul>
+<li>根节点下所有带compatible属性的子节点</li>
+<li>如果子节点的compatible属性值为”simple-bus”,”simple-mfd”,”isa”,”arm,amba-bus”，则会为该节点下所有带’compatible’ 属性的子节点（child）也分配并注册一个platform_device。</li>
+</ul>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// <span class="doctag">TODO:</span> nvt9856x 方案的</span></span><br><span class="line"><span class="keyword">i2c</span> {</span><br><span class="line">              compatile <span class="operator">=</span> <span class="string">"samsung,i2c"</span>;</span><br><span class="line">              <span class="keyword">at24c02</span> {</span><br><span class="line">                    compatile <span class="operator">=</span> <span class="string">"at24c02"</span>;                      </span><br><span class="line">              };</span><br><span class="line">          };</span><br></pre></td></tr></table></figure>
+<p>由以上分析可以知道，并不是所有的设备都会转化成platform device，对于I2C这类带有物理总线的设备来说，只有I2C的总线控制器会被转换成platform_device，那么对于挂在I2C总线上的设备应该如何转换呢？既然I2C下的设备不是在填充platform device过程中创建的，那么想必应该是和I2C总线设备相匹配的总线驱动干的好事。</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">nvttim_probe</span><br><span class="line">--&gt; i2c_add_numbered_adapter</span><br><span class="line">	--&gt; __i2c_add_numbered_adapter</span><br><span class="line">		--&gt; i2c_register_adapter</span><br><span class="line">			--&gt; of_i2c_register_devices  <span class="comment">// 遍历创建所有device</span></span><br><span class="line">				--&gt; of_i2c_register_device <span class="comment">// 创建i2c </span></span><br><span class="line">					--&gt; of_i2c_get_board_info  获取I2C地址，没有处理中断。</span><br><span class="line">					--&gt; i2c_new_client_device <span class="comment">// 创建i2c client设备</span></span><br><span class="line">						--&gt; device_register   <span class="comment">// 注册device</span></span><br></pre></td></tr></table></figure>
+<p>以nvt9856x方案为例，总线驱动和设备匹配上的时候会执行nvttim_probe函数，nvt9856x的I2C总线驱动在执行probe函数时，会将挂在I2C总线上的所有的设备都初始化为i2c_client并注册到系统中。</p>
+<p>那么，中断呢？以上probe添加挂在总线上的所有i2c client并没有处理中断，i2c的终端号是在哪里进行处理的？<br>中断处理。可以看到上面流程中，并没有对设备树中的中断进行处理，那么中断号是怎么存进i2c_client结构体中的呢？实际上中断的处理是在执行i2c_device_probe 的时候填充的。</p>
+<p>至此，从dtb-&gt;device node-&gt;platform device，以及i2c client是如何转化添加进系统的就已经介绍完毕了。至于i2c client和i2c driver是如何匹配的，不是本文的主要讨论内容，但其大致上和platform匹配规则差不多，可以参考<br>xxxx博文。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012489236/article/details/97271797">https://blog.csdn.net/u012489236/article/details/97271797</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zongzi10010/p/10793082.html">https://www.cnblogs.com/zongzi10010/p/10793082.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/10/06/computer_science/uboot/" rel="prev" title="uboot">
+                  <i class="fa fa-angle-left"></i> uboot
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/" rel="next" title="ffmpeg">
+                  ffmpeg <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2022/10/10/computer_science/Device-Tree/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="FFmpeg处理音视频流程 FFmpeg命令分类基本信息查询ffmpeg –version 录制命令TODO: 1234567ffmpeg -f avfoundation -i1-r30 out.yuv-f: 指定使用avfoundation采集数据-i: 指定从哪里采集数据,他是一个文件索引-r: 帧率ffmpeg -f avfoundataion -i :0 out.wav  分解与复用123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ffmpeg">
+<meta property="og:url" content="http://example.com/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="FFmpeg处理音视频流程 FFmpeg命令分类基本信息查询ffmpeg –version 录制命令TODO: 1234567ffmpeg -f avfoundation -i1-r30 out.yuv-f: 指定使用avfoundation采集数据-i: 指定从哪里采集数据,他是一个文件索引-r: 帧率ffmpeg -f avfoundataion -i :0 out.wav  分解与复用123">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-08-23-55-15_c19e35a2.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-08-23-58-29_e8afd001.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-09-07-45-27_8ddf0ddd.png">
+<meta property="og:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-11-00-08-23_6134648b.png">
+<meta property="article:published_time" content="2023-09-01T15:04:17.000Z">
+<meta property="article:modified_time" content="2024-01-11T00:14:34.491Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-08-23-55-15_c19e35a2.png">
+
+
+<link rel="canonical" href="http://example.com/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/","path":"2023/09/01/音视频/ffmpeg/","title":"ffmpeg"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ffmpeg | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E5%A4%84%E7%90%86%E9%9F%B3%E8%A7%86%E9%A2%91%E6%B5%81%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">FFmpeg处理音视频流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E5%91%BD%E4%BB%A4%E5%88%86%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">FFmpeg命令分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.1.</span> <span class="nav-text">基本信息查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%95%E5%88%B6%E5%91%BD%E4%BB%A4"><span class="nav-number">2.2.</span> <span class="nav-text">录制命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E8%A7%A3%E4%B8%8E%E5%A4%8D%E7%94%A8"><span class="nav-number">2.3.</span> <span class="nav-text">分解与复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE%E5%91%BD%E4%BB%A4"><span class="nav-number">2.4.</span> <span class="nav-text">处理原始数据命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FFmpeg-%E6%8F%90%E5%8F%96YUV%E6%95%B0%E6%8D%AE"><span class="nav-number">2.4.1.</span> <span class="nav-text">FFmpeg 提取YUV数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BB%A4%E9%95%9C%E5%91%BD%E4%BB%A4-filter"><span class="nav-number">2.5.</span> <span class="nav-text">滤镜命令(filter)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%81%E5%89%AA%E5%92%8C%E5%90%88%E5%B9%B6%E5%91%BD%E4%BB%A4"><span class="nav-number">2.6.</span> <span class="nav-text">裁剪和合并命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%89%87-%E8%A7%86%E9%A2%91%E4%BA%92%E8%BD%AC%E5%91%BD%E4%BB%A4"><span class="nav-number">2.7.</span> <span class="nav-text">图片&#x2F;视频互转命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%92%AD%E6%8E%A8%E6%8B%89%E6%B5%81"><span class="nav-number">2.8.</span> <span class="nav-text">直播推拉流</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E5%88%9D%E7%BA%A7%E5%BC%80%E5%8F%91"><span class="nav-number">3.</span> <span class="nav-text">FFmpeg初级开发!</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FFmpeg%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.1.</span> <span class="nav-text">FFmpeg日志系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%AA%92%E4%BD%93%E6%96%87%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text">多媒体文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E9%9F%B3%E8%A7%86%E9%A2%91%E4%BF%A1%E6%81%AF"><span class="nav-number">3.3.</span> <span class="nav-text">打印音视频信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E5%8F%96%E9%9F%B3%E9%A2%91%E6%95%B0%E6%8D%AE"><span class="nav-number">3.4.</span> <span class="nav-text">抽取音频数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%BD%E5%8F%96%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE"><span class="nav-number">3.5.</span> <span class="nav-text">抽取视频数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86MP4%E4%B8%93%E7%A8%8BFLV%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.6.</span> <span class="nav-text">将MP4专程FLV格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8Emp4%E6%88%AA%E5%8F%96%E4%B8%80%E6%AE%B5%E8%A7%86%E9%A2%91"><span class="nav-number">3.7.</span> <span class="nav-text">从mp4截取一段视频</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FFmpeg%E4%B8%AD%E7%BA%A7%E5%BC%80%E5%8F%91"><span class="nav-number">4.</span> <span class="nav-text">FFmpeg中级开发</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E9%A2%91%E8%BD%AC%E5%9B%BE%E7%89%87"><span class="nav-number">4.1.</span> <span class="nav-text">视频转图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SDL%E6%B8%B2%E6%9F%93%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">4.2.</span> <span class="nav-text">SDL渲染基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%AD%E6%94%BE%E9%9F%B3%E9%A2%91%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E5%88%99"><span class="nav-number">4.3.</span> <span class="nav-text">播放音频的基本原则</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ffmpeg | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ffmpeg
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-01 23:04:17" itemprop="dateCreated datePublished" datetime="2023-09-01T23:04:17+08:00">2023-09-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-01-11 08:14:34" itemprop="dateModified" datetime="2024-01-11T08:14:34+08:00">2024-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ffmpeg/" itemprop="url" rel="index"><span itemprop="name">ffmpeg</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="FFmpeg处理音视频流程"><a href="#FFmpeg处理音视频流程" class="headerlink" title="FFmpeg处理音视频流程"></a>FFmpeg处理音视频流程</h1><p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-08-23-55-15_c19e35a2.png" alt="2024-01-08-23-55-15"></p>
+<h1 id="FFmpeg命令分类"><a href="#FFmpeg命令分类" class="headerlink" title="FFmpeg命令分类"></a>FFmpeg命令分类</h1><h2 id="基本信息查询"><a href="#基本信息查询" class="headerlink" title="基本信息查询"></a>基本信息查询</h2><p>ffmpeg –version<br><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-08-23-58-29_e8afd001.png" alt="2024-01-08-23-58-29"></p>
+<h2 id="录制命令"><a href="#录制命令" class="headerlink" title="录制命令"></a>录制命令</h2><p>TODO:</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -f avfoundation -i1-<span class="built_in">r30</span> <span class="keyword">out</span>.yuv</span><br><span class="line">-f: 指定使用avfoundation采集数据</span><br><span class="line">-i: 指定从哪里采集数据,他是一个文件索引</span><br><span class="line">-r: 帧率</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ffmpeg -f avfoundataion -i :<span class="number">0</span> <span class="keyword">out</span>.wav</span><br></pre></td></tr></table></figure>
+
+<h2 id="分解与复用"><a href="#分解与复用" class="headerlink" title="分解与复用"></a>分解与复用</h2><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i <span class="keyword">out</span>.mp4 -vcodec <span class="keyword">copy</span> -acodec <span class="keyword">copy</span> <span class="keyword">out</span>.flv</span><br><span class="line"></span><br><span class="line">-vcodec <span class="keyword">copy</span>: 视频编码处理方式</span><br><span class="line">-acodec <span class="keyword">copy</span>: 音频编码处理方式</span><br><span class="line"></span><br><span class="line">ffmpeg -i <span class="keyword">test</span>.mp4 -vcodec <span class="keyword">copy</span> -<span class="keyword">an</span> <span class="keyword">test</span>.h264</span><br><span class="line">-<span class="keyword">an</span> 不要音频</span><br><span class="line"></span><br><span class="line">ffmpeg -i <span class="keyword">test</span>.mp4 -vcodec <span class="keyword">copy</span> -<span class="keyword">an</span> <span class="keyword">test</span>.h264</span><br><span class="line">-vn 不要视频</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="处理原始数据命令"><a href="#处理原始数据命令" class="headerlink" title="处理原始数据命令"></a>处理原始数据命令</h2><p>处理yuv和pcm的原始数据</p>
+<h3 id="FFmpeg-提取YUV数据"><a href="#FFmpeg-提取YUV数据" class="headerlink" title="FFmpeg 提取YUV数据"></a>FFmpeg 提取YUV数据</h3><p><a target="_blank" rel="noopener" href="https://trac.ffmpeg.org/wiki">https://trac.ffmpeg.org/wiki</a></p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i <span class="keyword">test</span>.mp4 -<span class="keyword">an</span> -c:v rawvideo -pix_fmt yuv420p <span class="keyword">out</span>.yuv</span><br><span class="line">-<span class="keyword">an</span>: 不要音频</span><br><span class="line">-c:v 对视频编码</span><br><span class="line">rawvideo: 原始视频</span><br><span class="line">-pix_fmt: 像素格式</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ffmpeg -i <span class="keyword">out</span>.mp4 -vn -ar 44100 -<span class="keyword">ac</span> 2 -f s16le <span class="keyword">out</span>.pcm</span><br><span class="line"></span><br><span class="line">-ar: 采样率</span><br><span class="line">-ac2: 2个通道</span><br><span class="line">-f: 音频格式</span><br><span class="line"></span><br><span class="line">ffplay -ar 44100 -<span class="keyword">ac</span> 2 -f s16le <span class="keyword">out</span>.pcm</span><br></pre></td></tr></table></figure>
+<h2 id="滤镜命令-filter"><a href="#滤镜命令-filter" class="headerlink" title="滤镜命令(filter)"></a>滤镜命令(filter)</h2><p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-09-07-45-27_8ddf0ddd.png" alt="2024-01-09-07-45-27"></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="selector-tag">i</span> <span class="keyword">in</span><span class="selector-class">.mov</span> -vf crop=in_w-<span class="number">200</span>:in_h-<span class="number">200</span> -c:v libxh264 -c:<span class="selector-tag">a</span> copy out<span class="selector-class">.mp4</span></span><br><span class="line"></span><br><span class="line">-vf: 视频<span class="attribute">filter</span> crop</span><br><span class="line">-c:v  使用libx264</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://ffmpeg.org/ffmpeg-filters.html">https://ffmpeg.org/ffmpeg-filters.html</a><br><a target="_blank" rel="noopener" href="https://trac.ffmpeg.org/wiki/FilteringGuide">https://trac.ffmpeg.org/wiki/FilteringGuide</a></p>
+<h2 id="裁剪和合并命令"><a href="#裁剪和合并命令" class="headerlink" title="裁剪和合并命令"></a>裁剪和合并命令</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="selector-tag">i</span> test<span class="selector-class">.mp4</span> -ss <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> -t <span class="number">10</span> test<span class="selector-class">.ts</span></span><br><span class="line"></span><br><span class="line">-ss: 从什么时间点开始裁剪</span><br><span class="line">-t: 裁剪几秒</span><br><span class="line"></span><br><span class="line">ffmpeg -f concat -<span class="selector-tag">i</span> inputs<span class="selector-class">.txt</span> out<span class="selector-class">.flv</span></span><br><span class="line"></span><br><span class="line">concat: 合并</span><br><span class="line">inputs<span class="selector-class">.txt</span>: 文件</span><br><span class="line">file <span class="string">&#x27;1.ts&#x27;</span></span><br><span class="line">file <span class="string">&#x27;2.ts&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="图片-视频互转命令"><a href="#图片-视频互转命令" class="headerlink" title="图片&#x2F;视频互转命令"></a>图片&#x2F;视频互转命令</h2><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i <span class="keyword">in</span>.flv -r <span class="number">1</span> -f image2 <span class="keyword">image</span>-%3d.jpeg</span><br><span class="line"></span><br><span class="line">-r: 帧率</span><br><span class="line">-f: 格式</span><br><span class="line"></span><br><span class="line">ffmpeg -i <span class="keyword">image</span>-%3d.jpeg out.mp4</span><br></pre></td></tr></table></figure>
+
+<h2 id="直播推拉流"><a href="#直播推拉流" class="headerlink" title="直播推拉流"></a>直播推拉流</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -re -i out.mp4 -c copy -f flv rtmp:<span class="regexp">//</span>server<span class="regexp">/live/</span>streamName</span><br><span class="line">ffmpeg -i rtmp:<span class="regexp">//</span>server<span class="regexp">/live/</span>streamName -c copy dump.flv</span><br></pre></td></tr></table></figure>
+
+<h1 id="FFmpeg初级开发"><a href="#FFmpeg初级开发" class="headerlink" title="FFmpeg初级开发!"></a>FFmpeg初级开发!</h1><p><a target="_blank" rel="noopener" href="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-09-08-26-35_0853f589.png">2024-01-09-08-26-35</a></p>
+<h2 id="FFmpeg日志系统"><a href="#FFmpeg日志系统" class="headerlink" title="FFmpeg日志系统"></a>FFmpeg日志系统</h2><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;libavutil/log.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">av_log_set_level(<span class="built_in">AV_LOG_DEBUG</span>)</span><br><span class="line">av_log(<span class="literal">NULL</span>, <span class="built_in">AV_LOG_INFO</span>, <span class="string">&quot;xxxx&quot;</span>, xxx);</span><br></pre></td></tr></table></figure>
+
+<p>pkg-config </p>
+<h2 id="多媒体文件"><a href="#多媒体文件" class="headerlink" title="多媒体文件"></a>多媒体文件</h2><ul>
+<li>多媒体文件其实是个容器</li>
+<li>在容器里有很多流(track&#x2F;stream)<br>AVFormatContext</li>
+</ul>
+<p>编码的<br>AVstream</p>
+<ul>
+<li>从流中独处的数据成为包<br>AVpacket</li>
+<li>在一个包中包含这一个或多个帧</li>
+<li>每种六是由不同的编码器!</li>
+</ul>
+<p>AVFormatContext<br>AVStream<br>AVPacket</p>
+<p><a target="_blank" rel="noopener" href="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-10-07-35-47_0e34927f.png">2024-01-10-07-35-47</a></p>
+<h2 id="打印音视频信息"><a href="#打印音视频信息" class="headerlink" title="打印音视频信息"></a>打印音视频信息</h2><ul>
+<li>av_register_all()</li>
+<li>avformat_open_input()&#x2F;avformat_close_input()</li>
+<li>av_dump_format()</li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;libavutil/error.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;libavutil/log.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;libavformat/avformat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">AVFormatContext</span>  *fmt_ctx = <span class="literal">NULL</span>;</span><br><span class="line">    av_log_set_level(<span class="built_in">AV_LOG_INFO</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> ret = avformat_open_input(&amp;fmt_ctx, <span class="string">&quot;../test.mp4&quot;</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        av_log(<span class="literal">NULL</span>, <span class="built_in">AV_LOG_ERROR</span>, <span class="string">&quot;Can&#x27;t not open file: %s\n&quot;</span>, av_err2str(ret));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    av_dump_format(fmt_ctx, <span class="number">0</span>, <span class="string">&quot;../test.mp4&quot;</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    avformat_close_input(&amp;fmt_ctx);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="抽取音频数据"><a href="#抽取音频数据" class="headerlink" title="抽取音频数据"></a>抽取音频数据</h2><h2 id="抽取视频数据"><a href="#抽取视频数据" class="headerlink" title="抽取视频数据"></a>抽取视频数据</h2><ul>
+<li>start code</li>
+<li>SPS&#x2F;PPS</li>
+<li>codec-&gt;extradata</li>
+</ul>
+<h2 id="将MP4专程FLV格式"><a href="#将MP4专程FLV格式" class="headerlink" title="将MP4专程FLV格式"></a>将MP4专程FLV格式</h2><ul>
+<li>avformat_alloc</li>
+<li>avformat_write_header()</li>
+<li>av_write_frame()&#x2F;av_interleaved_write_frame()</li>
+<li>av_write_trailer()</li>
+</ul>
+<h2 id="从mp4截取一段视频"><a href="#从mp4截取一段视频" class="headerlink" title="从mp4截取一段视频"></a>从mp4截取一段视频</h2><h1 id="FFmpeg中级开发"><a href="#FFmpeg中级开发" class="headerlink" title="FFmpeg中级开发"></a>FFmpeg中级开发</h1><ul>
+<li>FFmpeg H264编解码 </li>
+<li>FFmpeg aac编解码</li>
+</ul>
+<p>解码步骤</p>
+<ul>
+<li>查找解码器</li>
+<li>打开解码器</li>
+<li>解码</li>
+</ul>
+<h2 id="视频转图片"><a href="#视频转图片" class="headerlink" title="视频转图片"></a>视频转图片</h2><h2 id="SDL渲染基本原理"><a href="#SDL渲染基本原理" class="headerlink" title="SDL渲染基本原理"></a>SDL渲染基本原理</h2><p><img src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/blog/2024-01-11-00-08-23_6134648b.png" alt="2024-01-11-00-08-23"></p>
+<p>SDL_CreateTexture<br>SDL_DestroyTexture<br>SDL_SetRenderTarget<br>SDL_RendereClear<br>SDL_RenderCopy</p>
+<h2 id="播放音频的基本原则"><a href="#播放音频的基本原则" class="headerlink" title="播放音频的基本原则"></a>播放音频的基本原则</h2><ul>
+<li><p>声卡向你要数据而不是你主动推给声卡</p>
+</li>
+<li><p>数据的多少由音频参数决定的.</p>
+</li>
+<li><p>SDL_OpenAudio&#x2F;SDL_CloseAudio</p>
+</li>
+<li><p>SDL_PauseAudio</p>
+</li>
+<li><p>SDL_MixAudio</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/10/10/computer_science/Device-Tree/" rel="prev" title="Device-Tree">
+                  <i class="fa fa-angle-left"></i> Device-Tree
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/09/01/computer_network/A_top_down_proach/" rel="next" title="计算机网络自顶向下">
+                  计算机网络自顶向下 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2023/09/01/%E9%9F%B3%E8%A7%86%E9%A2%91/ffmpeg/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="instruction set architecture, or ISAvirtual addressthe programe counter virtual address and programe counter register file contain 16 named locations storing 64-bit values.These registers can hold add">
+<meta property="og:type" content="article">
+<meta property="og:title" content="csapp">
+<meta property="og:url" content="http://example.com/2022/01/02/computer_science/csapp/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="instruction set architecture, or ISAvirtual addressthe programe counter virtual address and programe counter register file contain 16 named locations storing 64-bit values.These registers can hold add">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-02T03:03:44.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/01/02/computer_science/csapp/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/01/02/computer_science/csapp/","path":"2022/01/02/computer_science/csapp/","title":"csapp"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>csapp | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98"><span class="nav-number">1.</span> <span class="nav-text">内存</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cache"><span class="nav-number">1.1.</span> <span class="nav-text">cache</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cache-1"><span class="nav-number">2.</span> <span class="nav-text">cache</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RAM"><span class="nav-number">3.</span> <span class="nav-text">RAM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#conflit-miss"><span class="nav-number">3.1.</span> <span class="nav-text">conflit miss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssespeflagscseip"><span class="nav-number">3.2.</span> <span class="nav-text">ssespeflagscseip</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Exception-Control-Flow"><span class="nav-number">4.</span> <span class="nav-text">Exception Control Flow</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/02/computer_science/csapp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="csapp | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          csapp
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-02 11:03:44" itemprop="dateCreated datePublished" datetime="2022-01-02T11:03:44+08:00">2022-01-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2022/01/02/computer_science/csapp/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2022/01/02/computer_science/csapp/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>10k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>17 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>instruction set architecture, or ISA<br>virtual address<br>the programe counter</p>
+<p>virtual address and programe counter</p>
+<p>register file contain 16 named locations storing 64-bit values.<br>These registers can hold addresses(corresponding to C pointer) &#x2F;&#x2F; 保存的是地址。！！！！不管什么，保存的都是地址。。。<br>The condition code registers hold status informatino about the most recently executed arithemetci or logical instruction. These are used to implement condition</p>
+<p>A set of vector resiters can each hold one or more integer or floating-point values</p>
+<p>Even for scalar data types, assembly code makes no distinctions between signed or unsigned integers, between different types of pointers, or even between pointers and integers.</p>
+<p>A key lesson to learn from this is that the program executed by the machine is simply a sequence of bytes encoding a series of instructions.</p>
+<p>16bits: word<br>32bits: double words<br>64bits: quad words</p>
+<p>16 general-purpose register storing 64-bit values. These registers are used to store integer data as well as pointers.</p>
+<p>operand specifiers<br>操作数 most instruction have one or more operands specifying the source values to use in performing an operation and the destinaton location into which to place the result.</p>
+<p>This technique takes advantage of the property that an instruction generating a 4-byte value with a register as the destination will fill the upper 4 bytes with zeros.</p>
+<p>mismatch between instruction suffix and register ID</p>
+<p>By way of background, a stack is a data structure whre values can be added or deleted, but only according to a “last-in, first-out” discipline.</p>
+<p>operations are divided into four groups: load effective address, unary, binary, and shifts</p>
+<ul>
+<li>lea</li>
+<li>unary 一元</li>
+<li>binary 二元</li>
+<li>shifts 移位</li>
+</ul>
+<p>leaq: instead of reading from the designated location, the instruction copies the effective address to the destination.</p>
+<p>Note that when the second operand is a memory location, the processor must read the value from memory, perform the operation, and then write the result back to memory</p>
+<p>CF (unsigned) t &lt; (unsigned) a Unsigned overflow<br>ZF (t &#x3D;&#x3D; 0) Zero<br>SF (t &lt; 0) Negetive<br>OF (a &lt; 0 &#x3D;&#x3D; b &lt; 0) &amp;&amp; (t &lt; 0 !&#x3D; a &lt; 0) Signed overflow</p>
+<p>use contion code<br>1、we can set a single byte to 0 or 1 depending on some combination of the condition codes<br>2、we can conditionally jump to some other part of the progrma<br>3、we can conditionally transfer data.</p>
+<p>In generating the object-code file, the assembler determines the addresses of all labeled instructions and encodes the jump targets (the addresses of the destination instructions) as part of the jump instructions.</p>
+<p>not that jump instruction, but the next instruction of jump</p>
+<p>Implementing Conditional Branches with Conditional Moves</p>
+<p>why code based on conditional data transfers can outperform code based on conditional control transfers?</p>
+<p>processors achieve high performance though pipelining,  – branch prediction logic</p>
+<p>such a misprediction can incur a serious penalty,say,15-30clock cycles of wasted effort, causing a serious degradation of program performance</p>
+<p>combination of conditional tests and jumps are used to implement the effect of loops.</p>
+<p>switch allow an efficient implementation using a data structure called a jump table.</p>
+<p>use of a jump table allows a very efficient way to implement a multiway branch</p>
+<p>procedure involve:</p>
+<ol>
+<li>Passing control</li>
+<li>Passing data.</li>
+<li>Allocating and deallocating memory</li>
+</ol>
+<p>3.7.4 接下来应该读 Local Storage on the Stack</p>
+<p>static:link</p>
+<ol>
+<li>找到符号。f 定位每一个函数f，能够定位到全局变量</li>
+<li>symbol resolution</li>
+<li>relocate</li>
+</ol>
+<p>文件elf<br>读头，寻道<br>连续的0&#x2F;1串，起来就是</p>
+<p>本质上就是视角上的不同。</p>
+<ul>
+<li><p>offset n<br>bytes</p>
+</li>
+<li><p>offset </p>
+</li>
+<li><p>offset 0</p>
+</li>
+</ul>
+<ol>
+<li>disk address 即 offset 0 但是无法读到大小？</li>
+</ol>
+<p>ELF : magic number</p>
+<p>0-&gt; header -&gt; section header table</p>
+<p>大家好，今天主要讨论静态链接。我将会从符号定位、符号解析、以及重定位三个方面来介绍静态链接。符号定位主要讨论的是Linux如何利用ELF文件格式来定位函数和全局变量。符号解析主要讨论多个可重定位文件链接到一起时如何解析符号，遇到多重定义符号怎么处理等内容。重定位，主要讨论多个可重定位文件链接成可执行程序时如何修正全局变量和函数调用的调用地址。OK，废话不多说。那我们就开始吧。</p>
+<p>我们将会使用这个例子，贯穿整个静态链接的介绍。这个例子很简单，从csapp这本书摘抄出来的。首先有一个sum函数，计算一个数组的和。有一个全局的array数组，里面有1和2两个数据。一个main函数，调用sum函数，计算array数组的和。我们将这个文件进行预处理，编译，汇编最终生成了一个main.o的文件。在计算机中，一个文件其实就是字节序列，就是一些01串而已。那么如何从main.o这个01串中定位到array符号的呢？array中包含的数据到底是怎么存放在main.o这个文件中呢？</p>
+<p>在Linux中像main.o这种目标文件是被组织成一种特殊的格式，叫做<br>Executabl 可执行<br>Linkable 可链接<br>Format 格式<br>简称ELF格式。<br>这张图就展现了一个elf文件格式的基本结构。<br>最开始的offset 0就是这个文件开始的地方。文件开始有一个elf header。之后还有一些.text 段.data 段等。最后还有一个Section header table，就叫做节头表吧。它是描述.text .data节的。这张图已经给了ELF文件大概的全景图，接下来会分别介绍其中的细节。首先介绍一个ELF Header。只有解析了elf header之后，才能根据其中的内容解析elf文件的其他部分。<br>(hexdump -C main.o 看一下整体的预览。)<br>对于ELF，首部的信息包括文件类型、机器类型等信息。在Linux读取ELF文件时，Linux将ELF Header从Byte翻译成内存中的数据结构：这个结构体就像这张PPT展示的一样。通常一个elf header中会存放这么些个东西，这个结构体是从&#x2F;usr&#x2F;bin&#x2F;elf.h摘抄出来的。<br>每个项目列出来讲一讲。<br>e_indent<br>e_type<br>e_machine<br>e_version<br>e_entry<br>e_phoff<br>e_shoff<br>e_flags<br>e_ehsize<br>e_phentsize<br>e_phnum<br>e_shentsize<br>e_shnum<br>e_shstrndx<br>我们需要重点关注的是e_shoff, e_ensize e_shentsize e_shnum 变量。<br>&#x2F;&#x2F; 应该需要吧elf.h 和hexdump之后的文件放上去。对照着讲。结合着讲。<br>起始位置的16个字节为magic number，在这之后偏移2+2+4+8+8&#x3D;24个字节之后，为e_shoff，是section header table 的偏移量。数值为0x280 &#x3D; 640，在这之后，对e_shoff偏移4字节是e_ehsize&#x3D;0x40 表示elf header 的长度，即64个字节。我们可以看到整个elf_header 是64个字节，算得非常准确。最后是e_shnum &#x3D; 0x0d &#x3D; 13个section，字符串表的索引是12.好了我们，已经人眼识别，将整个elf header解析出来，接下来，我们用一个readelf工具，直接将header解析出来。</p>
+<p>使用readelf -h main.o就可以将main.o的elf header解析出来了。划线的地方是需要重点关注的地方。使用readelf工具我们就可以更清楚的看到，section header table的偏移量，elf文件头的大小，每一个section header table的entry 大小。一个有多少个section header table。</p>
+<p>OK，根据目前我们解析得到的内容，可以画出一个elf文件现在大概这样的。首先，有64Bytes的ELF header。在header中，根据e_shoff可以找到SHT的位置。根据e_shentnum我们可以知道一个有多少个SHT有多少个表项。根据e_shentsize可以知道SHT每个表项的大小。至此，我们可以计算出整个elf文件的大小。<br>e_shoff + e_shentnum * e_shentsize &#x3D; 1472字节。</p>
+<p>接下来把目光放到section header table中。这个结构体就是描述section header table的。<br>SHT描述了ELF中不同的节，包括数据节、代码节等。这些Section中的数据是由编译器生成的，按照section的组织写入到磁盘上的ELF文件中。SHT的每一项都可以被数据结构ELF64_Shdr所描述。<br>列出来，讲一讲。<br>其中包含，<br>sh_name 它是string table的index<br>sh_type: section type:<br>sh_flags: section flasg</p>
+<p>&#x2F;&#x2F; 需要结合代码展示一个hexdump的结构。</p>
+<p>接下来我们就和解析ELF Header一样来人眼解析一个这个结构体。和解析ELF Header一样，对于SHT的每一个表项，按照上一页提到的数据结构逐个Byte解析，我们就可以得到.text对ELF文件的偏移：.sh_offset &#x3D; 0x00000000040。回忆起我们先前得知ELF header的大小就是0x40，也即64Bytes，因此.text所处的位置正是Header之后。并且，它的大小为.sh_size - 0x0000000024</p>
+<p>同样的，我们可以使用readelf作弊一下，可以将所有的section header table列出来。<br>值得一提的是，SHT中总存在[0]项目，它被视为未定义的符号所在Section，SHN_UNDEF，也就是0.</p>
+<p>OK，现在elf header和section header table已经解析完毕了，大概可以画出这么一张图。<br>首先解析，elf_header, 我们得到section header table的位置，解析section header table之后我们可以得到各个section 在文件中的位置，以及它的大小。</p>
+<p>解析来我们把目光放在.symbol section中。关于什么是符号的问题。<br>由模块m定义并能被其他模块引用的全局符号。<br>由其他模块定义并被模块m引用的全局符号。<br>只被模块m定义和引用的局部符号。</p>
+<p>类似elf header 和 section header table。符号表也是由一个结构体来描述的。<br>st_name: 符号的名字，它是字符串表的索引。<br>st_info: 高四位是bind信息，低四位是type信息。<br>st_other: 保留信息<br>st_shndx: 该符号保存在某个section的index<br>st_value: 保存在某个section的offset<br>st_size: 符号的大小。</p>
+<p>符号的绑定类型主要有：<br>STB_LOCAL<br>STB_GLOBAL<br>STB_WEAK</p>
+<p>符号的type主要有：<br>NOTYPE<br>OBJECT<br>FUNC</p>
+<p>同样的我们可以肉眼解析一个符号。例如，开头提到的array<br>st_name 是0x08，在字符串表偏移8个字节的位置，<br>bind是1： 为STB_GLOBAL<br>type是1：为STT_OBJECT<br>st_shndx: 是3 说明这个符号存储在.data节<br>st_value是0，说明array在.data节开始的位置。<br>st_size是0x08, 说明array符号大小为8个字节。</p>
+<p>自此，我们可以知道array符号在elf文件位置的计算公式：<br>start：.data节在elf文件的偏移量+st_value<br>end: start+st_size<br>最终我们找到了array符号的存储位置。</p>
+<p>同样的，也可以使用readelf工具作弊一下，使用readelf -s 命令就可以将符号表的信息列举出来。</p>
+<p>首先解析，elf_header, 我们得到section header table的位置，解析section header table<br>我们可以得到.symtab的位置，解析.symtab就可以得到各个符号在文件中的存储位置。自此，终于可以成功定位符号了。因而我们解决了开头提到的符号定位问题。</p>
+<p>接下来介绍符号解析问题。</p>
+<p>如何design file？？？？ 疯狂搞链接，套娃。。。。之类的。很像MP4文件格式，<br>所有的文件格式都是按照树，按照图去组织的。</p>
+<p>external intenal层</p>
+<p>如何知道符号表在文件中的哪一个位置。</p>
+<h1 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h1><h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2><ol>
+<li><p>size limit</p>
+</li>
+<li><p>速度</p>
+</li>
+<li></li>
+<li><p>memory wall</p>
+</li>
+<li><p>share: consistant 一致性问题 </p>
+</li>
+<li><p>vapa</p>
+</li>
+<li><p>cache</p>
+</li>
+</ol>
+<p>core<br>    L1 cache<br>        data<br>        inst<br>    L2 cache<br>    L3 cache L3 所有核共享</p>
+<p>cache 三元组<br>CT, CI, CO<br>cache tag, cache index, cache offset<br>40, 6, 6</p>
+<h1 id="cache-1"><a href="#cache-1" class="headerlink" title="cache"></a>cache</h1><h1 id="RAM"><a href="#RAM" class="headerlink" title="RAM"></a>RAM</h1><ul>
+<li>SRAM<br>  for cache</li>
+<li>DRAM<br>  for main memory</li>
+</ul>
+<p>Due to bistatble natue, the circuit will return to statble disturbance is removed</p>
+<p>Each transfer of data between CPU and memory is accomplished with a series of<br>steps called a bus transaction.</p>
+<p>Locality 局部性 程序的局部性</p>
+<p>programs with good locality run faseter than programs with poor locality</p>
+<p>true sharing 问题的产生。<br>多进程编程的true share的问题</p>
+<p>cache Coherence</p>
+<p>m bits that form M &#x3D; 2^m<br>S &#x3D; 2^s cache sets<br>Each set consists of E cache lines<br>Each line consists of a data block of B &#x3D; 2^b</p>
+<p>Address<br>| t bits | s bits | b bits |<br>| tag    | set    | block  |<br>hit or miss the requested word </p>
+<ol>
+<li>set selection</li>
+<li>line matching</li>
+<li>workd extraction</li>
+</ol>
+<p>&#x2F;&#x2F; 缓存冲突。</p>
+<h2 id="conflit-miss"><a href="#conflit-miss" class="headerlink" title="conflit miss"></a>conflit miss</h2><p>thrashing </p>
+<p>APIC<br>advanced programable interrupt controller</p>
+<ol>
+<li>extend interrupt</li>
+<li>trap&#x2F;system call 执行完指向下一个指令</li>
+<li>Fault 执行完重新执行当前命令。</li>
+<li>abort 直接挂掉。</li>
+</ol>
+<p>context switch 在内核中进行<br>trap：定时器，记录， trap syscall</p>
+<p>exception handler<br>syscall handler</p>
+<h2 id="ssespeflagscseip"><a href="#ssespeflagscseip" class="headerlink" title="ssespeflagscseip"></a>ss<br>esp<br>eflags<br>cs<br>eip</h2><p>error code</p>
+<p>以上为Trap Frame</p>
+<p>保存用户的一些寄存器。<br>user register 保存</p>
+<p>load the segment selector for the new code segment and the new instruction pointer</p>
+<h1 id="Exception-Control-Flow"><a href="#Exception-Control-Flow" class="headerlink" title="Exception Control Flow"></a>Exception Control Flow</h1><ul>
+<li>exception</li>
+<li>system call</li>
+<li>singnal</li>
+<li>nolocal jump</li>
+</ul>
+<p>exception finish happened things:</p>
+<ul>
+<li>goto I_curr</li>
+<li>goto I_next</li>
+<li>abort</li>
+</ul>
+<p>exception device to four class</p>
+<ol>
+<li>interrupts   async</li>
+<li>traps sync</li>
+<li>faults sync If the handler is able to correct the error condition, it returns control to the faulting instruction, thereby re-executing it. </li>
+<li>aborts sync</li>
+</ol>
+<p>system call has a jump table in linux kernel</p>
+<p>进程提供每个程序私有地址空间。</p>
+<p>context switch:<br>(1) saves the context of the current process,<br>(2) restores the saved context of some previously preempted process, and<br>(3) passes control to this newly restored process.</p>
+<p>fork COW 机制。<br>是否需要</p>
+<p>fork 的COW机制。</p>
+<p>control flow isolate</p>
+<p>memory physical isolate</p>
+<p>virtualization CPU virtualization memory</p>
+<p>when the kernel switched a process p from kernel mode to<br>user mode, it checks the set of unblocked pending sinals</p>
+<p>writing a correct Signal handlers<br>handler run concurrently with the main program ahd share the same global cariables, and thus can interfere with the main program and wich other handlers.</p>
+<p>Because the pending bit vector contains exactly one bit for each type of signal,<br>there can be at most one pending signal of any particular type. </p>
+<p>at least one signal has arrived<br>信号并不能排队处理，<br>signals cannot be used to count the occurrence of events in other processes</p>
+<p>System calls can be interrupted.<br>programmers must include code the manually restart<br>interrupted system calls</p>
+<p>Figure 8.40 shows one way to eliminate the race in Figure. By<br>blocking SIGCHILD signals before the call to fork and then unblocking.</p>
+<p>在执行前先屏蔽子进程信号等操作。</p>
+<p>setjump call<br>saves the current calling environment in the env buffer, for later use by longjmp, and return().</p>
+<p>longjump may be cause memory leak</p>
+<p>setlongjump并不是信号安全函数。需要小心谨慎的在回调函数使用信号安全函数。</p>
+<p>将要会用户态的时候会去检查signal</p>
+<p>do_signal: kernel mode</p>
+<p>signal handler: user mode</p>
+<p>usr trap in kernel</p>
+<p>&#x2F;&#x2F; trapfrme_t<br>&#x2F;&#x2F; interrupt on kernel stack<br>&#x2F;&#x2F; save user frame 保护用户态的内核frame</p>
+<p>&#x2F;&#x2F; push user frame context</p>
+<p>&#x2F;&#x2F; recover user frame context</p>
+<p>&#x2F;&#x2F; 维护内核的kernel stack rsp<br>&#x2F;&#x2F; 完成syscall, 完成内核之后就是安全的。</p>
+<p>&#x2F;&#x2F; 为什么需要引入外部中断呢？</p>
+<p>&#x2F;&#x2F; wait for system calls</p>
+<p>&#x2F;&#x2F; time, the creation of god</p>
+<p>static uint64_t global_time &#x3D; 0;<br>&#x2F;&#x2F; every time run a isa time plus one</p>
+<p>&#x2F;&#x2F; 1. syscall: trap<br>&#x2F;&#x2F; 2. timer async extend tirggerd<br>&#x2F;&#x2F; 3. page fault. sync</p>
+<p>&#x2F;&#x2F; 进程上下文切换。<br>&#x2F;&#x2F; context switch</p>
+<p>&#x2F;&#x2F; context switch</p>
+<p>&#x2F;&#x2F; page table</p>
+<p>&#x2F;&#x2F;1. no page fault<br>va2pa normal func call once return once</p>
+<p>&#x2F;&#x2F; 2. page fault<br>va2pa call once never return.</p>
+<p>&#x2F;&#x2F; 1. 时间器的中断。<br>timer handler 无影响</p>
+<p>&#x2F;&#x2F; 2. system call<br>syscall 这个也没有影响</p>
+<p>&#x2F;&#x2F; 3. page fault<br>不适用nolocaljump不能解决这个问题。<br>发生pagefault，需要在执行一遍。</p>
+<p>Descriptor table.<br>File table<br>v-node table</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/20/computer_science/platform%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8/" rel="prev" title="platform设备驱动">
+                  <i class="fa fa-angle-left"></i> platform设备驱动
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/03/06/computer_science/STM32/" rel="next" title="STM32">
+                  STM32 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2022/01/02/computer_science/csapp/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

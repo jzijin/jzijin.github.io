@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Overview iic物理总线 SCL:时钟线，数据收发同步sysfs文件系统。  kobject 对象 sysfs的目录项关联起来软件与硬件代码分离，提高程序复用性  device - 关联硬件代码 driver_devices - 关联软件代码 bus_type - 统一管理、设置match匹配规则设备驱动模型体现分离思想。  class_create()device_create()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IIC Driver">
+<meta property="og:url" content="http://example.com/2022/09/19/computer_science/IIC-Driver/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="Overview iic物理总线 SCL:时钟线，数据收发同步sysfs文件系统。  kobject 对象 sysfs的目录项关联起来软件与硬件代码分离，提高程序复用性  device - 关联硬件代码 driver_devices - 关联软件代码 bus_type - 统一管理、设置match匹配规则设备驱动模型体现分离思想。  class_create()device_create()">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-19T14:28:39.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2022/09/19/computer_science/IIC-Driver/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/09/19/computer_science/IIC-Driver/","path":"2022/09/19/computer_science/IIC-Driver/","title":"IIC Driver"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IIC Driver | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#iic%E7%89%A9%E7%90%86%E6%80%BB%E7%BA%BF"><span class="nav-number">2.</span> <span class="nav-text">iic物理总线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#kobject-%E5%AF%B9%E8%B1%A1-sysfs%E7%9A%84%E7%9B%AE%E5%BD%95%E9%A1%B9%E5%85%B3%E8%81%94%E8%B5%B7%E6%9D%A5"><span class="nav-number">3.</span> <span class="nav-text">kobject 对象 sysfs的目录项关联起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Model"><span class="nav-number">4.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Training-Detail"><span class="nav-number">5.</span> <span class="nav-text">Training Detail</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PyTorch-Code"><span class="nav-number">6.</span> <span class="nav-text">PyTorch Code</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%AE%BE%E5%A4%87%E6%A0%91"><span class="nav-number">8.</span> <span class="nav-text">什么是设备树</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dts%E3%80%81dtb%E5%92%8Cdtc%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">9.</span> <span class="nav-text">dts、dtb和dtc的关系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E7%A7%BB%E6%A4%8D-%E7%83%A7%E5%BD%95%E7%B3%BB%E7%BB%9F"><span class="nav-number">10.</span> <span class="nav-text">系统移植 烧录系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Uboot%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95%E5%88%86%E6%9E%90"><span class="nav-number">11.</span> <span class="nav-text">Uboot源码目录分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Uboot%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">12.</span> <span class="nav-text">Uboot启动流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#u-boot-lds%E8%AF%A6%E8%A7%A3"><span class="nav-number">12.1.</span> <span class="nav-text">u-boot.lds详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lowlevel-init%E5%87%BD%E6%95%B0"><span class="nav-number">12.1.1.</span> <span class="nav-text">lowlevel_init函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#main-%E5%87%BD%E6%95%B0"><span class="nav-number">12.1.2.</span> <span class="nav-text">_main 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#board-init-f%E5%87%BD%E6%95%B0"><span class="nav-number">12.1.3.</span> <span class="nav-text">board_init_f函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setup-dest-addr"><span class="nav-number">12.1.4.</span> <span class="nav-text">setup_dest_addr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#relocate-code-%E9%87%8D%E5%AE%9A%E4%BD%8D%E4%BB%A3%E7%A0%81%E3%80%82"><span class="nav-number">12.1.5.</span> <span class="nav-text">relocate_code 重定位代码。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#relocate-vectors"><span class="nav-number">12.1.6.</span> <span class="nav-text">relocate_vectors</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#board-init-r%E5%87%BD%E6%95%B0"><span class="nav-number">12.1.7.</span> <span class="nav-text">board_init_r函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#run-main-loop%E5%87%BD%E6%95%B0"><span class="nav-number">12.1.8.</span> <span class="nav-text">run_main_loop函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bootz%E5%90%AF%E5%8A%A8linux%E5%86%85%E6%A0%B8%E8%BF%87%E7%A8%8B"><span class="nav-number">13.</span> <span class="nav-text">bootz启动linux内核过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#images%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-number">13.1.</span> <span class="nav-text">images全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#do-bootz%E5%87%BD%E6%95%B0"><span class="nav-number">13.2.</span> <span class="nav-text">do_bootz函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NXP%E5%AE%98%E6%96%B9uboot%E7%9A%84%E7%BC%96%E8%AF%91%E5%92%8C%E6%B5%8B%E8%AF%95"><span class="nav-number">14.</span> <span class="nav-text">NXP官方uboot的编译和测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A7%BB%E6%A4%8Dnxp%E5%AE%98%E6%96%B9uboot"><span class="nav-number">15.</span> <span class="nav-text">移植nxp官方uboot</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#linux%E5%86%85%E6%A0%B8%E7%9B%AE%E5%BD%95%E5%88%86%E6%9E%90"><span class="nav-number">16.</span> <span class="nav-text">linux内核目录分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#linux%E5%86%85%E6%A0%B8%E7%9A%84%E9%A1%B6%E5%B1%82Makefile"><span class="nav-number">16.1.</span> <span class="nav-text">linux内核的顶层Makefile</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Linux%E9%A1%B6%E5%B1%82Makefile%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">16.1.0.0.1.</span> <span class="nav-text">Linux顶层Makefile基本流程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Make-xxx-defconfig%E8%BF%87%E7%A8%8B"><span class="nav-number">16.1.0.0.2.</span> <span class="nav-text">Make xxx_defconfig过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#make%E8%BF%87%E7%A8%8B"><span class="nav-number">16.1.0.0.3.</span> <span class="nav-text">make过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#built-in-o-%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91%E7%94%9F%E6%88%90%E8%BF%87%E7%A8%8B"><span class="nav-number">16.1.0.0.4.</span> <span class="nav-text">built-in.o 文件编译生成过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#make-zImage%E8%BF%87%E7%A8%8B"><span class="nav-number">16.1.0.0.5.</span> <span class="nav-text">make zImage过程</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-%E5%86%85%E6%A0%B8%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E7%AE%80%E4%BB%8B"><span class="nav-number">17.</span> <span class="nav-text">Linux 内核启动流程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vmlinux-lds%E7%AE%80%E4%BB%8B"><span class="nav-number">17.1.</span> <span class="nav-text">vmlinux.lds简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E5%85%A5%E5%8F%A3stext"><span class="nav-number">17.2.</span> <span class="nav-text">linux 入口stext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#start-kernel%E5%87%BD%E6%95%B0"><span class="nav-number">17.3.</span> <span class="nav-text">start_kernel函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E5%86%85%E6%A0%B8%E7%A7%BB%E6%A4%8D"><span class="nav-number">18.</span> <span class="nav-text">Linux内核移植</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%9E%84%E5%BB%BArootfs"><span class="nav-number">19.</span> <span class="nav-text">根文件系统构建rootfs</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%AE%80%E4%BB%8B"><span class="nav-number">19.1.</span> <span class="nav-text">根文件系统简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#busybox-%E6%9E%84%E5%BB%BA%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">19.2.</span> <span class="nav-text">busybox 构建根文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%88%9D%E6%AD%A5%E6%B5%8B%E8%AF%95"><span class="nav-number">19.3.</span> <span class="nav-text">根文件系统初步测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%8C%E5%96%84"><span class="nav-number">19.4.</span> <span class="nav-text">根文件系统的完善</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#linux-%E4%B8%AD%E6%96%AD"><span class="nav-number">20.</span> <span class="nav-text">linux 中断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E4%B8%8A%E5%8D%8A%E9%83%A8%E5%92%8C%E4%B8%8B%E5%8D%8A%E9%83%A8"><span class="nav-number">20.1.</span> <span class="nav-text">中断上半部和下半部</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AF%E4%B8%AD%E6%96%AD"><span class="nav-number">20.1.1.</span> <span class="nav-text">软中断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tasklet"><span class="nav-number">20.1.2.</span> <span class="nav-text">tasklet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E9%98%9F%E5%88%97"><span class="nav-number">20.1.3.</span> <span class="nav-text">工作队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E7%BA%BF%E7%A8%8B%E5%8C%96"><span class="nav-number">20.1.4.</span> <span class="nav-text">中断线程化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%8F%8F%E8%BF%B0%E4%B8%AD%E6%96%AD%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF"><span class="nav-number">20.1.5.</span> <span class="nav-text">如何在设备树中描述中断相关信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PWM%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">20.2.</span> <span class="nav-text">PWM子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PWM-%E9%A9%B1%E5%8A%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">20.2.1.</span> <span class="nav-text">PWM 驱动流程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Regmap-API%E7%AE%80%E6%B4%81"><span class="nav-number">21.</span> <span class="nav-text">Regmap API简洁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E5%86%85%E6%A0%B8%E5%AE%9A%E6%97%B6%E5%99%A8"><span class="nav-number">21.1.</span> <span class="nav-text">Linux 内核定时器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E9%98%BB%E5%A1%9E%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9EIO"><span class="nav-number">21.2.</span> <span class="nav-text">Linux 阻塞和非阻塞IO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E7%BD%91%E7%BB%9C%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8"><span class="nav-number">21.3.</span> <span class="nav-text">Linux 网络设备驱动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PHY%E8%8A%AF%E7%89%87%E8%AF%A6%E8%A7%A3"><span class="nav-number">21.3.1.</span> <span class="nav-text">PHY芯片详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#net-device-ops%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">21.3.2.</span> <span class="nav-text">net_device_ops结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sk-buff-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">21.3.3.</span> <span class="nav-text">sk_buff 结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9CNAPI%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6"><span class="nav-number">21.3.4.</span> <span class="nav-text">网络NAPI处理机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E9%A9%B1%E5%8A%A8%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E3%80%82"><span class="nav-number">21.3.5.</span> <span class="nav-text">网络驱动源码解析。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PHY-%E9%A9%B1%E5%8A%A8"><span class="nav-number">21.4.</span> <span class="nav-text">PHY 驱动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sensor-HAL"><span class="nav-number">21.5.</span> <span class="nav-text">sensor HAL</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/09/19/computer_science/IIC-Driver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IIC Driver | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IIC Driver
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-09-19 22:28:39" itemprop="dateCreated datePublished" datetime="2022-09-19T22:28:39+08:00">2022-09-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2022/09/19/computer_science/IIC-Driver/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2022/09/19/computer_science/IIC-Driver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>26k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>43 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><!---more--->
+<h1 id="iic物理总线"><a href="#iic物理总线" class="headerlink" title="iic物理总线"></a>iic物理总线</h1><ul>
+<li>SCL:时钟线，数据收发同步<br>sysfs文件系统。</li>
+</ul>
+<h1 id="kobject-对象-sysfs的目录项关联起来"><a href="#kobject-对象-sysfs的目录项关联起来" class="headerlink" title="kobject 对象 sysfs的目录项关联起来"></a>kobject 对象 sysfs的目录项关联起来</h1><p>软件与硬件代码分离，提高程序复用性</p>
+<ul>
+<li>device - 关联硬件代码</li>
+<li>driver_devices - 关联软件代码</li>
+<li>bus_type - 统一管理、设置match匹配规则<br>设备驱动模型体现分离思想。</li>
+</ul>
+<p>class_create()<br>device_create()<br>    kobject_uevent</p>
+<p>udevs创建/dev/xxx 的属性文件了。</p>
+<p>bus_register：<br>总线可以自己创建，注册。</p>
+<p>设备号的组成与哈希表</p>
+<p>Linux 内核使用哈希表进行散列表的管理。</p>
+<p>从源码角度看如何管理设备号</p>
+<p>主设备号为0，动态分配号 255~234</p>
+<p>其次使用：384~511</p>
+<p>Linux 最大支持512的主设备号。<br>数组+链表</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">专门管理字符设备</span><br><span class="line"><span class="keyword">struct</span> <span class="keyword">cdev</span> {</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">哈希表 probe</span><br><span class="line">kobj_map</span><br></pre></td></tr></table></figure>
+<p>传统设备树<br>批量管理硬件资源，机制僵化</p>
+<p>插件设备树<br>模块化管理硬件资源，灵活定制</p>
+<p>如何创建一个设备文件</p>
+<p>mknod</p>
+<p>iomuxc节点<br>汇总所需引脚的配置信息<br>pinctrl子系统预存iomux节点信息</p>
+<p>iomuxc节点。</p>
+<p>iomuxc: iomuxc@20e0000 {<br>    compatible = “<br>    reg = &lt;&gt;<br>}</p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><h1 id="Training-Detail"><a href="#Training-Detail" class="headerlink" title="Training Detail"></a>Training Detail</h1><h1 id="PyTorch-Code"><a href="#PyTorch-Code" class="headerlink" title="PyTorch Code"></a>PyTorch Code</h1><h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="">论文地址</a><br><a href="">参考代码</a></p>
+<p>第05节_device_node转换为platform_device</p>
+<p>dts -&gt; dtb -&gt; device_node -&gt; platform_device</p>
+<p>两个问题:<br>a. 哪些device_node可以转换为platform_device?<br>根节点下含有compatile属性的子节点<br>如果一个结点的compatile属性含有这些特殊的值(“simple-bus”,”simple-mfd”,”isa”,”arm,amba-bus”)之一, 那么它的子结点(需含compatile属性)也可以转换为platform_device<br>i2c, spi等总线节点下的子节点, 应该交给对应的总线驱动程序来处理, 它们不应该被转换为platform_device</p>
+<p>b. 怎么转换?<br>platform_device中含有resource数组, 它来自device_node的reg, interrupts属性;<br>platform_device.dev.of_node指向device_node, 可以通过它获得其他属性</p>
+<p>本节总结:</p>
+<p>a. 内核函数of_platform_default_populate_init, 遍历device_node树, 生成platform_device<br>b. 并非所有的device_node都会转换为platform_device<br>   只有以下的device_node会转换:<br>b.1 该节点必须含有compatible属性<br>b.2 根节点的子节点(节点必须含有compatible属性)<br>b.3 含有特殊compatible属性的节点的子节点(子节点必须含有compatible属性):<br>    这些特殊的compatilbe属性为: “simple-bus”,”simple-mfd”,”isa”,”arm,amba-bus”</p>
+<p>b.4 示例:<br>    比如以下的节点,<br>    /mytest会被转换为platform_device,<br>    因为它兼容”simple-bus”, 它的子节点/mytest/mytest@0 也会被转换为platform_device</p>
+<pre><code>/i2c节点一般表示i2c控制器, 它会被转换为platform_device, 在内核中有对应的platform_driver;
+/i2c/at24c02节点不会被转换为platform_device, 它被如何处理完全由父节点的platform_driver决定, 一般是被创建为一个i2c_client。
+
+类似的也有/spi节点, 它一般也是用来表示SPI控制器, 它会被转换为platform_device, 在内核中有对应的platform_driver;
+/spi/flash@0节点不会被转换为platform_device, 它被如何处理完全由父节点的platform_driver决定, 一般是被创建为一个spi_device。
+
+/ {
+      mytest {
+          compatile = "mytest", "simple-bus";
+          mytest@0 {
+                compatile = "mytest_0";
+          };
+      };
+      
+      i2c {
+          compatile = "samsung,i2c";
+          at24c02 {
+                compatile = "at24c02";                      
+          };
+      };
+
+      spi {
+          compatile = "samsung,spi";              
+          flash@0 {
+                compatible = "winbond,w25q32dw";
+                spi-max-frequency = &lt;25000000&gt;;
+                reg = &lt;0&gt;;
+              };
+      };
+  };
+</code></pre>
+<p>函数调用过程:<br>a. of_platform_default_populate_init (drivers/of/platform.c) 被调用到过程:<br>start_kernel     // init/main.c<br>    rest_init();<br>        pid = kernel_thread(kernel_init, NULL, CLONE_FS);<br>                    kernel_init<br>                        kernel_init_freeable();<br>                            do_basic_setup();<br>                                do_initcalls();<br>                                    for (level = 0; level &lt; ARRAY_SIZE(initcall_levels) - 1; level++)<br>                                        do_initcall_level(level);  // 比如 do_initcall_level(3)<br>                                                                               for (fn = initcall_levels[3]; fn &lt; initcall_levels[3+1]; fn++)<br>                                                                                    do_one_initcall(initcall_from_entry(fn));  // 就是调用”arch_initcall_sync(fn)”中定义的fn函数</p>
+<p>b. of_platform_default_populate_init  (drivers/of/platform.c) 生成platform_device的过程:<br>of_platform_default_populate_init<br>    of_platform_default_populate(NULL, NULL, NULL);<br>        of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL)<br>            for_each_child_of_node(root, child) {<br>                rc = of_platform_bus_create(child, matches, lookup, parent, true);  // 调用过程看下面<br>                            dev = of_device_alloc(np, bus_id, parent);   // 根据device_node节点的属性设置platform_device的resource<br>                if (rc) {<br>                    of_node_put(child);<br>                    break;<br>                }<br>            }</p>
+<p>c. of_platform_bus_create(bus, matches, …)的调用过程(处理bus节点生成platform_devie, 并决定是否处理它的子节点):<br>        dev = of_platform_device_create_pdata(bus, bus_id, platform_data, parent);  // 生成bus节点的platform_device结构体<br>        if (!dev || !of_match_node(matches, bus))  // 如果bus节点的compatile属性不吻合matches成表, 就不处理它的子节点<br>            return 0;</p>
+<pre><code>    for_each_child_of_node(bus, child) {    // 取出每一个子节点
+        pr_debug("   create child: %pOF\n", child);
+        rc = of_platform_bus_create(child, matches, lookup, &amp;dev-&gt;dev, strict);   // 处理它的子节点, of_platform_bus_create是一个递归调用
+        if (rc) {
+            of_node_put(child);
+            break;
+        }
+    }
+    
+</code></pre>
+<p>d. I2C总线节点的处理过程:<br>   /i2c节点一般表示i2c控制器, 它会被转换为platform_device, 在内核中有对应的platform_driver;<br>   platform_driver的probe函数中会调用i2c_add_numbered_adapter:</p>
+<p>   i2c_add_numbered_adapter   // drivers/i2c/i2c-core-base.c<br>        __i2c_add_numbered_adapter<br>            i2c_register_adapter<br>                of_i2c_register_devices(adap);   // drivers/i2c/i2c-core-of.c<br>                    for_each_available_child_of_node(bus, node) {<br>                        client = of_i2c_register_device(adap, node);<br>                                        client = i2c_new_device(adap, &amp;info);   // 设备树中的i2c子节点被转换为i2c_client<br>                    }</p>
+<p>e. SPI总线节点的处理过程:<br>   /spi节点一般表示spi控制器, 它会被转换为platform_device, 在内核中有对应的platform_driver;<br>   platform_driver的probe函数中会调用spi_register_master, 即spi_register_controller:</p>
+<p>   spi_register_controller        // drivers/spi/spi.c<br>        of_register_spi_devices   // drivers/spi/spi.c<br>            for_each_available_child_of_node(ctlr-&gt;dev.of_node, nc) {<br>                spi = of_register_spi_device(ctlr, nc);  // 设备树中的spi子节点被转换为spi_device<br>                                spi = spi_alloc_device(ctlr);<br>                                rc = of_spi_parse_dt(ctlr, spi, nc);<br>                                rc = spi_add_device(spi);<br>            }</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">graph TB</span><br><span class="line">A(开始)</span><br><span class="line">B[打开冰箱门]</span><br><span class="line">C{"冰箱小不小？"}</span><br><span class="line">D((连接))</span><br></pre></td></tr></table></figure>
+
+<p>imux6ull.dtsi</p>
+<p>iomuxc</p>
+<p>imx_pinctrl和pinctrl_dev：引脚名字和编号应该存在哪里？</p>
+<p>imx6ul_pinctrl_info<br>struct imx__soc_info</p>
+<p>imx6ul_pinctrl_pads 结构编号</p>
+<p>imx_pinctrl_soc_info imx6ul_pinctrl_info</p>
+<p>引脚的名字和编号该存在哪里</p>
+<p>为引脚配置分配内存<br>每个引脚的使用状态。</p>
+<p>imx_pinctrl_probe </p>
+<p>imx_pinctrl</p>
+<p>pctrlops = imx_pctrl_ops<br>pmxops = imx_pmx_ops<br>devm_pinctrl_register_and_init</p>
+<p>imx_pinctrl_probe_dt</p>
+<p>pinctrl_enable</p>
+<p>pinctrl_desc</p>
+<p>pinctrl_init_controller</p>
+<p>使用基数树来初始化<br>INIT_RADIX_TREE</p>
+<p>pinctrl_register_pins</p>
+<p>pinctrl_register_one_pin</p>
+<p>pin_desc_get</p>
+<p>pin function 和  pin group:<br>iomuxc节点解析始末</p>
+<p>iomuxc 节点层次<br>iomux<br>    function<br>        group<br>            fsl,pins = &lt;&gt;;</p>
+<p>iomuxc:pinctrl子系统的设备树节点<br>function；芯片具有的外设功能，一个功能对应一个或过个IO组配置信息<br>group：io组的每个IO的配置信息<br>fsl,pins:imx6ull中，功能和IO组的表示属性</p>
+<p>imx_pinctrl_porobe_dt函数</p>
+<p>iomux节点<br>// 获取设备树相关的<br>struct device_node *np = pdev-&gt;dev.of_node</p>
+<p>flat_funcs = imx_pincrl_dt_is_flat_functions函数</p>
+<p>flat_funcs<br>imx_pinctrl_parse_functions<br>pinmux_generic_get_function</p>
+<p>function_desc<br>    np-&gt;name iomux节点名</p>
+<p>group_desc<br>    np-&gt;name<br>    int *pins<br>    int num_pins<br>    void *data</p>
+<p>imx_pin<br>    unsigned int pin;<br>    int *pins<br>    union pin_conf</p>
+<p>list = of_get_property</p>
+<p>imx_pinctrl_parse_groups</p>
+<p>imx_pinctrl_parse_pin_mem</p>
+<p>pin state: pinctrl-names</p>
+<p>存储全部所需的引脚配置信息<br>虚拟 外设<br>    设置pin state数量和类型<br>    设置状态的pin group<br>pin state-&gt; pin group 一对多<br>pin group-&gt; pin 一对多</p>
+<p>pinctrl_enable<br>    create_pinctrl 函数</p>
+<p>pinctrl_dt_to_map<br>    “pinctrl-%d” for 循环所有的属性</p>
+<p>mp_config = dt_to_map_one_conf</p>
+<p>of_property_read_string</p>
+<p>dt_to_map_<br>dt_node_to_map</p>
+<p>pinctrl_map</p>
+<p>imx_dt_node_to_map</p>
+<p>type = PIN_MAP_TYPE_MUX_GROUP</p>
+<p>解析设备树，提取相关的信息。</p>
+<p>pinctrl_setting<br>pinctrl_map 保存了所有pin state所需要的pin group的信息</p>
+<p>group转化成setting信息<br>pinctrl_map-&gt;pinctrl_setting</p>
+<p>pinctrl 子系统的引脚设置接口</p>
+<p>pinctrl子系统试验：RGB灯引脚初始化过程。</p>
+<p>pinctrl_bind_pins() 函数，初始化引脚。</p>
+<p>gpio1节点：GPIO子系统</p>
+<p>直接使用GPIO子系统对外开放的接口就可以了</p>
+<p>interrupts<br>clocks<br>gpio-controller<br>interrupt-controller<br>#gpio-cells<br>gpio子系统借助pinctrl子系统来进行相关描述</p>
+<p>如何使用gpio子系统</p>
+<p>of_find_node_by_path<br>of_get_named_gpio函数</p>
+<p>gpio_request()函数<br>gpio_free()函数<br>gpio_direction_output函数设置gpio为输出函数<br>gpio_direction_input设置gpio为输入函数<br>gpio_get_value()函数获取gpio的电平值<br>gpio_set_value()设置gpio的高低电平</p>
+<p>gpio初始化仍然要使用pinctrl子系统。</p>
+<p>十面埋伏的并发<br>硬件同步原语：由计算机硬件提供的一组院子操作，具有不可分割性，避免并行运算执行错误。</p>
+<p>原子操作接口<br>ATOMIC_INIT</p>
+<p>只能做计数操作，保护的东西太少<br>atomic_set 用于设置原子变量的值<br>atomic_read<br>atomic_add/atomic_sub</p>
+<p>位原子操作函数<br>set_bit<br>clear_bit<br>change_bit</p>
+<p>自旋锁<br>主要用于多核处理器</p>
+<ul>
+<li>短时期的轻量级加锁</li>
+<li>加锁失败时，原地打转、忙等待</li>
+<li>避免上下文调度、系统开销较小</li>
+</ul>
+<p>自旋锁相关API<br>定义自旋锁<br>spinlock_t s_lock;<br>spin_lock_init<br>spin_lock<br>spin_trylock<br>spin_unlock</p>
+<p>信号量<br>计数器，用来控制对公共资源的访问<br>特点：</p>
+<ul>
+<li>长时期的资源占用</li>
+<li>获取信号量失败，触发上下文调度</li>
+<li>当前进程陷入休眠，系统开销大</li>
+</ul>
+<p>sema_init<br>down // 获取信号量<br>down_trylock<br>up // 释放信号量</p>
+<p>互斥锁<br>信号量与互斥锁：同步还是独占<br>信号量</p>
+<ul>
+<li>强调信号机制（同步）</li>
+<li>生产者-消费者模型</li>
+<li>获取信号量失败，触发上下文调度</li>
+</ul>
+<p>互斥锁</p>
+<ul>
+<li>强调互斥机制</li>
+<li>独占共享资源</li>
+<li>获取互斥锁失败，触发上下文调度</li>
+</ul>
+<p>自旋锁</p>
+<ul>
+<li>加锁成本低，不释放cpu使用权</li>
+</ul>
+<p>互斥锁</p>
+<ul>
+<li>加锁成本更高(上下文切换耗时在几十纳秒到几百)</li>
+</ul>
+<p>mutex_init<br>mutex_lock<br>mutex_trylock<br>mutex_unlock</p>
+<p>// 这个是不是跟系统编程的条件变量有关系？<br>设备驱动的阻塞IO：等待队列<br>请求数据没有准备好，让该进程睡眠知道数据准备好为止。</p>
+<p>等待队列头<br>init_waitqueue_head()<br>DECLARE_WAIT_QUEUE_HEAD(name) 宏初始化的方式</p>
+<p>等待队列元素<br>DECLARE_WAITQUEUE</p>
+<p>添加等待队列<br>add_wait_queue<br>移除等待队列<br>remove_wait_queue</p>
+<p>等待事件<br>wait_event<br>wait_event_interruptible<br>wait_event_timeout</p>
+<p>等待唤醒<br>wait_up<br>wake_up_interruptible</p>
+<p>POLL 机制基本概念<br>poll()函数<br>file_operations-&gt;poll</p>
+<p>应用层poll()函数<br>异步阻塞型IO</p>
+<ul>
+<li>同步阻塞：阻塞在一个文件的读写操作上(read/write)，自己设备驱动唤醒自己</li>
+<li>异步阻塞：则色在多个文件上的轮训操作(poll)，可被多个设备驱动唤醒。<br>文件IO事件</li>
+<li>可读、可写、异常</li>
+</ul>
+<p>poll函数</p>
+<p>POLL底层机制</p>
+<p>系统调用接口<br>sys_poll<br>fs/select.c</p>
+<p>include/linux/time64.h</p>
+<p>SYSCALL_DEFINE3</p>
+<p>do_sys_poll函数</p>
+<ul>
+<li>复制用户空间pollfd数组到内核空间<ul>
+<li>分配静态数组内存(一个poll_list结构体)</li>
+<li>动态分配内存</li>
+</ul>
+</li>
+</ul>
+<p>poll_initwait()<br>init_poll_funcptr<br>__pollwait<br>do_poll函数</p>
+<p>彻底掌握poll机制<br>动手设计一个POLL试验</p>
+<p>上层APP<br>底层驱动的修改。</p>
+<p>Completion机制基本概念 完成量</p>
+<p>用于进程、线程同步，<br>完成量：一个线程的运行依赖另一个线程</p>
+<p>completion结构体<br>struct completion {<br>    unsigned int done;<br>    wait_queue_heat_t wait;<br>}<br>init_completion()宏<br>静态定义并初始化<br>DECLARE_COMPLETION宏<br>wait_for_completion()函数：completion休眠<br>wait_for_completion_timeout<br>wait_for_completion_interruptible</p>
+<p>complete唤醒<br>complete()函数 唤醒一个进程或者线程<br>complet_all()函数唤醒多个进程或者线程。</p>
+<p>kthread_woker:怎么把内核线程当工人<br>驱动传输数据</p>
+<ul>
+<li>低速数据：驱动同步传输<ul>
+<li>简单直接、传输效率低</li>
+</ul>
+</li>
+<li>高速数据：驱动交给内核来异步传输<ul>
+<li>机制复杂、无阻塞</li>
+</ul>
+</li>
+</ul>
+<p>kthread_woker结构体<br>struct kthread_work {<br>    struct list_head node;<br>    kthread_work_func_t func;<br>    struct kthread_worker *worker;<br>    int canceling;<br>}</p>
+<p>kthread_flush_work结构体<br>表示等待某个内核线程工人处理完所有工作</p>
+<p>kthread_init_worker()函数</p>
+<p>为kthread_woker创建内核线程<br>kthread_run</p>
+<p>kthread_init_work()为具体工作指定具体工作函数。</p>
+<p>kthread_queue_work交付工作给内核线程工人</p>
+<p>kthread_flush_worker 所有工作</p>
+<p>kthread_queue_work</p>
+<p>kthread_worker队列化机制</p>
+<p>kthread_worker_fn</p>
+<p>kthread_init_work函数</p>
+<p>先初始化链表节点，然后知名相关的描述</p>
+<p>SPI物理总线<br>SCK:<br>MOSI<br>MISO<br>NSS、CS: 片选信号线</p>
+<p>支持一主多从，全双工通信，最大速率可达上百MHz<br>SPI核心层</p>
+<p>spi_master<br>#define spi_master spi_controller</p>
+<p>spi_register_master</p>
+<p>spi_device： 具体的spi设备<br>spi_driver: spi的驱动</p>
+<p>spi_register_driver<br>spi_unregister_driver</p>
+<p>spi总线注册<br>spi_init<br>bus_register<br>class_register</p>
+<p>spi总线定义<br>struct bus_type spi_bus_type = {<br>    .match  = spi_match_device,<br>    .uevent = spi_uevent<br>}</p>
+<p>spi_imx_probe函数<br>保存spi寄存器起始地址，填充spi控制器回调函数</p>
+<p>核心函数<br>spi_setup 设置片选信号</p>
+<p>spi_imx_setup</p>
+<p>spi_message_init函数</p>
+<p>spi_message_add_tail</p>
+<p>spi_transfer结构体<br>struct spi_transfer {</p>
+<p>}</p>
+<p>spi_sync<br>spi_async</p>
+<p>linux 终端基础概念<br>GIC中断控制器</p>
+<p>intc:interrupt-controller@a01000<br>外设中断控制器节点<br>gpio5:gpio@20ac000 中断控制器</p>
+<p>常用函数<br>request_irq函数<br>申请中断</p>
+<p>free_irq<br>enable_irq()函数 使能中断<br>disable_irq()函数 禁止中断，等待中断执行完毕。</p>
+<p>disable_irq_nosync()函数，禁止中断</p>
+<p>gpio_request<br>gpio_direction_input 设置gpio的输入模式<br>irq_of_parse_and_map // 获取gpioxxx对应的中断号</p>
+<p>软中断和tasklet基础概念</p>
+<p>设计原则：<br>执行越快越好</p>
+<ul>
+<li>打断其他重要代码的执行</li>
+<li>中断函数通常在关中断情况下执行</li>
+</ul>
+<p>上半部<br>传统的中断处理函数</p>
+<ul>
+<li>表明中断已经被linux补货</li>
+<li>对响应时间有苛刻要求</li>
+</ul>
+<p>下半部：<br>耗时<br>数据复制<br>数据包装盒转发<br>计算时间长的数据处理<br>读取外部数据</p>
+<p>软中断<br>中断下半部的一种机制。<br>使用tasklet使用中断下半部</p>
+<p>open_softirq()函数<br>raise_softirq</p>
+<p>tasklet机制<br>给予软中断的下半部机制，运行在软中断环境下。</p>
+<p>tasklet_struct<br>tasklet_action 中断上半部给中断下半部安排任务。</p>
+<p>tasklet_init<br>tasklet_schedule</p>
+<p>中断下半部的工作队列</p>
+<p>工作队列机制<br>类似于kthread_worker</p>
+<ul>
+<li>进程上下文环境执行、允许睡眠、不影响实时性</li>
+</ul>
+<p>创建工作队列<br>alloc_workqueue()</p>
+<p>schedule_work</p>
+<p>input子系统的基本概念<br>input子系统也是字符设备，input核心层会帮我们注册input字符设备驱动。既然内核已经帮我们写好了input驱动，那我们要干啥？需要我们去完善具体的输入设备，完善输入设备的时候就要按照input子系统驱动框架的要求来。</p>
+<p>1、input_dev<br>初始化并注册input_dev, evbit表示输入事件，比如案件对应的时间就是EV_KEY，如果要连按</p>
+<p>统一管理外部输入设备</p>
+<p>按键<br>键盘<br>鼠标<br>触摸屏</p>
+<p>分层模型<br>核心层</p>
+<ul>
+<li>创建input设备累</li>
+<li>根据输入设备种类、分发事件到不同事件处理器<br>事件处理器</li>
+<li>提供具体设备的操作接口，为输入设备input dev创建具体设备文件</li>
+<li>通用事件处理器</li>
+<li>鼠标事件处理器</li>
+<li>摇杆事件处理器</li>
+</ul>
+<p>创建input设备类<br>input_init<br>    class_register<br>    register_chrdev_region</p>
+<p>input_class定义<br>INPUT_MAJOR</p>
+<p>input_dev结构体<br>struct input_dev {<br>    const char *name;<br>    const char *phys;<br>    const char *uniq;<br>    struct input_id id;</p>
+<pre><code>unsigned long propbit[BITS_TO_LONGS]
+unsigned long evbit[];
+unsigned long keybit[];
+</code></pre>
+<p>}</p>
+<p>注册、销毁输入设备<br>input_allocate_device()函数<br>input_register_device<br>input_unregister_device<br>input_free_device</p>
+<p>上报输入事件<br>input_event()函数<br>通用事件上报接口。</p>
+<p>input_report_key函数<br>input_report_rel<br>input_report_abs<br>input_sync 同步事件上报接口</p>
+<p>通用输入设备识别</p>
+<p>BIT_MASK宏</p>
+<p>input_set_capability()函数<br>void input_set_capability(struct input_dev *dev, unsigned int type, unsigned int code)</p>
+<p>多点触摸事件类型<br>include/uapi/linux/input-event-codes.h</p>
+<p>input_mt_init_slots函数<br>初始化所有触摸点slot对象</p>
+<p>input_mt_slot()函数<br>上报触摸点序号。</p>
+<p>input_mt_report_slot_state</p>
+<p>多点触摸屏的框架</p>
+<p>pwm_device结构体</p>
+<p>pwm_state结构体</p>
+<p>pwm_device<br>devm_of_pwm_get()函数<br>解析pem设备树节点信息，生成pwm_device对象</p>
+<p>配置频率和周期<br>pwm_config</p>
+<p>配置pwm极性<br>// 占空比。？？？直接控制反向？直接在 通过sysfs设置这个极性？<br>pwm_set_polarity() // 金盛大哥那个极性是否可以用这个配置极性？<br>// 是不是直接通过/sys/pwm/pwm8/polarity 极性去翻转就好了？？？？</p>
+<p>pwm_disable()</p>
+<p>LCD驱动框架分析</p>
+<h1 id="什么是设备树"><a href="#什么是设备树" class="headerlink" title="什么是设备树"></a>什么是设备树</h1><p>  这个dts采用树形结构描述</p>
+<h1 id="dts、dtb和dtc的关系"><a href="#dts、dtb和dtc的关系" class="headerlink" title="dts、dtb和dtc的关系"></a>dts、dtb和dtc的关系</h1><p>dts相当于源文件<br>dtc工具相当于gcc<br>dtb相当于bin文件，或可执行程序文件。</p>
+<p>通过make dtbs编译所有的dts<br>编译一个指定的dtb</p>
+<p>make xxxx.dtb</p>
+<p>dts的基本语法</p>
+<p>@一般都是外设的起始地址。<br>unit-address一般都是外设寄存器的起始地址，有时候是i2c的其实地址，具体设备具体分析。</p>
+<p>系统启动都可以在/proc/device-tree/目录下存在着设备树信息。<br>节点都是以文件夹形式表现得。</p>
+<p>内核启动的时候会解析设备树，将文本解析一遍</p>
+<p>chosen aliases 定义别名<br>alias 会在/dev使用。</p>
+<p>chosen linux启动的时候向内部传参bootargs<br>将uboot里面的bootargs环境变量值，传递给Linux内核作为命令行参数，cmd line<br>uboot里面的bootargs</p>
+<p>uboot如何想kernel传递bootargs?<br>经过查看chosen节点中包含bootargs属性，属性值和uboot的bootargs环境值一样。</p>
+<p>uboot接触过dtb，最终通过bootz 80800000 - 83000000 来启动内核<br>经过分析判断uboot拥有bootargs环境变量和dtb，因此最有可能“作案“<br>fdt_chosen<br>最终发现在uboot的fdt_chosen函数中会查找chosen节点，</p>
+<p>属性是根据具体的设备和驱动去理解</p>
+<p>特殊的属性<br>compatible属性，用来描述兼容性<br>model属性，也是一个字符串。描述设备模块信息<br>status属性，用来描述设备状态。<br>#address-cells和#size-cells<br>#address-cells定义了子节点子节点信息所占的字长。<br>#size-cells 由父节点的address和size控制</p>
+<p>range属性。地址映射<br>name属性，指定节点的名字。已经被弃用了。<br>device_type用来描述设备的fc cpu和memory可能会使用。其他的不用。 </p>
+<p>DT_MACHINE_START和MACHINE_START基本相同。<br>使用设备树之后的情况。</p>
+<p>设备树是用来描述班子的设备信息的，不同的设备其信息不同，反应到设备树中就是属性不同。name我们在</p>
+<p>Linux 内核的OF操作函数</p>
+<p>设备树如何获取设备中的信息。</p>
+<p>在驱动中使用OF函数获取设备树属性内容。<br>of_find_compatible_node<br>of_find_matching_node_and_match<br>of_find_node_by_path<br>of_find_property_</p>
+<p>linux misc驱动实验</p>
+<p>misc的意思是混合、杂项驱动，嵌套到总线驱动中。<br>所有的misci设备驱动的主设备号为10，不同的设备使用不同的从设备号。随着linux<br>misc设备会自动创建cdev，不需要我们手动创建<br>我们需要想linux祖册一个miscdevice设备。<br>MISC驱动的编写的核心就是初始化miscdevice结构体，然后使用misc_register想内核注册，使用misc_unregister卸载设备。<br>misc驱动是基于platform的。</p>
+<ul>
+<li>如果设备miscdevice里面的minor为255，表示内核自动分配一个次设备号。</li>
+</ul>
+<p>struct miscdevice {<br>    int minor;<br>    const char *name;<br>    const struct<br>}</p>
+<p>传统的创建设备过程<br>alloc_chrdev_region()<br>cdev_init()<br>cdev_add()<br>class_create()<br>device_create()</p>
+<p>Linux IIO驱动设备</p>
+<p>手机或者手环里面的加速度计，磁力计等。</p>
+<p>以前的写法，就是驱动人员自己定义传感器数据上报，自己定义的格式，那么就只有自己知道。不灵活，不同意</p>
+<p>理想的驱动应该是：<br>1、黑匣子，应用直接能读取到，而且人性化。IIO</p>
+<p>自己算<br>in_accel_x_raw * in_accel_scale<br>accel_scale: 刻度，然后就可以算出来加速度计实际值的时候。</p>
+<p>iio子系统的框架</p>
+<p>INDIO_DIRECTE_MODE模式：设置sysfs模式。<br>channels 通道：表示传感器的魅影测量通道<br>info<br>核心</p>
+<p>申请与释放<br>iio_device_alloc(int sizeof_priv)<br>同时申请第一个iiodevice数据和私有数据</p>
+<p>return iio_dev内存起始地址<br>iio_info<br>重点是read_raw和write_raw<br>write_raw_get_fmt<br>处理小数部分</p>
+<p>通道iio_chan_spec</p>
+<p>IIO的应用编写<br>in_accel_scale<br>xxx<br>这些文件读到的都是字符串。</p>
+<h1 id="系统移植-烧录系统"><a href="#系统移植-烧录系统" class="headerlink" title="系统移植 烧录系统"></a>系统移植 烧录系统</h1><p>什么是Uboot</p>
+<ol>
+<li>uboot是一个裸机程序，比较复杂</li>
+<li>uboot就是一个BootLoader，作用就是用于启动linux或其他系统。uboot最主要的工作就是初始化ddr，应为linux是运行在ddr里面的。一般linux镜像zImage+设备树(.dtb)存放在sd、emmc、nand、spi flash等等外置存储区域。<br>这里就牵扯到一个问题，需要将linux镜像从外置flash拷贝到ddr中，再去启动。<br>Uboot的主要目的就是为系统的启动做准备。<br>uboot不仅仅能启动linux，也可以启动其他系统，比如vxworks<br>linux不仅仅能通过uboot启动，其他的BootLoader也可以启动。<br>uboot是个通用的BootLoader，他支持多种架构。</li>
+</ol>
+<p>Uboot获取</p>
+<ol>
+<li>首先就是uboot官网获取。缺点就是支持少，比如某一款具体芯片驱动等不完善。</li>
+<li>Soc厂商会从uboot官网下载某一个版本的uboot，然后再这个版本的uboot上加入响应的soc以及驱动，这个就是soc厂商定制版的uboot。</li>
+<li>做开发板的厂商。开发板会参考soc厂商的板子。开发板必然回合官方的板子不一样。因此开发板厂商又会去soc厂商做好的uboot以适应自己的板子。</li>
+</ol>
+<p>uboot编译过程</p>
+<ol>
+<li>编译uboot的时候需要先配置<br>编译完成以后就回生成一个u-boot.bin，必须想u-boot.bin添加头部信息。uboot编译最后会通过/tools/mkimage软件添加头部信息。</li>
+</ol>
+<p>如果配置过uboot，那么一定要注意sheel脚本会清楚整个工程。那么配置文件<br>4. 为了方便开发，建议直接在uboot顶层makefile里面设置好arch和cross_compile这两个变量的值。</p>
+<p>Uboot命令使用。<br>help 命令，当前uboot所有支持的命令<br>查看某一个命令帮助信息。？加命令名</p>
+<p>信息查询</p>
+<ol>
+<li><p>bdinfo<br>arch_number<br>boot_params<br>DRAM bank<br>start<br>size<br>eth0name<br>ethaddr</p>
+</li>
+<li><p>printenv命令<br>查看当前板子的环境变量</p>
+</li>
+<li><p>setenv命令，设置环境变量，也可以自定义环境变量，也可以删除环境变量<br>setenv bootdelay 5 之类的。<br>setenv bootcmd ‘console-ttymxc0,115200 ……’<br>setenv author ‘jiangzijin’<br>setenv author </p>
+</li>
+<li><p>saveenv命令，保存环境变量。</p>
+</li>
+</ol>
+<p>内存操作命令<br>// 查看<br>md.b 80000000 10<br>md.w 80000000 10<br>md.l 80000000 10</p>
+<p>// nm 修改<br>nm.l 800000</p>
+<p>// mm 命令也是修改内存<br>修改后可以自动加一，改完自动跳到下一个地址去了。</p>
+<p>// mw命令 使用一个指定的数据填充一段内存。</p>
+<p>cp命令 数据拷贝命令。</p>
+<p>cmp命令比较命令，同样比较两个内存地址的命令。</p>
+<p>网络操作有关的命令。<br>保证开发板和电脑处于同一个网段内。<br>设置一下环境变量</p>
+<ol>
+<li><p>ping命令重点<br>setenv ipaddr 192.168.1.50<br>setenv ethaddr 00:04:9f:04:d2:35<br>setenv gatewayip 192.168.1.1<br>setenv netmask<br>setenve serverip 192.168.1.66 // tftp服务器的地址。</p>
+</li>
+<li><p>dhcp命令</p>
+</li>
+<li><p>nfs命令<br>网络文件系统。使用nfs命令将linux镜像和设备树下载到开发板的DRAM中。这样可以方便调试linux镜像和设备树。</p>
+</li>
+<li><p>tftp命令重点<br>tftp</p>
+</li>
+</ol>
+<p>mmc相关命令ccxccccccccc<br>mmc info<br>mmc read<br>mmc write<br>mmc erase<br>mmc rescan<br>mmc part<br>mmc dev<br>mmc list ……</p>
+<p>FAT格式文件系统操作命令<br>fatinfo 命令查询mmc设置指定分区的文件系统信息<br>对于I.MX6U来说，分为三个分区<br>第一个：存放uboot<br>第二个：存放linux zImage .dtb </p>
+<p>fatload命令用于将指定的文件读取到DRAM中，</p>
+<p>NAND操作命令<br>nand info 查看info信息<br>nand device 命令<br>nand erase<br>nand write</p>
+<p>fdt指令可以查看设备树</p>
+<p>BOOT操作命令</p>
+<ol>
+<li><p>bootz命令<br>要启动Linux、需要先将linux镜像文件拷贝到DRAM中，<br>要启动linux必须将zImage和设备树放到软件中。</p>
+</li>
+<li><p>bootm<br>bootm用于启动uImage</p>
+</li>
+<li><p>boot命令<br>setenv bootcmd ‘xxxx’<br>boot</p>
+</li>
+<li><p>reset命令</p>
+</li>
+<li><p>go命令<br>go addr命令用于跳到指定的地址处执行应用。 用uboot调试逻辑</p>
+</li>
+<li><p>run<br>用于运行自定义命令。</p>
+</li>
+</ol>
+<h1 id="Uboot源码目录分析"><a href="#Uboot源码目录分析" class="headerlink" title="Uboot源码目录分析"></a>Uboot源码目录分析</h1><p>因为uboot会使用到一些经过编译才会生成的文件，因此我们在分析uboot的时候先编译一下uboot</p>
+<p>API:与硬件无关的硬件函数<br>arch：与架构体系有关的代码<br>board：不同板子的定制代码<br>cmd 命令相关代码<br>common 通用代码<br>configs 配置文件<br>disk 磁盘分区相关代码<br>doc 文档<br>drivers 驱动代码<br>dts 设备树<br>examples 示例代码<br>fs 文件系统<br>include 头文件<br>lib 库文件<br>net 网络相关代码<br>post 上电自检程序</p>
+<p>u-boot.lds就是整个uboot的链接脚本<br>configs目录就是uboot的默认配置文件目录。都是以_defconfig结尾的。根据不同的板子来配置的，配置文件对应不同的板子。</p>
+<p>我们一直uboot的时候重点要关注：<br>board<br>configs</p>
+<p>当我们执行make xxx_defconfig以后就回生成.config文件。<br>顶层readme非常重要</p>
+<p>u-boot。这个就是编译出来带ELF信息的uboot可执行文件</p>
+<p>Uboot的启动流程：<br>Uboot顶层Makefile分析</p>
+<p>uboot make过程<br>编译处理过程</p>
+<ol>
+<li>目标为script_basic<br>Build定义在script\Kbuild.include<br>展开以后就是<br>make -f ./script/Makefile.build obj=script/basic</li>
+</ol>
+<p>最后编译出fixdep软件<br>最后就是因此需要编译出scripts/basic/fixdep.c 中</p>
+<p>make执行的过程</p>
+<p>_all:all<br>依赖于ALL目标<br>ALL-y += u-boot.srec u-boot.bin xxxxxx<br>ccc</p>
+<p>uboot就是start.o将一大堆的.o链接到一起的。</p>
+<p>链接脚本为boot.lds<br>uboot的链接首地址为08700000</p>
+<p>编译链接完事了。Uboot的启动流程详解。</p>
+<h1 id="Uboot启动流程"><a href="#Uboot启动流程" class="headerlink" title="Uboot启动流程"></a>Uboot启动流程</h1><p>链接脚本</p>
+<h2 id="u-boot-lds详解"><a href="#u-boot-lds详解" class="headerlink" title="u-boot.lds详解"></a>u-boot.lds详解</h2><p>uboot的入口地址为_start<br>vector.S<br>__image_copy_start -&gt; 0x87800000<br>.vectors    -&gt; 0x87800000 存放中断向量表<br>arch/arm/cpu/armv7/start.o<br>__image_copy_end -&gt; 0x8785dc6c</p>
+<p>_rel_dyn_start - &gt; 0x8785dc6c<br>_rel_dyn_end  -&gt; </p>
+<p>__end</p>
+<p>_image_binary_end</p>
+<p>__bss_start -&gt;<br>__bss_end -&gt;</p>
+<p>_start开始的就是中断向量表<br>reset 函数源码详解<br>bicne </p>
+<ol>
+<li>reset函数目的是将处理器设置为svc模式并且关闭FIQ和IRQ</li>
+<li>设置中断向量。</li>
+<li>初始化CP15</li>
+<li>跳转到了lowlevel_init中</li>
+</ol>
+<h3 id="lowlevel-init函数"><a href="#lowlevel-init函数" class="headerlink" title="lowlevel_init函数"></a>lowlevel_init函数</h3><ol>
+<li>设置SP指针、设置R9寄存器</li>
+</ol>
+<h3 id="main-函数"><a href="#main-函数" class="headerlink" title="_main 函数"></a>_main 函数</h3><h3 id="board-init-f函数"><a href="#board-init-f函数" class="headerlink" title="board_init_f函数"></a>board_init_f函数</h3><ol>
+<li>初始化一系列外设，比如串口、定时器，或者打印一些消息</li>
+<li>初始化gb的各个变量，uboot会将自己重定位到DRAM最后面的地址区域，给linux腾出空间。</li>
+</ol>
+<p>initcall_run_list 次函数会调用一些列初始化函数数组<br>display_option<br>display_textinfo</p>
+<p>version_string[] =<br>U_BOOT_VERSION = U-Boot 2016.03</p>
+<p>print_cpuinfo<br>init_func_i2c</p>
+<h3 id="setup-dest-addr"><a href="#setup-dest-addr" class="headerlink" title="setup_dest_addr"></a>setup_dest_addr</h3><p>reserve_mmu(void)</p>
+<p>reserve_uboot</p>
+<p>gd-&gt;relocaddr</p>
+<p>预留一点空间出来。</p>
+<h3 id="relocate-code-重定位代码。"><a href="#relocate-code-重定位代码。" class="headerlink" title="relocate_code 重定位代码。"></a>relocate_code 重定位代码。</h3><p>加上偏移量。<br>relocate_code函数有一个参数，r0=gd-&gt;relocateaddr = 0x9FF47000 uboot重定位地址。<br>偏移保存在R4里面。</p>
+<p>copy_loop：开始拷贝<br>当简单粗暴的拷贝代码之后，关于函数调用，全局变量引用就会出现问题。<br>uboot对于这个处理方法就是采用位置无关代码。这个借助需要借助于.rel.dyn段<br>采用相对地址。即可了。对于汇编过程。</p>
+<p>位置无关码</p>
+<p>Label中的值还是原来的，必须修改原先的地址。</p>
+<p>重定位之后，需要对所有的label保存的地址加上偏移。<br>可以在链接的过程中加上-pie</p>
+<p>判断高4字节是否为0x17，如果是的话高4字节就是label的值。添加offset，修正地址。</p>
+<h3 id="relocate-vectors"><a href="#relocate-vectors" class="headerlink" title="relocate_vectors"></a>relocate_vectors</h3><p>设置VBAR寄存器为重定位后的中断向量表起始地址。<br>重定位中断向量表。</p>
+<h3 id="board-init-r函数"><a href="#board-init-r函数" class="headerlink" title="board_init_r函数"></a>board_init_r函数</h3><p>board_init_r和board_init_f函数类似，执行一系列的初始化代码</p>
+<h3 id="run-main-loop函数"><a href="#run-main-loop函数" class="headerlink" title="run_main_loop函数"></a>run_main_loop函数</h3><p>main_loop函数。<br>run_main_loop<br>    main_loop<br>        bootdelay_process获取bootdelay的值然后保存到store_boot_delay环境变量里面。<br>            autoboot_command 参数是<br>                abortboot参数为bootdelay，此函数会处理延时。<br>                    abortboot_normal<br>            cli_loop uboot命令处理函数，进行uboot命令处理。<br>                parse_file_outer<br>                    parse_stream_outer<br>                        parse_stream 解析输入字符，得到命令<br>                        run_list 运行命令<br>                            run_list_real<br>                                run_pipe_real<br>                                    cmd_process 处理命令，也就是执行命令</p>
+<p>uboot使用某些命令来定义命令。U_BOOT_CMD来表示一个命令<br>U_BOOT_CMD最终是定义了一个cmd_tbl_t类型的变量，所有的命令最终都是存放在这个u_boot_list段中。cmd_tbl_t的cmd成员变量就是具体的命令执行函数，命令执行函数都是do_xxx</p>
+<p>cmd_process<br>    find_cmd 从.u_boot_list段里面查找命令，当找到对应的命令的时候以返回值的形式给出，为cmd_tbl_t<br>    cmd_call<br>        cmdtp-&gt;cmd  do_xxxxx</p>
+<h1 id="bootz启动linux内核过程"><a href="#bootz启动linux内核过程" class="headerlink" title="bootz启动linux内核过程"></a>bootz启动linux内核过程</h1><p>Uboot启动linux 内核启动bootz命令。bootz命令是如何启动linux内核的。<br>uboot的生命是怎么终止的呢？linux又是怎么启动的呢？</p>
+<h2 id="images全局变量"><a href="#images全局变量" class="headerlink" title="images全局变量"></a>images全局变量</h2><p>bootm_headers_t images;</p>
+<h2 id="do-bootz函数"><a href="#do-bootz函数" class="headerlink" title="do_bootz函数"></a>do_bootz函数</h2><p>do_bootz<br>    bootz_start<br>        do_bootm_state J阶段为BOOTM_STATE_START<br>            bootm_start 对iamges全局变量清零<br>        images-&gt;ep = 0x8000000<br>        bootz_steup 判断zImage是否正确<br>        bootm_find_images<br>            boot_get_fdt 找到设备树，然后将设备树起始地址和长度写入到images的ft_addr和ft_len成员变量中。<br>    bootm_disable_interrupts 关闭中断相关<br>    images.os.os = IH_OS_LLINUX; 表示要启动linux系统<br>    do_bootm_states BOOTM_STATE_OS_PREP BOOTM_STATE_OS_FAKE_GO BOOTM_SATE_OS_GO<br>        bootm_os_get_boot_func 查找linux内核启动函数 do_bootm_linux找到linux内核启动函数 赋值给boot_fn<br>            do_bootm_linux(BOOTM_STATE_OS_PREP, arc, argv, image)<br>                boot_prep_linux 启动之前的一些工作，对于使用设备树来说，他会将bootargs传递给linux内核，通过设备树完成。向linux内核传参。<br>        boot_selected_os BOOTM_STATE_OS_GO<br>            do_bootm_linux(BOOTM_STATE_OS_GO)<br>                boot_jump_linux<br>                    machid = gb-&gt;bd-&gt;bi_arch_number<br>                    kernel_entry = images-&gt;ep; 0x80800000<br>                    announce_and_cleanup 输出Starting kernel…<br>                    kernel_entry(0, machid, r2) 启动linux kernel uboot的最终使用，启动linux内核。</p>
+<p>移植NXP官方uboot流程。</p>
+<h1 id="NXP官方uboot的编译和测试"><a href="#NXP官方uboot的编译和测试" class="headerlink" title="NXP官方uboot的编译和测试"></a>NXP官方uboot的编译和测试</h1><ol>
+<li><p>将NVP提供的uboot拷贝到ubuntu</p>
+</li>
+<li><p>编译和测试</p>
+</li>
+</ol>
+<h1 id="移植nxp官方uboot"><a href="#移植nxp官方uboot" class="headerlink" title="移植nxp官方uboot"></a>移植nxp官方uboot</h1><ol>
+<li>添加板子默认配置文件<br>借鉴nxp官方的config文件。<br>拷贝默认配置文件，mx6ull_ deconfig 文件</li>
+</ol>
+<p>uboot的移植先不用管了</p>
+<h1 id="linux内核目录分析"><a href="#linux内核目录分析" class="headerlink" title="linux内核目录分析"></a>linux内核目录分析</h1><p>分析linux内核的时候，最好编译一遍linux内核。<br>arch/arm/boot/ 这个目录，linux内核编译完成以后，在这边生成image,zImage</p>
+<p>arch/arm/boot/dts这个目录，存放linux内核所有设备树文件，包括dts编译后的dtb文件<br>Documentation/devicetree/binding 这个目录下描述设备树的相关信息</p>
+<h2 id="linux内核的顶层Makefile"><a href="#linux内核的顶层Makefile" class="headerlink" title="linux内核的顶层Makefile"></a>linux内核的顶层Makefile</h2><h5 id="Linux顶层Makefile基本流程"><a href="#Linux顶层Makefile基本流程" class="headerlink" title="Linux顶层Makefile基本流程"></a>Linux顶层Makefile基本流程</h5><p>hdr-arch = arm</p>
+<h5 id="Make-xxx-defconfig过程"><a href="#Make-xxx-defconfig过程" class="headerlink" title="Make xxx_defconfig过程"></a>Make xxx_defconfig过程</h5><p>生成fixdep和bin2c和最终生成.config</p>
+<h5 id="make过程"><a href="#make过程" class="headerlink" title="make过程"></a>make过程</h5><p>通过make或者make all来编译linux内核。默认规则：all : vmlinux</p>
+<p>scripts/link-vmlinux.sh vmlinux-deps<br>arch/arm/kernel/vmlinux.lds 链接脚本文件</p>
+<p>head-y<br>init-y<br>libs-y<br>core-y<br>xxx</p>
+<p>所有的.o和.a库文件准备好以后，就可以生成vmlinux了。<br>最终为<br>cmd_link-vmlinux = /bin/bash xxxxx</p>
+<h5 id="built-in-o-文件编译生成过程"><a href="#built-in-o-文件编译生成过程" class="headerlink" title="built-in.o 文件编译生成过程"></a>built-in.o 文件编译生成过程</h5><p>vmlinux-dirs := xxxxx<br>make -f ./scripts/Makefile.build obj=init</p>
+<h5 id="make-zImage过程"><a href="#make-zImage过程" class="headerlink" title="make zImage过程"></a>make zImage过程</h5><p>我们需要zImage文件，但是前面一直说的是生成vmlinux。</p>
+<p>BOOT_TARGETS = zImage Image xipImage bootpImage uImage</p>
+<h1 id="Linux-内核启动流程简介"><a href="#Linux-内核启动流程简介" class="headerlink" title="Linux 内核启动流程简介"></a>Linux 内核启动流程简介</h1><h2 id="vmlinux-lds简介"><a href="#vmlinux-lds简介" class="headerlink" title="vmlinux.lds简介"></a>vmlinux.lds简介</h2><p>从arch/arm/kernel/vmlinux.lds分析linux内核第一行启动条件。找到<br>ENTRY(stext)<br>stext定义在head.S文件中。image和zImage是经过压缩的。linux内核会先进行加压缩，解压缩完成之后会执行<br>要求</p>
+<ul>
+<li>mmu关闭</li>
+<li>D cache关闭</li>
+<li>i cache无所谓</li>
+<li>r0 = -</li>
+<li>r1 = machine nr</li>
+<li>r2 = atags或设备树</li>
+</ul>
+<h2 id="linux-入口stext"><a href="#linux-入口stext" class="headerlink" title="linux 入口stext"></a>linux 入口stext</h2><p>_vet_atags函数验证atags或dtb是否有效，如果使用设备树的话就是dtb<br>_create_page_tables 创建页表<br>__mmap_switched<br>__enable_mmu<br>    __turn_mmu_on<br>        _mmap_switched<br>            start_kernel 启动内核<br>linux 内核第一阶段</p>
+<h2 id="start-kernel函数"><a href="#start-kernel函数" class="headerlink" title="start_kernel函数"></a>start_kernel函数</h2><p>linux 内核启动的第二阶段<br>start_kernel<br>    rest_init<br>        kernel_init 创建kernel_init进程，也就是init进程,通过kernel_thread创建 进程PID为1<br>        kthreadd 进程，进程PID为2<br>        cpu_startup_entry 进入空闲进程，也就是主进程退化成空闲进程<br>            cpu_idle_loop</p>
+<p>kernel_init<br>    kernel_init_freeable<br>        设置标准输入，标准输出，标准错误使用console，<br>        raddisk_execute_command = /init<br>    检查/init是否存在，存在执行<br>    uboot传递给linux内核的bootargs可以指定init=xxx,或者角命令行参数。有一些开发板会设置init=linuxrc<br>    尝试运行/sbin/init /etc/init /bin/init /bin/sh</p>
+<p>可以看出，最终引出根文件系统。</p>
+<h1 id="Linux内核移植"><a href="#Linux内核移植" class="headerlink" title="Linux内核移植"></a>Linux内核移植</h1><h1 id="根文件系统构建rootfs"><a href="#根文件系统构建rootfs" class="headerlink" title="根文件系统构建rootfs"></a>根文件系统构建rootfs</h1><h2 id="根文件系统简介"><a href="#根文件系统简介" class="headerlink" title="根文件系统简介"></a>根文件系统简介</h2><p>根文件系统也叫做rootfs。<br>根文件系统就是一堆的文件，比如软件 配置文件等，这些文件是linux运行所有必须的，将他们组合在一起就构成了根文件系统。<br>根文件系统就是一个“文件夹”，此“文件夹”有很多歌文件，这些文件是linux运行所必须的，但是无法放到内核里面去。比如命令 库 配置文件等等。所有这些软件需要我们自己构建。<br>/就是linux的根文件系统</p>
+<h2 id="busybox-构建根文件系统"><a href="#busybox-构建根文件系统" class="headerlink" title="busybox 构建根文件系统"></a>busybox 构建根文件系统</h2><p>构建根文件系统，busybox。还有很多成熟化的根文件系统构建方式，buildroot,yocto。构建的根文件系统调试我们通过nfs网络挂载，也就是根文件系统存放到ubuntu下，开发板启动以后通过nfs服务使用ubuntu下的根文件系统。</p>
+<ol>
+<li>修改makefile，添加交叉编译器<br>修改arch 和 cross_compile这两个变量。</li>
+<li>busybox支持中文字符</li>
+<li>配置busybox</li>
+<li>编译busybox</li>
+<li>拷贝库文件<br>交叉工具链的库文件。</li>
+<li>创建其他文件夹</li>
+</ol>
+<h2 id="根文件系统初步测试"><a href="#根文件系统初步测试" class="headerlink" title="根文件系统初步测试"></a>根文件系统初步测试</h2><p>为了方便测试，使用网络系统测试。要求：</p>
+<ol>
+<li>linux内核网络驱动要工作正常</li>
+<li>设置uboot的bootargs，也就是linux的命令行参数<br>测试的时候发现这个是一个只读文件系统。bootargs参数没有设置可写的参数</li>
+</ol>
+<h2 id="根文件系统的完善"><a href="#根文件系统的完善" class="headerlink" title="根文件系统的完善"></a>根文件系统的完善</h2><h1 id="linux-中断"><a href="#linux-中断" class="headerlink" title="linux 中断"></a>linux 中断</h1><ol>
+<li>先知道你要是以哦那个的中断号</li>
+<li>申请中断<br>request_irq，此函数会激活中断</li>
+<li>如果不用了，就释放掉。free_irq<br>IRQ_HANDLED</li>
+<li>冲断处理函数</li>
+<li>使能和禁止中断。</li>
+</ol>
+<h2 id="中断上半部和下半部"><a href="#中断上半部和下半部" class="headerlink" title="中断上半部和下半部"></a>中断上半部和下半部</h2><p>request_irq属于上半部，只要中断触发，那么中断处理函数就会执行。中断处理函数一定要快点执行完毕，越短越好。</p>
+<p>所以在中断中读取IIC读取数据就会浪费时间。</p>
+<p>下半部：处理中断中较为耗时的部分。</p>
+<h3 id="软中断"><a href="#软中断" class="headerlink" title="软中断"></a>软中断</h3><p>softirq_action来表示irq<br>总共有10个软中断。<br>要使用软中断，需要先使用<br>open_softirq注册软中断函数。</p>
+<p>使用raise_softirq触发。</p>
+<p><strong>软中断必须在静态注册</strong></p>
+<h3 id="tasklet"><a href="#tasklet" class="headerlink" title="tasklet"></a>tasklet</h3><p>使用软中断实现<br>也需要用到上半部，只是上半部的中断处理函数的重点时调用tasklet_schedule<br>1、定义一个tasklet函数<br>2. 初始化，重点是设置对应的处理函数</p>
+<h3 id="工作队列"><a href="#工作队列" class="headerlink" title="工作队列"></a>工作队列</h3><p>使用工作队列</p>
+<h3 id="中断线程化"><a href="#中断线程化" class="headerlink" title="中断线程化"></a>中断线程化</h3><h3 id="如何在设备树中描述中断相关信息"><a href="#如何在设备树中描述中断相关信息" class="headerlink" title="如何在设备树中描述中断相关信息"></a>如何在设备树中描述中断相关信息</h3><p>compatible<br>interrupt-controller<br>interrupt-cells</p>
+<ol>
+<li>#interrupt-cells 指定 interrupt的cell数量，也就是属性</li>
+</ol>
+<p>写驱动的时候只需要在dts添加相关的</p>
+<p>interrupt-parent指定父中断。<br>interrupts = &lt;0 8&gt;<br>0: active high<br>1: active low</p>
+<p>8: active low level-sensitive</p>
+<p>获取中断号：<br>irq_of_parse_and_map<br>从interrupte属性中获取相关的中断号。</p>
+<p>如果使用GPIO的话，可以使用gpio_to_irq获取中断号</p>
+<p>使用tasklet，或者work queue来执行中断处理函数。</p>
+<h2 id="PWM子系统"><a href="#PWM子系统" class="headerlink" title="PWM子系统"></a>PWM子系统</h2><p>struct pwm_chip {</p>
+<p>}<br>最终，imx_chip</p>
+<p>pwm_ops *ops<br>pwm_ops-&gt;config<br>pwm_ops-&gt;enable<br>pwm_ops-&gt;</p>
+<h3 id="PWM-驱动流程"><a href="#PWM-驱动流程" class="headerlink" title="PWM 驱动流程"></a>PWM 驱动流程</h3><ol>
+<li>pwm_chip 初始化</li>
+<li>向内核注册pwm_chip</li>
+</ol>
+<p>pwmchip_add 添加</p>
+<h1 id="Regmap-API简洁"><a href="#Regmap-API简洁" class="headerlink" title="Regmap API简洁"></a>Regmap API简洁</h1><p>1.1 为什么要引用regmap函数。</p>
+<ol start="2">
+<li>regmap结构体<br>Linux内核将regmap框架抽象为regmap结构体</li>
+</ol>
+<p>regmap_config用来配置regmap<br>read_flag_mask、write_flag_mask</p>
+<p>regmap_init_i2c, regmap_init_spi<br>regmap_exit</p>
+<p>regmap设备访问API函数<br>regmap_read<br>readmap_write</p>
+<p>read_flag_mask<br>write_flag_mask</p>
+<p>初始化命令/</p>
+<h2 id="Linux-内核定时器"><a href="#Linux-内核定时器" class="headerlink" title="Linux 内核定时器"></a>Linux 内核定时器</h2><p>1.1 内核时间管理</p>
+<ol>
+<li>Cortex-M内核使用systick作为系统定时器</li>
+<li>硬件定时器、软件定时器，原理是一开系统定时器来驱动，系统使用定时中断来</li>
+<li>Linux内核频率可以配置，图形化界面配置。</li>
+<li>重点，HZ表示系统节拍率。高节拍率和地节拍率的优缺点。<br>高节拍率中断服务函数越来越多。</li>
+</ol>
+<p>jiffies<br>jiffies/HZ就是系统运行时间。单位为秒</p>
+<p>系统节拍<br>1.2 内核定时器</p>
+<ol>
+<li>软件定时器不像硬件定时器一样，直接给周期值。设置期满以后的时间点。</li>
+<li>定时处理函数</li>
+<li>内核定时器不是周期性的，一次定时时间到了以后就会关闭，除非重新打开。</li>
+<li>add_time mod_timer del_time</li>
+</ol>
+<p>节拍率：HZ<br>系统定时器频率是通过静态预处理定义的。</p>
+<p>高节拍率的优点：<br>更高的中断解析度，可提高事件驱动事件的解析度<br>提高了时间驱动事件的准确性。</p>
+<p>阻塞和非阻塞IO</p>
+<h2 id="Linux-阻塞和非阻塞IO"><a href="#Linux-阻塞和非阻塞IO" class="headerlink" title="Linux 阻塞和非阻塞IO"></a>Linux 阻塞和非阻塞IO</h2><p>1.1 阻塞与非阻塞简介</p>
+<p>阻塞：当资源不可用时，引用程序就会挂起。当资源可用的时候，唤醒任务。应用程序使用open打开驱动文件，默认使用阻塞方式打开。<br>非阻塞：当资源不可用的时候，应用程序轮询查看，或放弃。会有超时处理机制.应用程序在使用open是使用ONOBLOCK可以设置为非阻塞。</p>
+<p>1.2 等待队列。<br>linux内核提供等待队列来试下脑阻塞进程的唤醒工作。，初始化等待队列，创建一个等待队列头。<br>wait_queue_head_t需要定义一个。定义以后使用init_waitqueue_head函数。或者使用宏DECLARE_WAIT_QUEUE_HEAD</p>
+<ol start="2">
+<li><p>等待队列项<br>wait_queue_t表示等待队列项目，或者使用宏定义</p>
+</li>
+<li><p>将队列项添加/一处等待队列头<br>add_wait_queue</p>
+</li>
+<li><p>移除等待队列项<br>资源可用的时候使用remove_wait_queue函数移除。</p>
+</li>
+<li><p>唤醒。<br>wake_up唤醒。</p>
+</li>
+</ol>
+<p>1.3 轮询<br>Linux驱动需要提供poll函数的调用。</p>
+<p>1.4 驱动里面的poll函数。</p>
+<p>阻塞IO的试验。使用等待队列头，</p>
+<p>定义等待队列头<br>wait_queue_head_t r_wait;</p>
+<p>wait_event_interruptible() // 等待事件发生。</p>
+<p>platform_device 注册分析。<br>放入driver_list<br>放入device_list</p>
+<p>若匹配，则执行probe函数。<br>pinctrl子系统和GPIO的</p>
+<p>I2C</p>
+<p>GPIO        IOMUX</p>
+<p>SPI</p>
+<p>pinmux 多路复用</p>
+<p>I2C有两种状态：<br>一种是工作状态，defailt，sleep功能<br>default: pin as I2C<br>sleep: Pins as GPIO</p>
+<p>pinctrl 引脚设置成什么功能。</p>
+<p>设备树描述pinctrl信息。</p>
+<p>which pin config which function????</p>
+<p>really_probe, 在probe之前就可以设置pinctrl</p>
+<p>中断？？</p>
+<ol>
+<li>设置中断控制器</li>
+<li>注册中断处理函数</li>
+<li>保存现场</li>
+<li>调用处理函数</li>
+<li>恢复现场。</li>
+</ol>
+<p>request_irq</p>
+<p>mask mask计<br>state 状态寄存器<br>pri: 优先级控制器</p>
+<p>CPU-&gt;GIC-&gt;GPC-&gt;GPIO1,GPIO2</p>
+<p>GPC虚拟的</p>
+<p>interrupt-parent = &lt;&gt; 需要向那个中断控制器发送。</p>
+<h2 id="Linux-网络设备驱动"><a href="#Linux-网络设备驱动" class="headerlink" title="Linux 网络设备驱动"></a>Linux 网络设备驱动</h2><p>网卡就是一个芯片来完成了。首先两部分。<br>MAC和PHY。<br>支持网络：有MAC， SOC-&gt;PHY<br>不支持 无MAC，SOC-&gt;DM9000</p>
+<p>SOC内部集成网络MAC外设</p>
+<p>MII RMII 接口</p>
+<h3 id="PHY芯片详解"><a href="#PHY芯片详解" class="headerlink" title="PHY芯片详解"></a>PHY芯片详解</h3><p>用哪个厂家的PHY芯片，前面的16个寄存器都是一模一样的。因此Linux内核有通用的PHY驱动，</p>
+<p>LAN8720芯片。</p>
+<p>Linux 内核网络驱动框架<br>net_device结构体：</p>
+<p>struct net_device<br>{<br>    const struct net_device_ops *netdev_ops; // 网络设备的操作集<br>    const_struct ethtool_ops *ethtool_ops; // 网络工具的<br>    const sturct head_ops<br>}</p>
+<p>构建net_device<br>1、申请net_device<br>net_device, alloc_netdev_mqs<br>对于以太网，申请函数就是alloc_etherdev 和 alloc_etherdev_mqs<br>    ether_setup 对netdev进行初始化</p>
+<p>2、删除net_device</p>
+<p>3、注册netdev</p>
+<p>对于can，alloc_candev</p>
+<h3 id="net-device-ops结构体"><a href="#net-device-ops结构体" class="headerlink" title="net_device_ops结构体"></a>net_device_ops结构体</h3><p>ndo_open 和 ndo_stop.<br>ndo_start_xmit 函数 用于最总的网络数据发送。</p>
+<h3 id="sk-buff-结构体"><a href="#sk-buff-结构体" class="headerlink" title="sk_buff 结构体"></a>sk_buff 结构体</h3><ol>
+<li>发送数据dev_queue_xmit 函数</li>
+<li>netif_rx函数接收。<br>网络驱动里面很重要的一个东西，保存网络数据，<br>要申请和释放。alloc_skb申请，kfree_skb释放。</li>
+</ol>
+<h3 id="网络NAPI处理机制"><a href="#网络NAPI处理机制" class="headerlink" title="网络NAPI处理机制"></a>网络NAPI处理机制</h3><p>初始化NAPI<br>netif_napi_add</p>
+<p>I.MX6ULL 网络外设设备树<br>ENET1 网络复位引脚为SNVS_TAMPER7</p>
+<h3 id="网络驱动源码解析。"><a href="#网络驱动源码解析。" class="headerlink" title="网络驱动源码解析。"></a>网络驱动源码解析。</h3><p>fec_probe</p>
+<p>私有数据的申请<br>netdev + private 的内存申请。</p>
+<p>netdev_ops = xxx_ops</p>
+<p>netif_napi_add</p>
+<p>fec_enet_mii_init</p>
+<p>register_netdev // 注册到系统中。</p>
+<p>// 所以说驱动的流程大概都是差不多的。</p>
+<ol>
+<li>先试用midobus_alloc申请mii_bus。<br>设置read write函数。</li>
+</ol>
+<p>of_midobus_register<br>    // 找到了之后将子节点的所有节点中全部注册起来。</p>
+<pre><code>// 应该跟i2c的那个注册是差不多的。
+</code></pre>
+<p>of_mdiobus_register_phy // 注册PHY设备</p>
+<p>fec_netdev_ops // 这些ops</p>
+<p>网络数据收发<br>fec_enet_start_xmit函数来完成的。<br>fec_enet_interrupt, fex_etet_rx_napi</p>
+<h2 id="PHY-驱动"><a href="#PHY-驱动" class="headerlink" title="PHY 驱动"></a>PHY 驱动</h2><p>phy_driver<br>struct phy_driver {</p>
+<p>}<br>注册，phy_driver_register<br>通用的PHY驱动genphy_driver</p>
+<h2 id="sensor-HAL"><a href="#sensor-HAL" class="headerlink" title="sensor HAL"></a>sensor HAL</h2><p>APP<br>SensorManager<br>Sensorservier<br>SensorHal<br>kernel: /dev/input下生成，input子系统生成。</p>
+<p>sensorservier注册回调接口。处理之后返回给上层处理。</p>
+<p>sensorManager:</p>
+<ol>
+<li>传输回话并链接sensorserver</li>
+<li>对应用层提供接口，获取sensor类型和sensor数据</li>
+<li>处理sensor传感器数据，转化成android可以识别的数据格式。</li>
+</ol>
+<p>sensorservice：</p>
+<ol>
+<li>根据平台动态加载hal的库，初始化hal层</li>
+<li>抓取底层数据根据需要向上转发sensor数据</li>
+</ol>
+<p>sensorhal：<br>封装底层接口，对上提供同意接口<br>2 打开sensor设备，提供相关操作接口。</p>
+<p>SensorManager 服务</p>
+<p>注册SensorEventListener<br>onSensorChanged() 如果底层数据有变化，向上层发送<br>onAccuracyChanged() 、、</p>
+<p>通过SystemSensorManager中的registerListenerImpl()方法，这样就会有一个SensorEventQueue队列，这个队列与底层的向联系。<br>建立线程，select，linux unix套接字，然后调用回调函数。</p>
+<p>// 拿到数据之后处理。<br>用一个epoll去处理吗？</p>
+<p>Android Sensor流程：</p>
+<ol>
+<li>APP注册服务</li>
+<li>得到sensormanager，注册listener</li>
+<li>创建消息队列，通过JNI和sensorServer建立链接</li>
+<li>接受数据，通过listener回调得到数据。</li>
+</ol>
+<p>Android SensorService分析</p>
+<ol>
+<li>Systemserver初始化的时候，初始化sensorservice</li>
+<li>sensorservice创建sensordevice对象，sensordeviceshihal层的操作函数集</li>
+<li>SensorDevice会得到系统支持sensor的个数及Sensor操作接口</li>
+<li>SensorServer将系统支持的sensor添加sensorlist中</li>
+<li>根据系统反馈创建虚拟sensor？(是否可以模拟一个陀螺仪?) 加速度计和磁传感器模拟陀螺仪</li>
+<li>等待链接，启动线程分发数据。// 使用input子系统分发？？？？？</li>
+</ol>
+<p>hw_get_module()<br>    sensors_modulle_t<br>        open_sensors</p>
+<p>threadLoop，不断的调用底层的poll方法获取数据，获取到数据之后通过sendEvents发送给sensorManager</p>
+<p>load 相关的动态库，sensor_open_1()打开</p>
+<p>通过底层的poll方法，然后通过unix套接字发送给各个sensor_service</p>
+<p>Android framewaork层和HAL层关系。</p>
+<p>依次poll相关的fd。通过poll去读？</p>
+<p>安卓开发从顶层到底层。</p>
+<p>如果上层使用poll函数，应该要把驱动框架改成和Android的类似，用input子系统，kernel.config也需要更改，如果还是用轮询的话，2ms的读取时间太快了。又不满足需求。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/09/04/computer_science/%E7%94%B5%E5%AD%90%E7%BD%97%E7%9B%98%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95/" rel="prev" title="电子罗盘开发记录">
+                  <i class="fa fa-angle-left"></i> 电子罗盘开发记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/10/06/computer_science/uboot/" rel="next" title="uboot">
+                  uboot <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2022/09/19/computer_science/IIC-Driver/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>

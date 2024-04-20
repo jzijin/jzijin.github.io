@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="进程相关概念  程序和进程  并行和并发 pcb–linux 内核的进程控制块是task_struct  进程的五种状态  进程控制  基本概念  exec函数族  基本概念  执行指定目录下的程序  执行PATH环境变量能够搜索到的程序    进程回收  孤儿进程  僵尸进程  进程回收 tips: 段错误：             进程间通信相关概念  什么是IPC  进程间通信常用的4种">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux系统编程">
+<meta property="og:url" content="http://example.com/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="SRCNN">
+<meta property="og:description" content="进程相关概念  程序和进程  并行和并发 pcb–linux 内核的进程控制块是task_struct  进程的五种状态  进程控制  基本概念  exec函数族  基本概念  执行指定目录下的程序  执行PATH环境变量能够搜索到的程序    进程回收  孤儿进程  僵尸进程  进程回收 tips: 段错误：             进程间通信相关概念  什么是IPC  进程间通信常用的4种">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-26T07:33:05.000Z">
+<meta property="article:modified_time" content="2023-09-17T15:16:20.447Z">
+<meta property="article:author" content="srcnn">
+<meta property="article:tag" content="computer science">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/","path":"2020/05/26/computer_science/linux系统编程/","title":"linux系统编程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>linux系统编程 | SRCNN</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="https://waline.vercel.app">
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">SRCNN</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">13</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">51</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text"> 进程相关概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%92%8C%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text"> 程序和进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.2.</span> <span class="nav-text"> 并行和并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pcb%E2%80%93linux-%E5%86%85%E6%A0%B8%E7%9A%84%E8%BF%9B%E7%A8%8B%E6%8E%A7%E5%88%B6%E5%9D%97%E6%98%AFtask-struct"><span class="nav-number">1.3.</span> <span class="nav-text">pcb–linux 内核的进程控制块是task_struct</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%BA%94%E7%A7%8D%E7%8A%B6%E6%80%81"><span class="nav-number">1.4.</span> <span class="nav-text"> 进程的五种状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="nav-number">1.5.</span> <span class="nav-text"> 进程控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.5.1.</span> <span class="nav-text"> 基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exec%E5%87%BD%E6%95%B0%E6%97%8F"><span class="nav-number">1.5.2.</span> <span class="nav-text"> exec函数族</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5-1"><span class="nav-number">1.5.2.1.</span> <span class="nav-text"> 基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%8C%87%E5%AE%9A%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.5.2.2.</span> <span class="nav-text"> 执行指定目录下的程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A7%E8%A1%8CPATH%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%83%BD%E5%A4%9F%E6%90%9C%E7%B4%A2%E5%88%B0%E7%9A%84%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.5.2.3.</span> <span class="nav-text"> 执行PATH环境变量能够搜索到的程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%9B%9E%E6%94%B6"><span class="nav-number">1.5.3.</span> <span class="nav-text"> 进程回收</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.5.3.1.</span> <span class="nav-text"> 孤儿进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.5.3.2.</span> <span class="nav-text"> 僵尸进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%9B%9E%E6%94%B6-1"><span class="nav-number">1.5.3.3.</span> <span class="nav-text"> 进程回收</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#tips-%E6%AE%B5%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">1.5.3.3.1.</span> <span class="nav-text">tips: 段错误：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text"> 进程间通信相关概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFIPC"><span class="nav-number">2.1.</span> <span class="nav-text"> 什么是IPC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%B8%B8%E7%94%A8%E7%9A%844%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text"> 进程间通信常用的4种方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%EF%BC%88%E5%8C%BF%E5%90%8D%EF%BC%89"><span class="nav-number">2.2.1.</span> <span class="nav-text"> 管道（匿名）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.1.1.</span> <span class="nav-text"> 管道的概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">2.2.1.2.</span> <span class="nav-text"> 管道的原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">2.2.1.3.</span> <span class="nav-text"> 管道的局限性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93"><span class="nav-number">2.2.1.4.</span> <span class="nav-text"> 创建匿名管道</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%88%B6%E5%AD%90%E8%BF%9B%E7%A8%8B%E4%BD%BF%E7%94%A8%E7%AE%A1%E9%81%93%E9%80%9A%E4%BF%A1"><span class="nav-number">2.2.1.5.</span> <span class="nav-text"> 父子进程使用管道通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%A1%E9%81%93%E7%9A%84%E8%AF%BB%E5%86%99%E8%A1%8C%E4%B8%BA"><span class="nav-number">2.2.1.6.</span> <span class="nav-text"> 管道的读写行为</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%AE%A1%E9%81%93%E7%BC%93%E5%86%B2%E5%8C%BA%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.2.1.7.</span> <span class="nav-text"> 查看管道缓冲区大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E7%BD%AE%E9%9D%9E%E9%98%BB%E5%A1%9E%EF%BC%9F%EF%BC%9F"><span class="nav-number">2.2.1.8.</span> <span class="nav-text"> 如何设置非阻塞？？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fifo"><span class="nav-number">2.2.2.</span> <span class="nav-text"> fifo</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">2.2.2.1.</span> <span class="nav-text"> 特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.2.2.2.</span> <span class="nav-text"> 使用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.2.3.</span> <span class="nav-text"> 创建方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#fifo%E6%96%87%E4%BB%B6%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8IO%E5%87%BD%E6%95%B0%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C-%E5%B0%B1%E8%B7%9F%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%E4%B8%80%E6%91%B8%E4%B8%80%E6%A0%B7"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">fifo文件可以使用IO函数进行操作 就跟文件操作一摸一样</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="nav-number">2.2.2.5.</span> <span class="nav-text"> 进程间通信</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA"><span class="nav-number">2.2.3.</span> <span class="nav-text"> 内存映射区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mmap-%E5%88%9B%E5%BB%BA%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="nav-number">2.2.3.1.</span> <span class="nav-text"> mmap-创建内存映射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#munmap-%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA"><span class="nav-number">2.2.3.2.</span> <span class="nav-text"> munmap-释放内存映射区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%9D%E8%80%83%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.3.3.</span> <span class="nav-text"> 思考问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1-1"><span class="nav-number">2.2.3.4.</span> <span class="nav-text"> 进程间通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%88%B6%E5%AD%90%E8%BF%9B%E7%A8%8B%E6%B0%B8%E8%BF%9C%E5%85%B1%E4%BA%AB%E7%9A%84%E4%B8%9C%E8%A5%BF%EF%BC%9F"><span class="nav-number">2.2.3.5.</span> <span class="nav-text"> 父子进程永远共享的东西？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E5%88%9D%E6%AD%A5%E8%AE%A4%E8%AF%86"><span class="nav-number">2.2.4.</span> <span class="nav-text"> 信号初步认识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9-1"><span class="nav-number">2.2.4.1.</span> <span class="nav-text"> 特点:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.4.2.</span> <span class="nav-text"> 信号的状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.4.3.</span> <span class="nav-text"> 处理方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E5%9B%9B%E8%A6%81%E7%B4%A0"><span class="nav-number">2.2.4.4.</span> <span class="nav-text"> 信号的四要素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%9A%E8%BF%87man%E6%96%87%E6%A1%A3%E6%9F%A5%E7%9C%8B%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.2.4.5.</span> <span class="nav-text"> 通过man文档查看信号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%EF%BC%9A%E9%98%BB%E5%A1%9E%E4%BF%A1%E5%8F%B7%E9%9B%86%EF%BC%8C%E6%9C%AA%E5%86%B3%E4%BF%A1%E5%8F%B7%E9%9B%86"><span class="nav-number">2.2.4.6.</span> <span class="nav-text"> 概念：阻塞信号集，未决信号集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E7%9B%B8%E5%85%B3%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.4.7.</span> <span class="nav-text"> 信号相关的函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%9B%86%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.4.8.</span> <span class="nav-text"> 信号集操作相关函数</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text"> 守护进程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">3.1.</span> <span class="nav-text"> 守护进程的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%BB%84"><span class="nav-number">3.2.</span> <span class="nav-text"> 进程组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9D-%E5%A4%9A%E4%B8%AA%E8%BF%9B%E7%A8%8B%E7%BB%84"><span class="nav-number">3.3.</span> <span class="nav-text"> 会话-多个进程组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.4.</span> <span class="nav-text"> 创建守护进程模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text"> 练习：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text"> 线程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="nav-number">4.1.</span> <span class="nav-text"> 线程的相关概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%BA%BF%E7%A8%8B%E7%9A%84LWP%E5%8F%B7%EF%BC%9A"><span class="nav-number">4.1.1.</span> <span class="nav-text"> 查看线程的LWP号：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E2%80%93pthread-create"><span class="nav-number">4.1.2.</span> <span class="nav-text"> 创建线程–pthread_create</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E4%B8%AA%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA%E2%80%93pthread-exit"><span class="nav-number">4.1.3.</span> <span class="nav-text"> 单个线程退出–pthread_exit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E7%AD%89%E5%BE%85%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA%EF%BC%8C%E8%8E%B7%E5%BE%97%E7%BA%BF%E7%A8%8B%E9%80%80%E5%87%BA%E7%8A%B6%E6%80%81"><span class="nav-number">4.1.4.</span> <span class="nav-text"> 阻塞等待线程退出，获得线程退出状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%88%86%E7%A6%BB"><span class="nav-number">4.1.5.</span> <span class="nav-text"> 线程分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%80%E6%AD%BB%E7%BA%BF%E7%A8%8B%E2%80%93pthread-cancle"><span class="nav-number">4.1.6.</span> <span class="nav-text"> 杀死线程–pthread_cancle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E4%B8%A4%E4%B8%AA%E7%BA%BF%E7%A8%8Bid%E6%98%AF%E5%90%A6%E7%9B%B8%E7%AD%89%EF%BC%88%E9%A2%84%E7%95%99%E5%87%BD%E6%95%B0"><span class="nav-number">4.1.7.</span> <span class="nav-text"> 比较两个线程id是否相等（预留函数)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="nav-number">4.2.</span> <span class="nav-text"> 线程同步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">4.2.1.</span> <span class="nav-text"> 互斥锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E7%B1%BB%E5%9E%8B%EF%BC%9A"><span class="nav-number">4.2.1.1.</span> <span class="nav-text"> 互斥锁类型：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">4.2.1.2.</span> <span class="nav-text"> 互斥锁的特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%BA%92%E6%96%A5%E9%94%81%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">4.2.1.3.</span> <span class="nav-text"> 使用互斥锁的缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E7%9A%84%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="nav-number">4.2.1.4.</span> <span class="nav-text"> 互斥锁的使用步骤：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-number">4.2.1.5.</span> <span class="nav-text"> 互斥锁相关函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%A0%E6%88%90%E6%AD%BB%E9%94%81%E7%9A%84%E5%8E%9F%E5%9B%A0%EF%BC%9A"><span class="nav-number">4.2.2.</span> <span class="nav-text"> 造成死锁的原因：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">4.2.3.</span> <span class="nav-text"> 读写锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E6%98%AF%E5%87%A0%E6%8A%8A%E9%94%81%EF%BC%9F"><span class="nav-number">4.2.3.1.</span> <span class="nav-text"> 读写锁是几把锁？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.2.3.2.</span> <span class="nav-text"> 读写锁的类型:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E7%8A%B6%E6%80%81%EF%BC%9A"><span class="nav-number">4.2.3.3.</span> <span class="nav-text"> 读写锁的状态：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E7%89%B9%E6%80%A7%EF%BC%9A"><span class="nav-number">4.2.3.4.</span> <span class="nav-text"> 读写锁的特性：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.2.3.5.</span> <span class="nav-text"> 读写锁的使用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">4.2.4.</span> <span class="nav-text"> 条件变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E6%98%AF%E9%94%81%E5%90%97%EF%BC%9F"><span class="nav-number">4.2.4.1.</span> <span class="nav-text"> 条件变量是锁吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E7%9A%84%E4%B8%A4%E4%B8%AA%E5%8A%A8%E4%BD%9C"><span class="nav-number">4.2.4.2.</span> <span class="nav-text"> 条件变量的两个动作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E7%9A%84%E7%B1%BB%E5%9E%8B%EF%BC%9A"><span class="nav-number">4.2.4.3.</span> <span class="nav-text"> 条件变量的类型：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%87%BD%E6%95%B0"><span class="nav-number">4.2.4.4.</span> <span class="nav-text"> 主要函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%EF%BC%88%E4%BF%A1%E5%8F%B7%E7%81%AF%EF%BC%89%E9%AB%98%E7%BA%A7%E7%9A%84%E4%BA%92%E6%96%A5%E9%94%81"><span class="nav-number">4.2.5.</span> <span class="nav-text"> 信号量（信号灯）高级的互斥锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">4.2.5.1.</span> <span class="nav-text"> 头文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.2.5.2.</span> <span class="nav-text"> 信号量类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%87%BD%E6%95%B0-1"><span class="nav-number">4.2.5.3.</span> <span class="nav-text"> 主要函数</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="srcnn"
+      src="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+  <p class="site-author-name" itemprop="name">srcnn</p>
+  <div class="site-description" itemprop="description">computer science</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jzijin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jzijin" rel="noopener me" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://srcnn-blog.oss-cn-hangzhou.aliyuncs.com/2023-10-06-15-57-57_0d920927.png">
+      <meta itemprop="name" content="srcnn">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SRCNN">
+      <meta itemprop="description" content="computer science">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="linux系统编程 | SRCNN">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux系统编程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-05-26 15:33:05" itemprop="dateCreated datePublished" datetime="2020-05-26T15:33:05+08:00">2020-05-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-17 23:16:20" itemprop="dateModified" datetime="2023-09-17T23:16:20+08:00">2023-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>9.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>16 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><ul>
+<li><a href="#head1"> 进程相关概念</a><ul>
+<li><a href="#head2"> 程序和进程</a></li>
+<li><a href="#head3"> 并行和并发</a></li>
+<li><a href="#head4">pcb–linux 内核的进程控制块是task_struct</a></li>
+<li><a href="#head5"> 进程的五种状态</a></li>
+<li><a href="#head6"> 进程控制</a><ul>
+<li><a href="#head7"> 基本概念</a></li>
+<li><a href="#head8"> exec函数族</a><ul>
+<li><a href="#head9"> 基本概念</a></li>
+<li><a href="#head10"> 执行指定目录下的程序</a></li>
+<li><a href="#head11"> 执行PATH环境变量能够搜索到的程序</a></li>
+</ul>
+</li>
+<li><a href="#head12"> 进程回收</a><ul>
+<li><a href="#head13"> 孤儿进程</a></li>
+<li><a href="#head14"> 僵尸进程</a></li>
+<li><a href="#head15"> 进程回收</a><ul>
+<li><a href="#head16">tips: 段错误：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!---more--->
+<ul>
+<li><a href="#head17"> 进程间通信相关概念</a><ul>
+<li><a href="#head18"> 什么是IPC</a></li>
+<li><a href="#head19"> 进程间通信常用的4种方式</a><ul>
+<li><a href="#head20"> 管道（匿名）</a><ul>
+<li><a href="#head21"> 管道的概念</a></li>
+<li><a href="#head22"> 管道的原理</a></li>
+<li><a href="#head23"> 管道的局限性</a></li>
+<li><a href="#head24"> 创建匿名管道</a></li>
+<li><a href="#head25"> 父子进程使用管道通信</a></li>
+<li><a href="#head26"> 管道的读写行为</a></li>
+<li><a href="#head27"> 查看管道缓冲区大小</a></li>
+<li><a href="#head28"> 如何设置非阻塞？？</a></li>
+</ul>
+</li>
+<li><a href="#head29"> fifo</a><ul>
+<li><a href="#head30"> 特点</a></li>
+<li><a href="#head31"> 使用场景</a></li>
+<li><a href="#head32"> 创建方式</a></li>
+<li><a href="#head33">fifo文件可以使用IO函数进行操作 就跟文件操作一摸一样</a></li>
+<li><a href="#head34"> 进程间通信</a></li>
+</ul>
+</li>
+<li><a href="#head35"> 内存映射区</a><ul>
+<li><a href="#head36"> mmap-创建内存映射</a></li>
+<li><a href="#head37"> munmap-释放内存映射区</a></li>
+<li><a href="#head38"> 思考问题</a></li>
+<li><a href="#head39"> 进程间通信</a></li>
+<li><a href="#head40"> 父子进程永远共享的东西？</a></li>
+</ul>
+</li>
+<li><a href="#head41"> 信号初步认识</a><ul>
+<li><a href="#head42"> 特点:</a></li>
+<li><a href="#head43"> 信号的状态</a></li>
+<li><a href="#head44"> 处理方式</a></li>
+<li><a href="#head45"> 信号的四要素</a></li>
+<li><a href="#head46"> 通过man文档查看信号</a></li>
+<li><a href="#head47"> 概念：阻塞信号集，未决信号集</a></li>
+<li><a href="#head48"> 信号相关的函数</a></li>
+<li><a href="#head49"> 信号集操作相关函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#head50"> 守护进程</a><ul>
+<li><a href="#head51"> 守护进程的特点</a></li>
+<li><a href="#head52"> 进程组</a></li>
+<li><a href="#head53"> 会话-多个进程组</a></li>
+<li><a href="#head54"> 创建守护进程模型</a></li>
+<li><a href="#head55"> 练习：</a></li>
+</ul>
+</li>
+<li><a href="#head56"> 线程</a><ul>
+<li><a href="#head57"> 线程的相关概念</a><ul>
+<li><a href="#head58"> 查看线程的LWP号：</a></li>
+<li><a href="#head59"> 创建线程–pthread_create</a></li>
+<li><a href="#head60"> 单个线程退出–pthread_exit</a></li>
+<li><a href="#head61"> <strong>阻塞等待</strong>线程退出，获得线程退出状态</a></li>
+<li><a href="#head62"> 线程分离</a></li>
+<li><a href="#head63"> 杀死线程–pthread_cancle</a></li>
+<li><a href="#head64"> 比较两个线程id是否相等（预留函数)</a></li>
+</ul>
+</li>
+<li><a href="#head65"> 线程同步</a><ul>
+<li><a href="#head66"> 互斥锁</a><ul>
+<li><a href="#head67"> 互斥锁类型：</a></li>
+<li><a href="#head68"> 互斥锁的特点</a></li>
+<li><a href="#head69"> 使用互斥锁的缺点</a></li>
+<li><a href="#head70"> 互斥锁的使用步骤：</a></li>
+<li><a href="#head71"> 互斥锁相关函数</a></li>
+</ul>
+</li>
+<li><a href="#head72"> 造成死锁的原因：</a></li>
+<li><a href="#head73"> 读写锁</a><ul>
+<li><a href="#head74"> 读写锁是几把锁？</a></li>
+<li><a href="#head75"> 读写锁的类型:</a></li>
+<li><a href="#head76"> 读写锁的状态：</a></li>
+<li><a href="#head77"> 读写锁的特性：</a></li>
+<li><a href="#head78"> 读写锁的使用场景</a></li>
+</ul>
+</li>
+<li><a href="#head79"> 条件变量</a><ul>
+<li><a href="#head80"> 条件变量是锁吗？</a></li>
+<li><a href="#head81"> 条件变量的两个动作</a></li>
+<li><a href="#head82"> 条件变量的类型：</a></li>
+<li><a href="#head83"> 主要函数</a></li>
+</ul>
+</li>
+<li><a href="#head84"> 信号量（信号灯）高级的互斥锁</a><ul>
+<li><a href="#head85"> 头文件</a></li>
+<li><a href="#head86"> 信号量类型</a></li>
+<li><a href="#head87"> 主要函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="进程相关概念"><a href="#进程相关概念" class="headerlink" title=" 进程相关概念"></a><span id="head1"> 进程相关概念</span></h1><h2 id="程序和进程"><a href="#程序和进程" class="headerlink" title=" 程序和进程"></a><span id="head2"> 程序和进程</span></h2><ul>
+<li>程序：二进制文件，占用的磁盘空间</li>
+<li>进程：启动的程序 所有的数据都在内存中 需要占用更多的系统资源 cpu，物理内存</li>
+</ul>
+<h2 id="并行和并发"><a href="#并行和并发" class="headerlink" title=" 并行和并发"></a><span id="head3"> 并行和并发</span></h2><ul>
+<li>并发 时间段内的概念</li>
+<li>并发：concurrent = two queue on coffe machine</li>
+<li>并行：paraller = two queue two caffe machies</li>
+</ul>
+<h2 id="pcb–linux-内核的进程控制块是task-struct"><a href="#pcb–linux-内核的进程控制块是task-struct" class="headerlink" title="pcb–linux 内核的进程控制块是task_struct"></a><span id="head4">pcb–linux 内核的进程控制块是task_struct</span></h2><ul>
+<li>进程id。系统中每个进程由唯一的id</li>
+<li>进程的状态，就绪、运行、挂起、停止等状态</li>
+<li>进程切换时需要保存和回复的一下CPU寄存器</li>
+<li>描述虚拟地址空间的信息</li>
+<li>描述控制终端的信息</li>
+<li>当前的工作目录</li>
+<li>umask掩码</li>
+<li>文件描述符表，包含很多指向file结构体的指针</li>
+<li>和信号相关的信息</li>
+<li>用户id和组id</li>
+<li>会话（session）(多个进程组组成的) 和进程组</li>
+<li>进程可以使用资源上限</li>
+</ul>
+<h2 id="进程的五种状态"><a href="#进程的五种状态" class="headerlink" title=" 进程的五种状态"></a><span id="head5"> 进程的五种状态</span></h2><p>    初始态 就绪态 运行态 挂起态 终止态</p>
+<h2 id="进程控制"><a href="#进程控制" class="headerlink" title=" 进程控制"></a><span id="head6"> 进程控制</span></h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title=" 基本概念"></a><span id="head7"> 基本概念</span></h3><p>fork函数有两个返回值, 由不同的进程返回的。父进程返回子进程的ID,子进程返回0。</p>
+<ul>
+<li><p>fork函数的返回值：父进程的返回值大于0;子进程的返回值等于0</p>
+</li>
+<li><p>子进程创建成功之后，代码的执行位置: 父进程执行到了哪里，子进程就从哪里执行</p>
+</li>
+<li><p>父子进程的执行顺序: 不一定 谁抢到CPU谁执行!!!</p>
+</li>
+<li><p>如何区分父子进程: 通过fork函数的返回值</p>
+</li>
+<li><p>getpid/getppid 得到当前进程的PID 得到当前进程的父进程的PID</p>
+</li>
+<li><p>ps aux | grep “aaa”: 常用查看进程ID</p>
+</li>
+<li><p>ps ajx | grep “aaa”: 可以查看的信息更多 </p>
+</li>
+<li><p>kill 想指定的进程发送信号 kill -9 pid;9号信号为SIGKILL:无条件的杀死, 不能被屏蔽，捕捉。</p>
+</li>
+<li><p>刚fork出来之后: 两个地址空间用户区数据完全相同</p>
+</li>
+<li><p>后续各自进行了不同的操作: 各个进程的地址空间中的数据是完全独立的</p>
+</li>
+<li><p>父子进程两个进程读时共享、写时复制！！！</p>
+</li>
+<li><p>父子进程之间能够使用全局变量通信？: 不能，两个进程间内存不能共享</p>
+</li>
+</ul>
+<h3 id="exec函数族"><a href="#exec函数族" class="headerlink" title=" exec函数族"></a><span id="head8"> exec函数族</span></h3><h4 id="基本概念-1"><a href="#基本概念-1" class="headerlink" title=" 基本概念"></a><span id="head9"> 基本概念</span></h4><p>让父子进程执行不相干的操作, 能够替换进程地址空间的源代码.text段, 当前程序中调用另外一个应用程序,首先想到exec之前需要fork。返回值:如果函数执行成功，不返回;如果执行失败，打印错误信息，退出当前程序。</p>
+<ol>
+<li>实现换核不换壳的功能</li>
+<li>执行一个另外的程序不需要创建额外的地址空间</li>
+<li>有个运行程序a，在a中调用另外的应用程序b</li>
+</ol>
+<h4 id="执行指定目录下的程序"><a href="#执行指定目录下的程序" class="headerlink" title=" 执行指定目录下的程序"></a><span id="head10"> 执行指定目录下的程序</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execl</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* path, <span class="type">const</span> <span class="type">char</span> *arg, ...)</span></span><br><span class="line">绝对路径</span><br><span class="line">最后要填上参数<span class="literal">NULL</span></span><br><span class="line">第一arg:随便 站位作用</span><br><span class="line">参数写完后 写 <span class="literal">NULL</span></span><br><span class="line">一般执行自定义程序</span><br></pre></td></tr></table></figure>
+
+<h4 id="执行PATH环境变量能够搜索到的程序"><a href="#执行PATH环境变量能够搜索到的程序" class="headerlink" title=" 执行PATH环境变量能够搜索到的程序"></a><span id="head11"> 执行PATH环境变量能够搜索到的程序</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execlp</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* file, <span class="type">const</span> <span class="type">char</span>*arg)</span></span><br><span class="line">第一arg:站位</span><br><span class="line">一般执行系统自带的程序</span><br><span class="line">  /bin</span><br></pre></td></tr></table></figure>
+
+<h3 id="进程回收"><a href="#进程回收" class="headerlink" title=" 进程回收"></a><span id="head12"> 进程回收</span></h3><h4 id="孤儿进程"><a href="#孤儿进程" class="headerlink" title=" 孤儿进程"></a><span id="head13"> 孤儿进程</span></h4><p>父进程结束，子进程没有正常退出。<br>孤儿进程被init进程领养，init进程变成孤儿进程的父亲。<br>为了释放子进程占用的系统资源,进程结束之后，能够释放用户区空间 子进程自己释放不了pcb，pcb必须由父进程释放。</p>
+<h4 id="僵尸进程"><a href="#僵尸进程" class="headerlink" title=" 僵尸进程"></a><span id="head14"> 僵尸进程</span></h4><p>子进程死了，父进程活着，父进程不去释放子进程的pcb，子进程变成僵尸进程。 僵尸进程是一个已经死掉的进程。</p>
+<h4 id="进程回收-1"><a href="#进程回收-1" class="headerlink" title=" 进程回收"></a><span id="head15"> 进程回收</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  wait--阻塞函数</span><br><span class="line">     <span class="type">pid_t</span> <span class="title function_">wait</span><span class="params">(<span class="type">int</span> *status)</span></span><br><span class="line">返回值：</span><br><span class="line">    -1：回收失败，已经没有子进程了</span><br><span class="line">    &gt;0: 回收子进程对应的pid</span><br><span class="line">参数：status</span><br><span class="line">    判断子进程如何死的</span><br><span class="line">       正常退出</span><br><span class="line">       被某个信号杀死</span><br><span class="line">调用一次只能回收一个子进程</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> waitpid</span><br><span class="line"><span class="type">pid_t</span> <span class="title function_">waitpid</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> *status, <span class="type">int</span> options)</span>    </span><br><span class="line">pid:</span><br><span class="line">    pid &gt; 0: 某个子进程的pid</span><br><span class="line">    pid == <span class="number">-1</span>: 回收所有的子进程</span><br><span class="line">	循环回收</span><br><span class="line">	<span class="keyword">while</span>((wpid = waitpid(<span class="number">-1</span>, &amp;status, xx) != <span class="number">-1</span>)???</span><br><span class="line">    pid == <span class="number">0</span>:</span><br><span class="line">	回收当前进程组的所有的子进程</span><br><span class="line">    pid &lt; <span class="number">0</span>:子进程的pid取反（加减号）</span><br><span class="line">options：</span><br><span class="line">    <span class="number">0</span>：阻塞</span><br><span class="line">    WNOHANG - 非阻塞</span><br><span class="line">返回值：</span><br><span class="line">   <span class="number">-1</span>： 回收失败 没有子进程</span><br><span class="line">   &gt;<span class="number">0</span>: 被回收的子进程的pid</span><br><span class="line">   如果为非阻塞：</span><br><span class="line">	=<span class="number">0</span>：子进程处于运行状态</span><br></pre></td></tr></table></figure>
+
+<h5 id="tips-段错误："><a href="#tips-段错误：" class="headerlink" title="tips: 段错误："></a><span id="head16">tips: 段错误：</span></h5><ul>
+<li>访问了非法内存</li>
+<li>访问了不可写的区域进行写操作</li>
+<li>栈空间溢出</li>
+</ul>
+<h1 id="进程间通信相关概念"><a href="#进程间通信相关概念" class="headerlink" title=" 进程间通信相关概念"></a><span id="head17"> 进程间通信相关概念</span></h1><h2 id="什么是IPC"><a href="#什么是IPC" class="headerlink" title=" 什么是IPC"></a><span id="head18"> 什么是IPC</span></h2><ul>
+<li>进程间通信</li>
+<li>InterProcess Communication</li>
+</ul>
+<h2 id="进程间通信常用的4种方式"><a href="#进程间通信常用的4种方式" class="headerlink" title=" 进程间通信常用的4种方式"></a><span id="head19"> 进程间通信常用的4种方式</span></h2><ul>
+<li>管道-简单</li>
+<li>信号-系统开销小</li>
+<li>共享映射区-（有无血缘关系的进程间通信都可以）</li>
+<li>本地套接字-稳定</li>
+</ul>
+<h3 id="管道（匿名）"><a href="#管道（匿名）" class="headerlink" title=" 管道（匿名）"></a><span id="head20"> 管道（匿名）</span></h3><h4 id="管道的概念"><a href="#管道的概念" class="headerlink" title=" 管道的概念"></a><span id="head21"> 管道的概念</span></h4><ul>
+<li>本质：内核缓冲区 伪文件-不占用磁盘空间</li>
+<li>特点：<br>两部分：读端，写端，对应两个文件描述符,数据写端流入，读端流出 ,操作管道的进程被销毁之后，管道自动被释放了,管道默认是阻塞的。</li>
+</ul>
+<h4 id="管道的原理"><a href="#管道的原理" class="headerlink" title=" 管道的原理"></a><span id="head22"> 管道的原理</span></h4><ul>
+<li>内部的实现方式：队列<br>环形队列<br>特点：先进先出</li>
+<li>缓冲区大小：<br>默认4K<br>大小会根据实际情况做<strong>适当</strong>的调整</li>
+</ul>
+<h4 id="管道的局限性"><a href="#管道的局限性" class="headerlink" title=" 管道的局限性"></a><span id="head23"> 管道的局限性</span></h4><ul>
+<li>队列：<br>数据只能读取一次，不能重复读取</li>
+<li>半双工: <strong>数据传输的方向是单向的</strong></li>
+<li>匿名管道：<br>适用于有血缘关系的进程</li>
+</ul>
+<h4 id="创建匿名管道"><a href="#创建匿名管道" class="headerlink" title=" 创建匿名管道"></a><span id="head24"> 创建匿名管道</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> fd[<span class="number">2</span>])</span>;</span><br><span class="line">  fd-传出参数</span><br><span class="line">  fd[<span class="number">0</span>]-读端</span><br><span class="line">  fd[<span class="number">1</span>]-写端</span><br></pre></td></tr></table></figure>
+<h4 id="父子进程使用管道通信"><a href="#父子进程使用管道通信" class="headerlink" title=" 父子进程使用管道通信"></a><span id="head25"> 父子进程使用管道通信</span></h4><ul>
+<li>单个进程能否使用管道完成读写操作?<br>可以</li>
+<li>父子进程间通信是否需要sleep函数？<br>父写–写的慢,<br>子读–读的快,<br>不需要,阻塞的</li>
+<li>注意事项：<br>父进程读 关闭写端;<br>子进程写 关闭读端</li>
+</ul>
+<h4 id="管道的读写行为"><a href="#管道的读写行为" class="headerlink" title=" 管道的读写行为"></a><span id="head26"> 管道的读写行为</span></h4><ol>
+<li>读操作</li>
+</ol>
+<ul>
+<li>有数据.<br>read(fd) 正常读，返回读出的字节流</li>
+<li>无数据.<br>写端全部关闭，read解除阻塞，返回0<br>相当于读文件读到了尾部<br>没有全部关闭<br>read阻塞</li>
+</ul>
+<ol start="2">
+<li>写操作</li>
+</ol>
+<ul>
+<li>读端全部关闭.<br>  管道破裂，进程被终止，</li>
+</ul>
+<p>内核给当前进程发信号SIGPIPE</p>
+<ul>
+<li>读端没全部关闭.<br>  缓冲区写满了<br>  write阻塞<br>  缓冲区没有满<br>  write继续写</li>
+</ul>
+<h4 id="查看管道缓冲区大小"><a href="#查看管道缓冲区大小" class="headerlink" title=" 查看管道缓冲区大小"></a><span id="head27"> 查看管道缓冲区大小</span></h4><p>fpathconf</p>
+<h4 id="如何设置非阻塞？？"><a href="#如何设置非阻塞？？" class="headerlink" title=" 如何设置非阻塞？？"></a><span id="head28"> 如何设置非阻塞？？</span></h4><p>默认读写两端都阻塞</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">设置读端为非阻塞pipe(fd)</span><br><span class="line">  fcntl--变参函数</span><br><span class="line">  复制文件描述符-dup</span><br><span class="line">  修改文件属性-open的时候对应flag属性</span><br><span class="line">设置方法：</span><br><span class="line">  获取原来的flags</span><br><span class="line">  <span class="type">int</span> flags = fcntl(fd[<span class="number">0</span>], F_GETFL)</span><br><span class="line">  <span class="comment">// 设置新的flags</span></span><br><span class="line">  flag |= O_NONBLOCK;</span><br><span class="line">  fcntl(fd[<span class="number">0</span>], F_SETFL, flags);</span><br></pre></td></tr></table></figure>
+
+<h3 id="fifo"><a href="#fifo" class="headerlink" title=" fifo"></a><span id="head29"> fifo</span></h3><h4 id="特点"><a href="#特点" class="headerlink" title=" 特点"></a><span id="head30"> 特点</span></h4><ul>
+<li>有名管道</li>
+<li>在磁盘上由这样一个文件ls -l -&gt; p</li>
+<li>伪文件，在磁盘上大小永远为0</li>
+<li>在内核中有一个对应的缓冲区</li>
+<li>半双工的通信方式</li>
+</ul>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title=" 使用场景"></a><span id="head31"> 使用场景</span></h4><p>没有血缘关系的进程间通信</p>
+<h4 id="创建方式"><a href="#创建方式" class="headerlink" title=" 创建方式"></a><span id="head32"> 创建方式</span></h4><ul>
+<li>命令：mkfifo 管道名</li>
+<li>函数：mkfifo</li>
+</ul>
+<h4 id="fifo文件可以使用IO函数进行操作-就跟文件操作一摸一样"><a href="#fifo文件可以使用IO函数进行操作-就跟文件操作一摸一样" class="headerlink" title="fifo文件可以使用IO函数进行操作 就跟文件操作一摸一样"></a><span id="head33">fifo文件可以使用IO函数进行操作 就跟文件操作一摸一样</span></h4><ul>
+<li>open/close</li>
+<li>read/write</li>
+<li>不能执行lseek操作</li>
+</ul>
+<h4 id="进程间通信"><a href="#进程间通信" class="headerlink" title=" 进程间通信"></a><span id="head34"> 进程间通信</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">a. fifo文件 --- myfifo</span><br><span class="line">两个不相干的进程A(a.c) B(b.c)</span><br><span class="line">a.c ---&gt; read</span><br><span class="line">  <span class="type">int</span> fd = open(<span class="string">"myfifo"</span>, O_RDONLY)</span><br><span class="line">  read(fd, buf, <span class="keyword">sizeof</span>(buf))</span><br><span class="line">  close(fd);</span><br><span class="line">b b.c --- write</span><br><span class="line">  <span class="type">int</span> fd1 = open(<span class="string">"myfifo"</span>, O_WRONLY);)</span><br><span class="line">  write(fd1, <span class="string">"hello, world"</span>, <span class="number">11</span>)</span><br><span class="line">  close(fd1);</span><br></pre></td></tr></table></figure>
+<h3 id="内存映射区"><a href="#内存映射区" class="headerlink" title=" 内存映射区"></a><span id="head35"> 内存映射区</span></h3><h4 id="mmap-创建内存映射"><a href="#mmap-创建内存映射" class="headerlink" title=" mmap-创建内存映射"></a><span id="head36"> mmap-创建内存映射</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">作用：将磁盘文件的数据映射到内存，用户通过修改内存就能修改磁盘文件</span><br><span class="line">函数原型：</span><br><span class="line">  <span class="type">void</span>* <span class="title function_">mmap</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span>* adrr, <span class="comment">// 映射区首地址，NULL</span></span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> length, <span class="comment">// 映射区的大小</span></span></span><br><span class="line"><span class="params">      <span class="number">4</span>k 整数倍</span></span><br><span class="line"><span class="params">      不能为<span class="number">0</span></span></span><br><span class="line"><span class="params">      一般文件多大，length就指定多大</span></span><br><span class="line"><span class="params">    <span class="type">int</span> prot, <span class="comment">// 映射区权限</span></span></span><br><span class="line"><span class="params">      PROT_READ6 -- 映射区必须要有读权限</span></span><br><span class="line"><span class="params">      PROT_WRITE</span></span><br><span class="line"><span class="params">      PROT_READ6 | PROT_WRITE 读写操作</span></span><br><span class="line"><span class="params">    <span class="type">int</span> flags, <span class="comment">// 标志位参数</span></span></span><br><span class="line"><span class="params">      MAP_SHARED</span></span><br><span class="line"><span class="params">        修改了内存数据会同步到磁盘</span></span><br><span class="line"><span class="params">      MAP_PRIVATE </span></span><br><span class="line"><span class="params">        修改了内存数据不会同步到磁盘</span></span><br><span class="line"><span class="params">    <span class="type">int</span> fd, <span class="comment">// 文件描述符</span></span></span><br><span class="line"><span class="params">      干嘛的文件描述符？</span></span><br><span class="line"><span class="params">        要映射的文件对应的fd</span></span><br><span class="line"><span class="params">      怎么得到？</span></span><br><span class="line"><span class="params">        open()</span></span><br><span class="line"><span class="params">    <span class="type">off_t</span> offset <span class="comment">// 映射文件的偏移量</span></span></span><br><span class="line"><span class="params">      映射的时候文件指针的偏移量</span></span><br><span class="line"><span class="params">        必须是<span class="number">4</span>k的整数倍</span></span><br><span class="line"><span class="params">        <span class="number">0</span></span></span><br><span class="line"><span class="params">  )</span></span><br><span class="line">返回值：</span><br><span class="line">  映射区的首地址-调用成功</span><br><span class="line">  调用失败：<span class="title function_">MAP_FAILED</span> <span class="params">(<span class="type">void</span>*)</span> -1</span><br></pre></td></tr></table></figure>
+<h4 id="munmap-释放内存映射区"><a href="#munmap-释放内存映射区" class="headerlink" title=" munmap-释放内存映射区"></a><span id="head37"> munmap-释放内存映射区</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">函数原型：<span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span>*addr, <span class="type">size_t</span> length)</span></span><br><span class="line">  addr: --mmap 的返回值，映射区的首地址</span><br><span class="line">  length: --mmap的第二个参数，映射区的长度</span><br></pre></td></tr></table></figure>
+<h4 id="思考问题"><a href="#思考问题" class="headerlink" title=" 思考问题"></a><span id="head38"> 思考问题</span></h4><ol>
+<li>如果对mmap的返回值做++操作，munmap不能释放成功<br>char *pt = ptr; 要复制一份</li>
+<li>mmap什么情况下会调用失败？</li>
+</ol>
+<ul>
+<li>第二个参数为零</li>
+<li>第三个参数必须指定PROT_READ</li>
+<li>fd对应的打开权限必须大于等于prot权限</li>
+<li>偏移量：必须是4096的整数倍</li>
+</ul>
+<ol start="3">
+<li>可以open的时候O_CREAT一个新文件来创建映射区吗？<ul>
+<li>可以，需要做文件扩展<br>  lseek<br>  truncate(path, length)</li>
+</ul>
+</li>
+<li>mmap后关闭文件描述符，对mmap映射区有没有影响</li>
+</ol>
+<ul>
+<li>没有</li>
+</ul>
+<ol start="5">
+<li>对ptr越界操作会怎样？</li>
+</ol>
+<ul>
+<li>段错误</li>
+</ul>
+<h4 id="进程间通信-1"><a href="#进程间通信-1" class="headerlink" title=" 进程间通信"></a><span id="head39"> 进程间通信</span></h4><ul>
+<li>没有血缘关系的进程间通信:<br>  不能使用匿名映射的方式;<br>  只能借助磁盘文件创建映射区 -hello;<br>  不阻塞.</li>
+</ul>
+<h4 id="父子进程永远共享的东西？"><a href="#父子进程永远共享的东西？" class="headerlink" title=" 父子进程永远共享的东西？"></a><span id="head40"> 父子进程永远共享的东西？</span></h4><ul>
+<li>文件描述符</li>
+<li>内存映射区</li>
+</ul>
+<h3 id="信号初步认识"><a href="#信号初步认识" class="headerlink" title=" 信号初步认识"></a><span id="head41"> 信号初步认识</span></h3><h4 id="特点-1"><a href="#特点-1" class="headerlink" title=" 特点:"></a><span id="head42"> 特点:</span></h4><ul>
+<li>简单</li>
+<li>携带的信息量少</li>
+<li>使用在某个特定的场景中</li>
+</ul>
+<h4 id="信号的状态"><a href="#信号的状态" class="headerlink" title=" 信号的状态"></a><span id="head43"> 信号的状态</span></h4><ul>
+<li>产生： 键盘、命令kill、系统函数kill、软条件：定时器、硬件：段错误，除零错误</li>
+<li>未决状态-信号等待被处理</li>
+<li>递达-信号被处理</li>
+</ul>
+<h4 id="处理方式"><a href="#处理方式" class="headerlink" title=" 处理方式"></a><span id="head44"> 处理方式</span></h4><ul>
+<li>忽略</li>
+<li>捕捉</li>
+<li>执行默认的动作</li>
+<li>信号的优先级比较高，进程收到信号之后，暂停正在处理的工作，有限处理信号，处理完成之后在继续暂停的工作。</li>
+</ul>
+<h4 id="信号的四要素"><a href="#信号的四要素" class="headerlink" title=" 信号的四要素"></a><span id="head45"> 信号的四要素</span></h4><h4 id="通过man文档查看信号"><a href="#通过man文档查看信号" class="headerlink" title=" 通过man文档查看信号"></a><span id="head46"> 通过man文档查看信号</span></h4><p>man 7 siganl The signals SIGKILL and SIGSTOP connot  be cought blocked, or ingnored</p>
+<h4 id="概念：阻塞信号集，未决信号集"><a href="#概念：阻塞信号集，未决信号集" class="headerlink" title=" 概念：阻塞信号集，未决信号集"></a><span id="head47"> 概念：阻塞信号集，未决信号集</span></h4><ul>
+<li>pcb:<br>不能直接操作</li>
+<li>阻塞信号集:<br>  要屏蔽的信号(要忽略的信号直接放到阻塞信号集)</li>
+<li>未决信号集：<br>  没有被处理的信号的集合</li>
+<li>信号产生，信号处于未决状态，进程收到信号之后，信号被放入未决信号集 放入未决信号集中的信号等待处理，在处理之前需要做一件事情： 判断阻塞信号集中该信号对应的标志位是否为1，如果为1，不处理，如果0 则处理该信号 当阻塞信号集中该信号对应的标志位为0时，信号被处理。</li>
+<li>设置信号阻塞？<br>  先设置一个自定义信号集，把一些要屏蔽的信号置位</li>
+</ul>
+<h4 id="信号相关的函数"><a href="#信号相关的函数" class="headerlink" title=" 信号相关的函数"></a><span id="head48"> 信号相关的函数</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、kill -- 发送信号给指定进程</span><br><span class="line">	函数原型：<span class="type">int</span> <span class="title function_">kill</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig)</span></span><br><span class="line">2、raise-- 自己给自己发信号</span><br><span class="line">	函数原型： <span class="type">int</span> <span class="title function_">raise</span><span class="params">(<span class="type">int</span> sig)</span></span><br><span class="line">3、<span class="built_in">abort</span>--给自己发送异常终止信号</span><br><span class="line">4、闹钟（定时器）</span><br><span class="line">	每个进程只有一个定时其</span><br><span class="line">	使用的是自然定时法</span><br><span class="line">		不受进程状态的影响</span><br><span class="line">	real = 用户 + 内核 + 损耗</span><br><span class="line">		损耗来自文件IO操作</span><br><span class="line">	</span><br><span class="line">	setitimer -- 定时器，并实现周期性定时</span><br></pre></td></tr></table></figure>
+
+<h4 id="信号集操作相关函数"><a href="#信号集操作相关函数" class="headerlink" title=" 信号集操作相关函数"></a><span id="head49"> 信号集操作相关函数</span></h4><ol>
+<li>概念：</li>
+</ol>
+<ul>
+<li>未决信号集：<br>没有被当前进程处理的信号</li>
+<li>阻塞信号集：<br>将某个信号放到阻塞信号集，这个信号就不会被进程处理<br>阻塞接触之后，信号被处理</li>
+<li>信号产生，信号处于未决状态，进程收到信号之后，信号被放入未决信号集 放入未决信号集中的信号等待处理，在处理之前需要判断阻塞信号集中该信号对应的标志位，如果为1，不处理，如果0则处理该信号<br>当阻塞信号集该标志位对应的标志位为0时，该信号被处理。</li>
+</ul>
+<ol start="2">
+<li>自定义信号集</li>
+</ol>
+<ul>
+<li>int sigemptyset(sigset_t *set); 将set集合之空</li>
+<li>int sigfillset(sigset_t *set); 将所有信号加入set集合</li>
+<li>int sigaddset(sigset_t *set, int signo);<br>将signo信号加入set集合</li>
+<li>int sigdelset(sigset_t *set, int signo);<br>从set集合中移除signo信号</li>
+<li>int sigismember(const sigset_t *set, int signo);<br>判断信号是否存在</li>
+</ul>
+<ol start="3">
+<li>sigprocmask 函数</li>
+</ol>
+<ul>
+<li>屏蔽和接触信号屏蔽，将自定义信号集设置给阻塞信号集</li>
+</ul>
+<ol start="4">
+<li>sipenging</li>
+</ol>
+<ul>
+<li>读取当前进程的未决信号集</li>
+</ul>
+<ol start="5">
+<li>信号捕捉</li>
+</ol>
+<ul>
+<li>signal函数 (不是POSIX标准)<br>typedef void (*sighandler_t)(int)<br>sighandler_t signal(int signum, sighander_t hander)</li>
+<li>sigaction函数(是POSIX标准)<br>int sigaction(int signum, // 捕捉的信号<br>const struct sigaction *act,<br>struct sigaction *oldact<br>)<br>struct sigaction {<br>void (*sa_handler)(int),<br>void (<em>sa_sigaction)(int ,siginfo_t</em>, void *);<br>sigset_t sa_mask; 在信号处理函数执行过程中，临时屏蔽指定的信号<br>int sa_flags;0-&gt;sa_handler<br>}</li>
+</ul>
+<h1 id="守护进程"><a href="#守护进程" class="headerlink" title=" 守护进程"></a><span id="head50"> 守护进程</span></h1><h2 id="守护进程的特点"><a href="#守护进程的特点" class="headerlink" title=" 守护进程的特点"></a><span id="head51"> 守护进程的特点</span></h2><ul>
+<li>后台服务进程</li>
+<li>独立于控制终端</li>
+<li>周期性执行某个任务</li>
+<li>不受用户登录注销影响</li>
+<li>一般采用以d结尾的名字（服务）</li>
+</ul>
+<h2 id="进程组"><a href="#进程组" class="headerlink" title=" 进程组"></a><span id="head52"> 进程组</span></h2><ul>
+<li>进程的组长？<br>组里边的第一进程<br>进程组的ID == 进程组的组长的ID</li>
+<li>进程组组长的选择:<br>进程中的第一个进程</li>
+<li>进程组ID的设定:<br>进程组的id就是组长的进程ID</li>
+</ul>
+<h2 id="会话-多个进程组"><a href="#会话-多个进程组" class="headerlink" title=" 会话-多个进程组"></a><span id="head53"> 会话-多个进程组</span></h2><ul>
+<li>创建一个会话注意事项:<br>不能是进程组长;<br>创建会话的进程成为新进程组的组长;<br>有些linux版本需要root权限执行此操作;<br>创建出新回话会丢弃原来的控制终端;<br>一般步骤：先fork，父亲死，儿子执行创建回话操作（setsid）</li>
+<li>获取进程所属的会话ID:<br>pid_t getsid(pid_t pid);</li>
+<li>创建一个会话:<br>pid_t setsid(void);</li>
+</ul>
+<h2 id="创建守护进程模型"><a href="#创建守护进程模型" class="headerlink" title=" 创建守护进程模型"></a><span id="head54"> 创建守护进程模型</span></h2><ol>
+<li>fork子进程，父进程退出:<br>必须</li>
+<li>子进程创建新会话:<br>必须;<br>setsid()</li>
+<li>改变当前工作目录chdir:<br>不是必须的</li>
+<li>重设文件掩码:<br>子进程会继承父进程的掩码,重新设置掩码可以增加子程序操作的灵活性;<br>umask(0);<br>不是必须的</li>
+<li>关闭文件描述符:<br>close(STDIN);<br>close(STDOUT);<br>close(STDERR);<br>释放资源;<br>不是必须的</li>
+<li>执行核心工作:<br>–必须的</li>
+</ol>
+<h2 id="练习："><a href="#练习：" class="headerlink" title=" 练习："></a><span id="head55"> 练习：</span></h2><ol>
+<li>写一个守护进程，每个2s获取一次系统时间， 将这个时间写入到磁盘文件。</li>
+</ol>
+<ul>
+<li>创建守护进程</li>
+<li>需要一个定时器，2s触发一次<br>setitimer<br>sleep</li>
+<li>信号捕捉</li>
+</ul>
+<h1 id="线程"><a href="#线程" class="headerlink" title=" 线程"></a><span id="head56"> 线程</span></h1><ul>
+<li><p>创建线程之后，地址空间没有变化，进程退化成了线程-主线程</p>
+</li>
+<li><p>创建出的子线程和主线程共用地址空间</p>
+</li>
+<li><p>主线程和子线程有各自独立的pcb:<br>子线程的pcb是从主线程拷贝过来的</p>
+</li>
+<li><p>主线程和子线程除了栈不共享，其他都共享;<br>通信：全局变量、堆<br>不共享：<br>栈，栈被多个线程平均分配</p>
+</li>
+<li><p>在Linux下:<br>线程就是进程-轻量级进程<br>对于内核来说，线程就是进程(只看pcb)</p>
+</li>
+<li><p>多线程和多进程区别：</p>
+</li>
+<li><p>多进程始终共享的资源：<br>代码;<br>文件描述符;<br>内存映射区 – mmap.</p>
+</li>
+<li><p>线程共享：<br>堆<br>全局变量</p>
+</li>
+<li><p>线程节省资源</p>
+</li>
+</ul>
+<h2 id="线程的相关概念"><a href="#线程的相关概念" class="headerlink" title=" 线程的相关概念"></a><span id="head57"> 线程的相关概念</span></h2><h3 id="查看线程的LWP号："><a href="#查看线程的LWP号：" class="headerlink" title=" 查看线程的LWP号："></a><span id="head58"> 查看线程的LWP号：</span></h3><p>线程号和线程ID是有区别的<br>线程号是给内核看的</p>
+<ul>
+<li>查看方式：<br>找到程序的进程ID;<br>ps -Lf pid</li>
+</ul>
+<h3 id="创建线程–pthread-create"><a href="#创建线程–pthread-create" class="headerlink" title=" 创建线程–pthread_create"></a><span id="head59"> 创建线程–pthread_create</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果成功0， 失败返回错误号 </span></span><br><span class="line"><span class="comment">// perror() 不能使用该函数打印错误信息</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(</span></span><br><span class="line"><span class="params">  <span class="type">pthread_t</span> *thread, <span class="comment">// 线程ID = 无符号长整形</span></span></span><br><span class="line"><span class="params">  <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="comment">// 线程属性，NULL 可以线程分离 通过设置属性来实现线程分离 pthread_attr_init() pthread_attr_setdetachstat() pthread_attr_destroy()</span></span></span><br><span class="line"><span class="params">  <span class="type">void</span> *(*start_routine)(<span class="type">void</span> *), <span class="comment">// 线程处理函数</span></span></span><br><span class="line"><span class="params">  <span class="type">void</span> *arg <span class="comment">// 线程处理函数参数</span></span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">参数：</span><br><span class="line">  thread:传出参数，线程创建成功之后，会被设置一个合适的值</span><br><span class="line">  attr:默认传<span class="literal">NULL</span></span><br><span class="line">  start_routine:子线程的处理函数</span><br><span class="line">  arg:回调函数的参数。</span><br></pre></td></tr></table></figure>
+
+<h3 id="单个线程退出–pthread-exit"><a href="#单个线程退出–pthread-exit" class="headerlink" title=" 单个线程退出–pthread_exit"></a><span id="head60"> 单个线程退出–pthread_exit</span></h3><ul>
+<li>函数原型： void pthread_exit(void *retval)</li>
+<li>retval指针： 必须指向全局，堆，不能使用栈空间</li>
+<li>不要用exit(1)退出线程，这样会影响其他县城。</li>
+</ul>
+<h3 id="阻塞等待线程退出，获得线程退出状态"><a href="#阻塞等待线程退出，获得线程退出状态" class="headerlink" title=" 阻塞等待线程退出，获得线程退出状态"></a><span id="head61"> <strong>阻塞等待</strong>线程退出，获得线程退出状态</span></h3><ul>
+<li>int pthread_join(pthread_t pthread, void **retval)</li>
+<li>thread: 要回收的子线程的线程id</li>
+<li>retval：读取线程退出的时候携带的状态信息</li>
+<li>传出参数</li>
+<li>void* ptr</li>
+<li>pthread_join(pthread, &amp;ptr);</li>
+<li>指向的内存和pthread_exit参数指向同一块内存空间</li>
+</ul>
+<h3 id="线程分离"><a href="#线程分离" class="headerlink" title=" 线程分离"></a><span id="head62"> 线程分离</span></h3><ul>
+<li>pthread_detach</li>
+<li>子线程会自动回收自己的pcb</li>
+<li>调用函数后不需要调用pthread_join</li>
+<li>函数原型： int pthread_detach(pthread_t pthread)</li>
+<li>一般指定属性就能实现线程分离</li>
+</ul>
+<h3 id="杀死线程–pthread-cancle"><a href="#杀死线程–pthread-cancle" class="headerlink" title=" 杀死线程–pthread_cancle"></a><span id="head63"> 杀死线程–pthread_cancle</span></h3><ul>
+<li>使用注意事项：<br>设置取消点,没有任何意义 pthread_testcancle();<br>在要杀死的子线程对应的处理函数的内部必须做过一个系统调用<br>int pthread_cancle(pthread_t thread)</li>
+</ul>
+<h3 id="比较两个线程id是否相等（预留函数"><a href="#比较两个线程id是否相等（预留函数" class="headerlink" title=" 比较两个线程id是否相等（预留函数)"></a><span id="head64"> 比较两个线程id是否相等（预留函数)</span></h3><ul>
+<li>pthread_equal</li>
+</ul>
+<h2 id="线程同步"><a href="#线程同步" class="headerlink" title=" 线程同步"></a><span id="head65"> 线程同步</span></h2><ul>
+<li>数据混乱的原因：<br>操作了共享资源<br>CPU调度问题</li>
+<li>解决：<br>线程同步<br>什么叫同步：<br>协同步调，按照先后顺序执行操作</li>
+<li>线程同步思想:<br>如果锁是锁着的,<br>线程阻塞，阻塞在这把锁上;<br>如果锁是打开的,<br>线程访问共享资源<br>会将这把锁上锁.</li>
+</ul>
+<h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title=" 互斥锁"></a><span id="head66"> 互斥锁</span></h3><h4 id="互斥锁类型："><a href="#互斥锁类型：" class="headerlink" title=" 互斥锁类型："></a><span id="head67"> 互斥锁类型：</span></h4><ul>
+<li>创建一把锁：pthread_mutex_t mutex;</li>
+</ul>
+<h4 id="互斥锁的特点"><a href="#互斥锁的特点" class="headerlink" title=" 互斥锁的特点"></a><span id="head68"> 互斥锁的特点</span></h4><ul>
+<li>多个线程访问共享数据的时候是串行的</li>
+</ul>
+<h4 id="使用互斥锁的缺点"><a href="#使用互斥锁的缺点" class="headerlink" title=" 使用互斥锁的缺点"></a><span id="head69"> 使用互斥锁的缺点</span></h4><ul>
+<li>效率低</li>
+</ul>
+<h4 id="互斥锁的使用步骤："><a href="#互斥锁的使用步骤：" class="headerlink" title=" 互斥锁的使用步骤："></a><span id="head70"> 互斥锁的使用步骤：</span></h4><ol>
+<li>创建互斥锁：pthread_mutex_t mutex</li>
+<li>初始化这把锁：pthread_mutex_init(&amp;mutex)</li>
+<li>寻找共享资源：<br>操作共享资源的代码之前加锁<br>pthread_mutex_lock(&amp;mutex)<br>。。。临界区 应该尽可能的保证临界区越小越好<br>。。。<br>pthread_mutex_unlock(&amp;mutex)</li>
+</ol>
+<h4 id="互斥锁相关函数"><a href="#互斥锁相关函数" class="headerlink" title=" 互斥锁相关函数"></a><span id="head71"> 互斥锁相关函数</span></h4><ol>
+<li><p>pthread_mutex_init</p>
+</li>
+<li><p>pthread_mutex_destroy</p>
+</li>
+<li><p>pthread_mutex_lock</p>
+</li>
+<li><p>pthread_mutex_unlock</p>
+</li>
+<li><p>pthread_mutex_trylock 尝试加锁，失败返回，不阻塞。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(pthread_mutex_trylock(&amp;mutex) == <span class="number">0</span>)</span><br><span class="line">{</span><br><span class="line">  成功加锁</span><br><span class="line">}</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">{</span><br><span class="line">  为成功加锁。</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>原子操作</p>
+</li>
+</ol>
+<ul>
+<li>CPU处理一个指令，线程、进程在处理完这个指令之前是不会失去CPU的<br>printf()</li>
+</ul>
+<h3 id="造成死锁的原因："><a href="#造成死锁的原因：" class="headerlink" title=" 造成死锁的原因："></a><span id="head72"> 造成死锁的原因：</span></h3><ol>
+<li>自己锁自己 –操作做完成之后，一定要解锁。</li>
+<li>互相需要对方的资源</li>
+</ol>
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title=" 读写锁"></a><span id="head73"> 读写锁</span></h3><h4 id="读写锁是几把锁？"><a href="#读写锁是几把锁？" class="headerlink" title=" 读写锁是几把锁？"></a><span id="head74"> 读写锁是几把锁？</span></h4><p>一把锁<br>pthread_rwlock_t lock;</p>
+<h4 id="读写锁的类型"><a href="#读写锁的类型" class="headerlink" title=" 读写锁的类型:"></a><span id="head75"> 读写锁的类型:</span></h4><p>读锁 - 对内存做读操作<br>写锁 - 对内存做写操作</p>
+<h4 id="读写锁的状态："><a href="#读写锁的状态：" class="headerlink" title=" 读写锁的状态："></a><span id="head76"> 读写锁的状态：</span></h4><h4 id="读写锁的特性："><a href="#读写锁的特性：" class="headerlink" title=" 读写锁的特性："></a><span id="head77"> 读写锁的特性：</span></h4><ul>
+<li>线程A加读锁成功，又来了三个线程，做读操作.可以加锁成功<br><strong>读共享</strong>-并行处理</li>
+<li>线程A加写锁成功，又来了三个线程，做读操作.可以加锁阻塞<br><strong>写独占</strong></li>
+<li>线程A加读锁成功，又来了B线程加写锁阻塞，又来了C线程加读锁阻塞.<br>读写不能同时进行<br><strong>写的优先级高</strong></li>
+</ul>
+<h4 id="读写锁的使用场景"><a href="#读写锁的使用场景" class="headerlink" title=" 读写锁的使用场景"></a><span id="head78"> 读写锁的使用场景</span></h4><ul>
+<li>互斥锁-读写串行</li>
+<li>读写锁-读并行，写串行</li>
+<li>程序中的读操作比较多。</li>
+</ul>
+<ol start="6">
+<li>主要操作函数</li>
+</ol>
+<ul>
+<li>pthread_rwlock_init()</li>
+<li>pthread_rwlock_destroy()</li>
+<li>pthread_rwlock_rdlock()</li>
+<li>pthread_rwlock_tryrdlock()</li>
+<li>pthread_rwlock_wrlock()</li>
+<li>pthread_rwlock_trywrlock()</li>
+<li>pthread_rwlock_unlock()</li>
+</ul>
+<ol start="7">
+<li>读写锁、互斥锁<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">阻塞线程</span><br><span class="line">不是什么时候都能阻塞线程</span><br><span class="line">  链表Node* head = <span class="literal">NULL</span></span><br><span class="line">  <span class="keyword">while</span>(head == <span class="literal">NULL</span>)</span><br><span class="line">  {</span><br><span class="line">    <span class="comment">// 我们想让代码在这个位置阻塞</span></span><br><span class="line">    <span class="comment">// 等待链表中有了节点之后在继续向下运行</span></span><br><span class="line">    <span class="comment">// 在不满足条件的时候能够阻塞线程</span></span><br><span class="line">  }</span><br><span class="line">  <span class="comment">// 链表不为空的处理代码</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="条件变量"><a href="#条件变量" class="headerlink" title=" 条件变量"></a><span id="head79"> 条件变量</span></h3><h4 id="条件变量是锁吗？"><a href="#条件变量是锁吗？" class="headerlink" title=" 条件变量是锁吗？"></a><span id="head80"> 条件变量是锁吗？</span></h4><ul>
+<li><strong>不是锁</strong>，但是条件变量能够阻塞线程</li>
+<li>使用<strong>条件变量+互斥量</strong><br>互斥量：保护一块共享数据<br>条件变量：引起阻塞<br>生产者和消费者模型</li>
+</ul>
+<h4 id="条件变量的两个动作"><a href="#条件变量的两个动作" class="headerlink" title=" 条件变量的两个动作"></a><span id="head81"> 条件变量的两个动作</span></h4><ul>
+<li>条件不满足，阻塞线程</li>
+<li>当条件满足，通知阻塞的线程开始工作</li>
+</ul>
+<h4 id="条件变量的类型："><a href="#条件变量的类型：" class="headerlink" title=" 条件变量的类型："></a><span id="head82"> 条件变量的类型：</span></h4><ul>
+<li>pthread_cond_t cond;</li>
+</ul>
+<h4 id="主要函数"><a href="#主要函数" class="headerlink" title=" 主要函数"></a><span id="head83"> 主要函数</span></h4><ul>
+<li>pthread_cond_init()</li>
+<li>pthread_cond_destroy()</li>
+<li>pthread_cond_wait()<br><strong>阻塞线程</strong><br><strong>将已经上锁的mutex解锁!!</strong><br><strong>该函数解除阻塞，会对互斥锁加锁!!</strong></li>
+<li>pthread_cond_timedwait() 阻塞一定的时间</li>
+<li>唤醒至少一个阻塞在条件变量上的线程<br>pthread_cond_signal(pthread_cond_t *cond)</li>
+<li>唤醒全部阻塞在条件变量上的线程<br>pthread_cond_broadcast()</li>
+</ul>
+<h3 id="信号量（信号灯）高级的互斥锁"><a href="#信号量（信号灯）高级的互斥锁" class="headerlink" title=" 信号量（信号灯）高级的互斥锁"></a><span id="head84"> 信号量（信号灯）高级的互斥锁</span></h3><h4 id="头文件"><a href="#头文件" class="headerlink" title=" 头文件"></a><span id="head85"> 头文件</span></h4><p>semaphore.h</p>
+<h4 id="信号量类型"><a href="#信号量类型" class="headerlink" title=" 信号量类型"></a><span id="head86"> 信号量类型</span></h4><p>sem_t sem;<br>加强版的互斥锁</p>
+<h4 id="主要函数-1"><a href="#主要函数-1" class="headerlink" title=" 主要函数"></a><span id="head87"> 主要函数</span></h4><ul>
+<li>初始化信号量</li>
+<li>sem_init(sem_t *sem, int pshared, unsigned int val);</li>
+<li>0 线程同步</li>
+<li>1 进程同步</li>
+<li>val 最多有几个线程操作共享数据</li>
+<li>销毁信号量:<br>sem_destroy(sem_t *sem)</li>
+<li>加锁:<br>sem_wait(sem_t *sem);<br>调用一次相当于对sem做了–操作<br>如果sem值为0， 线程会阻塞</li>
+<li>尝试加锁:<br>sem_trywait(sem_t *sem)<br>sem == 0 加锁失败，不阻塞，直接返回</li>
+<li>限时尝试加锁<br>sem_timedwait(sem_t *sem, ****)</li>
+<li>解锁<br>sem_post(sem_t *sem)</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/05/15/computer_science/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/" rel="prev" title="C预处理器">
+                  <i class="fa fa-angle-left"></i> C预处理器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/05/28/computer_science/linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="next" title="linux网络编程">
+                  linux网络编程 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2020 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">srcnn@cs</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">217k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"https://waline.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"libUrl":"https://unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/2020/05/26/computer_science/linux%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+
+</body>
+</html>
